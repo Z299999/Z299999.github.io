@@ -1,0 +1,35 @@
+# Site settings
+title: Z299999
+description: PhD Student @ UC San Diego
+author: shz
+email: your-email@example.com
+
+# Build settings
+theme: minima
+timezone: America/Los_Angeles
+
+# Optional: GitHub username for footer
+github_username: Z299999
+
+# Navigation: pages listed in header (order matters)
+header_pages:
+  - research.md
+  - films.md
+  - writing.md
+  - life.md
+  - about.md
+
+# Permalink structure for posts
+permalink: /blog/:year/:month/:day/:title/
+
+# Exclude from build
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+# Minima theme settings
+minima:
+  social_links:
+    - { platform: github, user_url: "https://github.com/Z299999" }

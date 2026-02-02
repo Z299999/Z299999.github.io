@@ -1,0 +1,55 @@
+/* Custom CSS for Z299999.github.io */
+/* Overrides and extensions for minima theme */
+
+/* Typography adjustments */
+.page-content {
+  line-height: 1.7;
+}
+
+/* Navigation tweaks */
+.site-nav .page-link {
+  margin-left: 1.5rem;
+}
+
+/* Film and publication items */
+.film-item,
+.publication {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.film-item:last-child,
+.publication:last-child {
+  border-bottom: none;
+}
+
+/* Post list styling */
+.post-list li {
+  margin-bottom: 1rem;
+}
+
+/* Back links */
+a[href^="/"][href$="/"] {
+  font-size: 0.9rem;
+}
+
+/* Responsive images */
+.page-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Code blocks */
+pre,
+code {
+  font-size: 0.9rem;
+}
+
+/* Utility classes */
+.text-muted {
+  color: #828282;
+}
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
