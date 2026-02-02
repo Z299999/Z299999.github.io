@@ -14,6 +14,19 @@ My research focuses on *[your research area]*. Below you'll find my ongoing work
 2. **Topic Two** — Brief description
 3. **Topic Three** — Brief description
 
+---
+
+## Projects
+
+### Eco-evolutionary Neural Ecosystem
+
+A computational framework for studying the emergence of complex behaviors through the co-evolution of neural agents and their environment.
+
+- [Project Overview](/research/eco-evo/) — Motivation, mechanisms, and status
+- [Interactive Demo](/research/eco-evo/demo.html) — Visualization interface (placeholder)
+
+---
+
 ### Resources
 
 - [Research Notes](/research/notes/) — Working notes and thoughts

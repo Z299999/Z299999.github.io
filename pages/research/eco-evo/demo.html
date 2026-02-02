@@ -1,0 +1,138 @@
+---
+layout: null
+permalink: /research/eco-evo/demo.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eco-evolutionary Neural Ecosystem — Demo</title>
+
+  <!-- Local styles for this demo -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="demo-container">
+
+    <!-- Header -->
+    <header class="demo-header">
+      <h1>Eco-evolutionary Neural Ecosystem</h1>
+      <p class="demo-subtitle">Interactive Simulation Viewer</p>
+    </header>
+
+    <!-- Status Banner -->
+    <div class="status-banner">
+      <strong>Status:</strong> This demo is a placeholder.
+      The simulation has not been implemented yet.
+      The interface below shows the intended layout and controls.
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="demo-main">
+
+      <!-- Simulation Canvas -->
+      <section class="canvas-section">
+        <canvas id="simulation-canvas" width="800" height="600">
+          Your browser does not support the canvas element.
+        </canvas>
+
+        <!-- Placeholder overlay (will be removed when simulation is active) -->
+        <div class="canvas-placeholder">
+          <p>Simulation Canvas</p>
+          <p class="placeholder-note">Neural agents will appear here</p>
+        </div>
+      </section>
+
+      <!-- Controls Panel -->
+      <section class="controls-section">
+        <h2>Controls</h2>
+
+        <div class="control-group">
+          <h3>Simulation</h3>
+          <div class="button-row">
+            <button id="btn-play" class="control-btn" disabled>
+              ▶ Play
+            </button>
+            <button id="btn-pause" class="control-btn" disabled>
+              ⏸ Pause
+            </button>
+            <button id="btn-reset" class="control-btn" disabled>
+              ↺ Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Speed</h3>
+          <div class="slider-row">
+            <input type="range" id="speed-slider" min="1" max="10" value="5" disabled>
+            <span id="speed-value">5x</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Display</h3>
+          <div class="checkbox-row">
+            <label>
+              <input type="checkbox" id="show-energy" disabled> Show energy levels
+            </label>
+          </div>
+          <div class="checkbox-row">
+            <label>
+              <input type="checkbox" id="show-neural" disabled> Show neural activity
+            </label>
+          </div>
+          <div class="checkbox-row">
+            <label>
+              <input type="checkbox" id="show-trails" disabled> Show movement trails
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statistics Panel -->
+      <section class="stats-section">
+        <h2>Statistics</h2>
+
+        <div class="stat-item">
+          <span class="stat-label">Generation:</span>
+          <span class="stat-value" id="stat-generation">—</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Population:</span>
+          <span class="stat-value" id="stat-population">—</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Avg. Energy:</span>
+          <span class="stat-value" id="stat-energy">—</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Species Count:</span>
+          <span class="stat-value" id="stat-species">—</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Elapsed Time:</span>
+          <span class="stat-value" id="stat-time">—</span>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="demo-footer">
+      <a href="/research/eco-evo/">← Back to Project Overview</a>
+      <span class="footer-separator">|</span>
+      <a href="/research/">Research</a>
+    </footer>
+
+  </div>
+
+  <!-- Viewer JavaScript (stub) -->
+  <script src="viewer.js"></script>
+</body>
+</html>
