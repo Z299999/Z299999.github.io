@@ -1,2 +1,5 @@
-# Z299999.github.io
-Z299999's personal website
+title: Z299999
+description: PhD Student @ UC San Diego
+author: shz
+
+theme: minima
