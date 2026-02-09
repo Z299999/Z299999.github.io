@@ -10,9 +10,12 @@ My research focuses on *[your research area]*. Below you'll find my ongoing work
 
 ### Areas of Interest
 
-1. **Topic One** — Brief description
-2. **Topic Two** — Brief description
-3. **Topic Three** — Brief description
+1. **Topic One** — Partial Differential Equations
+2. **Topic Two** — Mathematical Biology
+3. **Topic Three** — Control and System Theory
+4. **Topic Four** — Deep Learning
+5. **Topic Five** — Network Theory
+
 
 ---
 

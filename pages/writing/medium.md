@@ -4,21 +4,17 @@ title: Medium
 permalink: /writing/medium/
 ---
 
-## Medium Articles
+## Medium
 
-I write essays and articles on Medium covering various topics.
+Read my essays on [Medium (@sh299999zhang)](https://medium.com/@sh299999zhang).
 
-### Profile
+### Articles
 
-Visit my Medium profile: [medium.com/@yourusername](https://medium.com/@yourusername)
+1. **[From Age-Structured Models to Artificial Life](https://medium.com/@sh299999zhang/from-age-structured-models-to-artificial-life-62ec6630b00c)** — How natural selection acts on neural networks · Feb 2026
 
-### Selected Articles
+2. **[Graph Theory Kindergarten](https://medium.com/@sh299999zhang/graph-theory-kindergarten-37f56253d174)** — A daydream about education · Oct 2025
 
-*Links to featured articles:*
-
-1. *Article Title One* — [Read on Medium](#)
-2. *Article Title Two* — [Read on Medium](#)
-3. *Article Title Three* — [Read on Medium](#)
+3. **[The Dumpling Dream of Oxford](https://medium.com/@sh299999zhang/the-dumpling-dream-of-oxford-5c7c6a9a41c7)** — Every food can be approximated by dumplings · Jun 2025
 
 ---
 
