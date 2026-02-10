@@ -12,8 +12,8 @@ Personal website for shz — PhD Student @ UC San Diego
 Z299999.github.io/
 ├── _config.yml                 # Jekyll configuration
 ├── _data/
-│   ├── films.yml               # Film project data
-│   └── publications.yml        # Publication data
+│   ├── films.yml               # (optional) film project data
+│   └── publications.yml        # (optional) publication data
 ├── _includes/
 │   └── custom-head.html        # Links custom CSS (minima hook)
 ├── _posts/                     # Blog posts (date-prefixed .md files)
@@ -27,15 +27,12 @@ Z299999.github.io/
 │   │   └── van/                # Van life photos
 │   └── js/main.js              # JavaScript (optional)
 ├── pages/                      # Subpages (permalinks hide /pages/ in URL)
-│   ├── films/
-│   │   └── echoes.md           # → /films/echoes/
-│   ├── life/
-│   │   └── vanlife.md          # → /life/vanlife/
-│   ├── research/
-│   │   ├── notes.md            # → /research/notes/
-│   │   └── publications.md     # → /research/publications/
-│   └── writing/
-│       └── medium.md           # → /writing/medium/
+│   └── research/
+│       └── eco-evo/            # Eco-evolutionary Neural Ecosystem project
+│           ├── index.md        # → /research/eco-evo/
+│           ├── demo.html       # → /research/eco-evo/demo.html
+│           ├── style.css       # Demo styles
+│           └── viewer.js       # Demo logic
 ├── index.md                    # Home page
 ├── about.md                    # → /about/
 ├── research.md                 # → /research/
@@ -60,7 +57,7 @@ Z299999.github.io/
 
 ## How to Add Content
 
-### New Blog Post
+### New Blog Post (optional)
 Create a file in `_posts/` with format `YYYY-MM-DD-title.md`:
 ```yaml
 ---
@@ -73,35 +70,13 @@ tags: [optional, tags]
 Your content here...
 ```
 
-### New Subpage
-Create a file in `pages/<category>/your-page.md`:
-```yaml
----
-layout: page
-title: "Page Title"
-permalink: /category/your-page/
----
-Your content here...
-```
+### Eco-evo Demo Page
+The interactive eco-evolutionary neural ecosystem lives under `pages/research/eco-evo/`:
 
-### Add Publication
-Edit `_data/publications.yml`:
-```yaml
-- title: "Paper Title"
-  authors: "Author, A. & Author, B."
-  venue: "Conference Name"
-  year: 2024
-  link: "https://..."
-```
+- Edit project text in `pages/research/eco-evo/index.md`
+- Edit demo HTML / styles / JS in `demo.html`, `style.css`, and `viewer.js`
 
-### Add Film Project
-Edit `_data/films.yml`:
-```yaml
-- title: "Film Title"
-  logline: "One-line description"
-  status: "In Development"
-  link: "/films/your-film/"
-```
+All top-level sections (`research.md`, `films.md`, `writing.md`, `life.md`) are kept as simple, mostly static HTML pages; new subpages are only needed if you want additional project-specific sections like the eco-evo demo.
 
 ---
 

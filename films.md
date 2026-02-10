@@ -8,16 +8,8 @@ permalink: /films/
 
 I create documentary and creative films exploring themes of nature, identity, and human experience.
 
-### Current Projects
+### Selected Work
 
-{% for film in site.data.films %}
-<div class="film-item" style="margin-bottom: 1.5rem;">
-  <h4><a href="{{ film.link }}">{{ film.title }}</a></h4>
-  <p><em>{{ film.logline }}</em></p>
-  <p><strong>Status:</strong> {{ film.status }}</p>
-</div>
-{% endfor %}
+- **Echoes of the Mountains** — a documentary about the relationship between people and mountain landscapes (in development).
 
-### Archive
-
-*More projects coming soon.*
+More projects are in preparation and will be added here over time.
