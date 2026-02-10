@@ -9,12 +9,11 @@ permalink: /research/
 My research sits at the intersection of analysis, dynamical systems, and complex adaptive behaviour.
 
 ### Areas of Interest
-
-- Partial differential equations  
+ 
 - Mathematical biology  
 - Control and systems theory  
-- Deep learning and representation learning  
-- Network theory and complex systems  
+- Deep learning 
+- Network theory 
 
 ### Eco-evolutionary Neural Ecosystem
 
