@@ -1,6 +1,6 @@
-# Z299999.github.io
+# Personal website for Shuheng Zhang
 
-Personal website for shz — PhD Student @ UC San Diego
+Personal website for Shuheng Zhang — PhD Student @ UC San Diego
 
 **Live site:** [https://z299999.github.io](https://z299999.github.io)
 

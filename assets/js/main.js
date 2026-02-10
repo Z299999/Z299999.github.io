@@ -1,4 +1,4 @@
-// Main JavaScript for Z299999.github.io
+// Main JavaScript for Shuheng Zhang's site
 // Add custom functionality here
 
 document.addEventListener('DOMContentLoaded', function() {

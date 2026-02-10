@@ -11,7 +11,7 @@ I'm a PhD student at UC San Diego. My work spans research, filmmaking, and writi
 ### Contact
 
 - Email: [your-email@example.com](mailto:your-email@example.com)
-- GitHub: [Z299999](https://github.com/Z299999)
+- GitHub: [Shuheng Zhang](https://github.com/Z299999)
 
 ### Background
 
