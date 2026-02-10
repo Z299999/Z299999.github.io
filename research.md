@@ -17,9 +17,7 @@ My research sits at the intersection of analysis, dynamical systems, and complex
 
 #### *Eco-evolutionary Neural Ecosystem*
 
-A computational framework for studying the emergence of complex behaviours through the co-evolution of neural agents and their environment.
-
-- [Project overview](/research/eco-evo/)
+A computational framework for studying the emergence of complex behaviours through the co-evolution of neural agents and their environment.  
 - [Interactive demo](/research/eco-evo/demo.html)
 
 #### *Random Vortex Method for 2D Incompressible Flows*
