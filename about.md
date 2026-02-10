@@ -10,7 +10,7 @@ I'm a PhD student at UC San Diego. My work spans research, filmmaking, and writi
 
 ### Contact
 
-- Email: [your-email@example.com](mailto:your-email@example.com)
+- Email: [sh299999zhang@gmail.com](mailto:sh299999zhang@gmail.com)
 - GitHub: [Shuheng Zhang](https://github.com/Z299999)
 
 ### Background
