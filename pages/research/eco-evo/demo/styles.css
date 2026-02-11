@@ -185,8 +185,8 @@ html, body {
   border-radius: 1px;
 }
 
-.line-pos { background: #2e7d32; }
-.line-neg { background: #c62828; }
+.line-pos { background: #000000; }
+.line-neg { background: #b71c1c; }
 
 /* Center panel */
 #panel-center {

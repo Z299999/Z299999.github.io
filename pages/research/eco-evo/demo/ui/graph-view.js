@@ -10,8 +10,9 @@ const NODE_COLORS = {
   output: '#d94a4a'
 };
 
-// All edges are drawn in black on a light background for clarity.
-const EDGE_COLOR = '#000000';
+// Edge colours: positive / non-negative vs negative weights.
+const EDGE_POS_COLOR = '#000000';   // black
+const EDGE_NEG_COLOR = '#b71c1c';   // deep red
 const BRIDGE_BORDER_COLOR = '#ffd600';
 
 export class GraphView {
@@ -95,7 +96,7 @@ export class GraphView {
     outputs.sort(sortByIndex);
     internals.sort();
 
-    const spacing = 80;
+    const spacingY = 80;
     const positions = new Map();
 
     const assignColumn = (ids, x) => {
@@ -103,15 +104,32 @@ export class GraphView {
       if (n === 0) return;
       const offset = (n - 1) / 2;
       ids.forEach((id, idx) => {
-        const y = (idx - offset) * spacing;
+        const y = (idx - offset) * spacingY;
         positions.set(id, { x, y });
       });
     };
 
     // Logical coordinates; cy.fit() will scale them to viewport.
-    assignColumn(inputs, -200);   // left column
-    assignColumn(internals, 0);   // middle column
-    assignColumn(outputs, 200);   // right column
+    assignColumn(inputs, -250);   // left column for inputs
+    assignColumn(outputs, 250);   // right column for outputs
+
+    // Internal nodes are distributed in a compact grid in the middle,
+    // rather than forced into a single tall column.
+    const nInt = internals.length;
+    if (nInt > 0) {
+      const cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
+      const rows = Math.ceil(nInt / cols);
+      const spacingX = 140;
+      const offsetCol = (cols - 1) / 2;
+      const offsetRow = (rows - 1) / 2;
+      internals.forEach((id, idx) => {
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const x = (col - offsetCol) * spacingX;
+        const y = (row - offsetRow) * spacingY;
+        positions.set(id, { x, y });
+      });
+    }
 
     return positions;
   }
@@ -144,7 +162,7 @@ export class GraphView {
           id: eid,
           source: edge.src,
           target: edge.dst,
-          color: EDGE_COLOR,
+          color: edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR,
           thickness: Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2)
         }
       });
@@ -201,7 +219,7 @@ export class GraphView {
             id: eid,
             source: edge.src,
             target: edge.dst,
-            color: EDGE_COLOR,
+            color: edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR,
             thickness: Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2)
           }
         });
@@ -224,7 +242,7 @@ export class GraphView {
     for (const [eid, edge] of graph.edges) {
       const cyEdge = this.cy.getElementById(eid);
       if (cyEdge.length) {
-        cyEdge.data('color', EDGE_COLOR);
+        cyEdge.data('color', edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR);
         cyEdge.data('thickness', Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2));
       }
     }
