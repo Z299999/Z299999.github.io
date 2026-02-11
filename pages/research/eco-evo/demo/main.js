@@ -17,6 +17,9 @@ let t = 0;
 let playing = false;
 let lastBridged = new Set();
 let genesisM = 3; // track m used at last reset
+let mode = 'evolve'; // 'evolve' | 'test'
+let testStepIndex = 0;
+let currentTest = null; // { inputIndex, amplitude, steps }
 
 // --- UI components (initialized after DOM ready) ---
 let controls, graphView, chartView, outputView, stats;
@@ -50,6 +53,9 @@ function reset() {
   t = 0;
   lastBridged = new Set();
   outputHistory.length = 0;
+  mode = 'evolve';
+  testStepIndex = 0;
+  currentTest = null;
 
   graphView.rebuild(graph, lastBridged);
   chartView.update(graph.degreeHistogram());
@@ -59,8 +65,8 @@ function reset() {
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 }
 
-/** Run a single simulation step and update the UI. */
-function step() {
+/** Run a single eco-evo evolution step and update the UI. */
+function evolveStep() {
   if (!graph) return;
 
   // Use the m from genesis, not the current slider value
@@ -84,6 +90,72 @@ function step() {
   // Update degree chart every 10 steps
   if (t % 10 === 0) {
     chartView.update(graph.degreeHistogram());
+  }
+}
+
+/** One impulse-response test step with frozen graph (no evolution). */
+function impulseTestStep() {
+  if (!graph || !currentTest) return;
+
+  const { inputIndex, amplitude, steps } = currentTest;
+  if (testStepIndex >= steps) {
+    // Auto-stop test playback but stay in test mode until user ends it.
+    playing = false;
+    document.getElementById('btn-play').textContent = 'Play';
+    return;
+  }
+
+  // 1) Set input activations: impulse at k=0 on channel inputIndex, else 0.
+  for (let i = 0; i < genesisM; i++) {
+    const node = graph.nodes.get(`x_${i}`);
+    if (!node) continue;
+    if (i === inputIndex && testStepIndex === 0) {
+      node.activation = amplitude;
+    } else {
+      node.activation = 0;
+    }
+  }
+
+  // 2) Forward pass for non-input nodes (same order as simulationStep).
+  const order = graph.getForwardOrder();
+  for (const nodeId of order) {
+    const node = graph.nodes.get(nodeId);
+    if (!node || node.type === 'input') continue;
+
+    const inEdges = graph.adjIn.get(nodeId);
+    let z = 0;
+    if (inEdges) {
+      for (const eid of inEdges) {
+        const edge = graph.edges.get(eid);
+        if (!edge) continue;
+        const srcNode = graph.nodes.get(edge.src);
+        if (!srcNode) continue;
+        z += edge.w * srcNode.activation;
+      }
+    }
+    node.activation = Math.tanh(z);
+  }
+
+  // No bridging / weight updates / cleanup: graph structure is frozen.
+  lastBridged = new Set();
+
+  // Update view and statistics. Use local testStepIndex on the time axis.
+  graphView.update(graph, lastBridged);
+
+  const outputNorm = computeOutputNorm(graph);
+  outputHistory.push({ t: testStepIndex, norm: outputNorm });
+  outputView.update(outputHistory);
+  stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
+
+  testStepIndex++;
+}
+
+/** Dispatch a single step depending on mode. */
+function step() {
+  if (mode === 'test') {
+    impulseTestStep();
+  } else {
+    evolveStep();
   }
 }
 
@@ -154,6 +226,34 @@ function init() {
   document.getElementById('btn-reset').addEventListener('click', () => {
     pause();
     reset();
+  });
+
+  // Impulse test buttons
+  document.getElementById('btn-test-start').addEventListener('click', () => {
+    if (!graph) return;
+    pause();
+    // Reset activations to zero
+    for (const [, node] of graph.nodes) {
+      node.activation = 0;
+    }
+    outputHistory.length = 0;
+    outputView.update(outputHistory);
+    currentTest = controls.getTestParams();
+    testStepIndex = 0;
+    mode = 'test';
+  });
+
+  document.getElementById('btn-test-stop').addEventListener('click', () => {
+    pause();
+    mode = 'evolve';
+    currentTest = null;
+    testStepIndex = 0;
+    // Optionally reset activations back to zero after the test
+    if (graph) {
+      for (const [, node] of graph.nodes) {
+        node.activation = 0;
+      }
+    }
   });
 
   // Handle window resize

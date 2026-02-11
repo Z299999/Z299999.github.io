@@ -17,6 +17,8 @@
       <button id="btn-play" title="Play / Pause">Play</button>
       <button id="btn-step" title="Single step">Step</button>
       <button id="btn-reset" title="Reset simulation">Reset</button>
+      <button id="btn-test-start" title="Impulse response test">Start test</button>
+      <button id="btn-test-stop" title="End test and resume">End test</button>
     </div>
     <div class="toolbar-group toolbar-stats">
       <span>t = <strong id="stat-step">0</strong></span>
@@ -94,6 +96,22 @@
           K (bridge cooldown)
           <input type="range" id="param-K" min="0" max="50" value="10" step="1">
           <span id="param-K-val">10</span>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Impulse test (frozen graph)</legend>
+        <label>
+          Input index (i)
+          <input type="number" id="param-test-input" min="0" value="0" step="1">
+        </label>
+        <label>
+          Amplitude A
+          <input type="number" id="param-test-amp" min="0" value="1" step="0.1">
+        </label>
+        <label>
+          Test steps
+          <input type="number" id="param-test-steps" min="1" value="200" step="10">
         </label>
       </fieldset>
 

@@ -27,6 +27,11 @@ export class Controls {
     this.elSpeed = document.getElementById('param-speed');
     this.elSpeedVal = document.getElementById('param-speed-val');
 
+    // Impulse test params
+    this.elTestInput = document.getElementById('param-test-input');
+    this.elTestAmp = document.getElementById('param-test-amp');
+    this.elTestSteps = document.getElementById('param-test-steps');
+
     // Show live values next to sliders
     this._bindSliderDisplay(this.elMu, this.elMuVal);
     this._bindSliderDisplay(this.elPFlip, this.elPFlipVal);
@@ -70,5 +75,14 @@ export class Controls {
   /** Get speed in steps per second. */
   getSpeed() {
     return parseInt(this.elSpeed.value, 10);
+  }
+
+  /** Get impulse test parameters. */
+  getTestParams() {
+    return {
+      inputIndex: parseInt(this.elTestInput.value, 10) || 0,
+      amplitude: parseFloat(this.elTestAmp.value) || 1,
+      steps: parseInt(this.elTestSteps.value, 10) || 200
+    };
   }
 }
