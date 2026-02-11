@@ -174,6 +174,68 @@ function impulseTestStep() {
   testStepIndex++;
 }
 
+/** Run a full impulse-response experiment in test mode in one shot. */
+function runImpulseOnce() {
+  if (!graph) return;
+  if (mode !== 'test') return;
+
+  const params = controls.getTestParams();
+  const { inputIndex, amplitude, steps } = params;
+  currentTest = params;
+  testStepIndex = 0;
+
+  // Reset activations and history
+  for (const [, node] of graph.nodes) {
+    node.activation = 0;
+  }
+  outputHistory.length = 0;
+
+  for (let k = 0; k < steps; k++) {
+    // Inputs: impulse at k=0 on selected channel, otherwise 0.
+    for (let i = 0; i < genesisM; i++) {
+      const node = graph.nodes.get(`x_${i}`);
+      if (!node) continue;
+      if (i === inputIndex && k === 0) {
+        node.activation = amplitude;
+      } else {
+        node.activation = 0;
+      }
+    }
+
+    // Forward pass for non-input nodes.
+    const order = graph.getForwardOrder();
+    for (const nodeId of order) {
+      const node = graph.nodes.get(nodeId);
+      if (!node || node.type === 'input') continue;
+
+      const inEdges = graph.adjIn.get(nodeId);
+      let z = 0;
+      if (inEdges) {
+        for (const eid of inEdges) {
+          const edge = graph.edges.get(eid);
+          if (!edge) continue;
+          const srcNode = graph.nodes.get(edge.src);
+          if (!srcNode) continue;
+          z += edge.w * srcNode.activation;
+        }
+      }
+      node.activation = Math.tanh(z);
+    }
+
+    const outputNorm = computeOutputNorm(graph);
+    outputHistory.push({ t: k, norm: outputNorm });
+  }
+
+  // Final view/state corresponds to the last step.
+  lastBridged = new Set();
+  graphView.update(graph, lastBridged);
+  outputView.update(outputHistory);
+  const finalNorm = outputHistory.length
+    ? outputHistory[outputHistory.length - 1].norm
+    : computeOutputNorm(graph);
+  stats.update(t, graph.nodeCount, graph.edgeCount, finalNorm);
+}
+
 /** Dispatch a single step depending on mode. */
 function step() {
   if (mode === 'test') {
@@ -287,6 +349,11 @@ function init() {
     } else {
       startImpulseTest();
     }
+  });
+
+  // Inject impulse once in test mode
+  document.getElementById('btn-test-inject').addEventListener('click', () => {
+    runImpulseOnce();
   });
 
   // Handle window resize
