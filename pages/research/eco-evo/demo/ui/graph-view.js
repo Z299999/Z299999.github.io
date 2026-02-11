@@ -56,8 +56,8 @@ export class GraphView {
           }
         }
       ],
-      // We use explicit positions (preset layout) so that
-      // inputs stay on the left and outputs on the right.
+      // We use explicit positions (preset layout) with a simple
+      // square grid arrangement for all nodes.
       layout: { name: 'preset' },
       minZoom: 0.2,
       maxZoom: 5,
@@ -66,125 +66,55 @@ export class GraphView {
   }
 
   /**
-   * Compute deterministic positions so that:
-   *  - input nodes form a vertical column on the left
-   *  - output nodes form a vertical column on the right
-   *  - internal nodes are arranged on a regular grid inside the
-   *    square region between the two columns (side length equal
-   *    to the x-distance between input and output columns).
+   * Compute deterministic positions for all nodes on a simple
+   * square grid, independent of node type.
    */
   _computePositions(graph) {
-    const inputs = [];
-    const internals = [];
-    const outputs = [];
-
-    for (const [id, node] of graph.nodes) {
-      if (node.type === 'input') inputs.push(id);
-      else if (node.type === 'output') outputs.push(id);
-      else internals.push(id);
+    const ids = [];
+    for (const [id] of graph.nodes) {
+      ids.push(id);
     }
 
-    // Sort ids to keep a stable ordering
-    const sortByIndex = (a, b) => {
-      const parse = id => {
-        const m = id.match(/(\d+)$/);
-        return m ? parseInt(m[1], 10) : 0;
-      };
-      return parse(a) - parse(b);
-    };
-    inputs.sort(sortByIndex);
-    outputs.sort(sortByIndex);
-    internals.sort();
+    // Sort ids to keep a stable, deterministic ordering.
+    ids.sort();
 
-    const spacingY = 60;
+    const n = ids.length;
     const positions = new Map();
 
-    const assignColumn = (ids, x) => {
-      const n = ids.length;
-      if (n === 0) return;
-      const offset = (n - 1) / 2;
-      ids.forEach((id, idx) => {
-        const y = (idx - offset) * spacingY;
-        positions.set(id, { x, y });
-      });
-    };
-
-    // Logical coordinates; cy.fit() will scale them to viewport.
-    // Keep input/output columns at fixed positions; only the
-    // internal grid adapts within the central square strictly
-    // between the two columns.
-    const nInt = internals.length;
-    const xLeft = -250;
-    const xRight = 250;
-    assignColumn(inputs, xLeft);    // left column for inputs
-    assignColumn(outputs, xRight);  // right column for outputs
-
-    // Internal nodes are distributed on a grid strictly between
-    // xLeft and xRight. The grid is roughly square, with a minimum
-    // spacing for readability.
-    if (nInt > 0) {
-      // Inner horizontal region reserved for internal nodes only.
-      const innerMargin = 40;
-      const innerLeft = xLeft + innerMargin;
-      const innerRight = xRight - innerMargin;
-      const side = innerRight - innerLeft;
-
-      // Minimum spacing shrinks compared to the original version
-      // so that dense graphs use a tighter grid.
-      const minSpacing = 25;
-      let cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
-      let rows = Math.ceil(nInt / cols);
-
-      let spacingX = side / (cols + 1);
-      if (spacingX < minSpacing) {
-        cols = Math.max(1, Math.floor(side / minSpacing));
-        rows = Math.ceil(nInt / cols);
-        spacingX = side / (cols + 1);
-      }
-      let spacingGridY = side / (rows + 1);
-      if (spacingGridY < minSpacing) {
-        rows = Math.max(1, Math.floor(side / minSpacing));
-        cols = Math.ceil(nInt / rows);
-        spacingGridY = side / (rows + 1);
-      }
-
-      internals.forEach((id, idx) => {
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        const x = innerLeft + (col + 1) * spacingX;
-        const y = -side / 2 + (row + 1) * spacingGridY;
-        positions.set(id, { x, y });
-      });
+    if (n === 0) {
+      return positions;
     }
 
-    // Also return a recommended size for internal nodes so the caller
-    // can shrink them when there are many.
-    const baseSize = 28;
-    const minSize = 10;
-    const N0 = 100;
-    const internalSize =
-      nInt > 0
-        ? Math.max(minSize, baseSize * Math.sqrt(N0 / (nInt + N0)))
-        : baseSize;
+    // Arrange nodes on a roughly square grid centred around (0, 0).
+    const cols = Math.ceil(Math.sqrt(n));
+    const rows = Math.ceil(n / cols);
+    const spacing = 60;
+    const width = (cols - 1) * spacing;
+    const height = (rows - 1) * spacing;
 
-    return { positions, internalSize, xLeft, xRight };
+    ids.forEach((id, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const x = col * spacing - width / 2;
+      const y = row * spacing - height / 2;
+      positions.set(id, { x, y });
+    });
+
+    return positions;
   }
 
   /** Full rebuild of the cytoscape graph from simulation graph. */
   rebuild(graph, bridgedSet) {
     this.cy.elements().remove();
 
-    const { positions, internalSize } = this._computePositions(graph);
+    const positions = this._computePositions(graph);
     const elements = [];
 
     // Add nodes
     for (const [id, node] of graph.nodes) {
-      const size = node.type === 'internal' ? internalSize : 28;
-      const fontSize =
-        node.type === 'internal'
-          ? Math.max(6, Math.round(size * 0.45))
-          : 10;
-      const textOutlineWidth = fontSize >= 10 ? 1 : 0.5;
+      const size = 28;
+      const fontSize = 10;
+      const textOutlineWidth = 1;
       elements.push({
         group: 'nodes',
         data: {
@@ -229,8 +159,8 @@ export class GraphView {
     const graphNodeIds = new Set(graph.nodes.keys());
     const graphEdgeIds = new Set(graph.edges.keys());
 
-    // Recompute desired positions and internal node size
-    const { positions, internalSize } = this._computePositions(graph);
+    // Recompute desired positions on the square grid
+    const positions = this._computePositions(graph);
 
     // Remove nodes/edges no longer in graph
     this.cy.nodes().forEach(n => {
@@ -244,12 +174,9 @@ export class GraphView {
     const newElements = [];
     for (const [id, node] of graph.nodes) {
       if (!cyNodeIds.has(id)) {
-        const size = node.type === 'internal' ? internalSize : 28;
-        const fontSize =
-          node.type === 'internal'
-            ? Math.max(6, Math.round(size * 0.45))
-            : 10;
-        const textOutlineWidth = fontSize >= 10 ? 1 : 0.5;
+        const size = 28;
+        const fontSize = 10;
+        const textOutlineWidth = 1;
         newElements.push({
           group: 'nodes',
           data: {
@@ -291,18 +218,12 @@ export class GraphView {
       const cyNode = this.cy.getElementById(id);
       if (cyNode.length) {
         cyNode.position(pos);
-        const node = graph.nodes.get(id);
-        if (node) {
-          const size = node.type === 'internal' ? internalSize : 28;
-          const fontSize =
-            node.type === 'internal'
-              ? Math.max(6, Math.round(size * 0.45))
-              : 10;
-          const textOutlineWidth = fontSize >= 10 ? 1 : 0.5;
-          cyNode.data('size', size);
-          cyNode.data('fontSize', fontSize);
-          cyNode.data('textOutlineWidth', textOutlineWidth);
-        }
+        const size = 28;
+        const fontSize = 10;
+        const textOutlineWidth = 1;
+        cyNode.data('size', size);
+        cyNode.data('fontSize', fontSize);
+        cyNode.data('textOutlineWidth', textOutlineWidth);
       }
     }
 
