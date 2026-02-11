@@ -131,18 +131,28 @@ export class GraphView {
       const innerMargin = 60;
       const innerLeft = xInput + innerMargin;
       const innerRight = xOutput - innerMargin;
-      const side = Math.max(200, innerRight - innerLeft); // ensure a minimal square
+      const maxSide = innerRight - innerLeft;
+      const minSide = 120; // keep small clusters visually compact
 
       const cols = Math.ceil(Math.sqrt(nInt));
       const rows = Math.ceil(nInt / cols);
-      const spacing = side / Math.max(cols - 1, 1);
+
+      // Try to keep roughly 60px between neighbours; shrink/grow
+      // the central square depending on how many z nodes we have.
+      const targetSpacing = 60;
+      const neededWidth = (cols - 1) * targetSpacing;
+      const neededHeight = (rows - 1) * targetSpacing;
+      let side = Math.max(minSide, Math.max(neededWidth, neededHeight));
+      side = Math.min(side, maxSide);
+
+      const spacing = cols > 1 ? side / (cols - 1) : 0;
       const width = (cols - 1) * spacing;
-      const height = (rows - 1) * spacing;
+      const height = rows > 1 ? (rows - 1) * spacing : 0;
 
       internals.forEach((id, idx) => {
         const col = idx % cols;
         const row = Math.floor(idx / cols);
-        const x = innerLeft + col * spacing;
+        const x = innerLeft + (maxSide - side) / 2 + col * spacing;
         const y = row * spacing - height / 2;
         positions.set(id, { x, y });
       });
