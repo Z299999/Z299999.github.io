@@ -7,12 +7,13 @@
 }
 
 :root {
-  --bg: #1a1a2e;
-  --surface: #16213e;
-  --border: #0f3460;
-  --text: #e0e0e0;
-  --accent: #4a90d9;
-  --accent-dim: #2d5a8a;
+  /* Light theme */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --border: #dddddd;
+  --text: #222222;
+  --accent: #0b63ce;
+  --accent-dim: #2f7fe0;
 }
 
 html, body {
@@ -55,16 +56,17 @@ html, body {
   padding: 5px 14px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--accent-dim);
-  color: #fff;
+  background: var(--accent);
+  color: #ffffff;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 #toolbar button:hover {
-  background: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 #toolbar label {
@@ -106,11 +108,12 @@ html, body {
   border-radius: 4px;
   padding: 10px;
   margin-bottom: 12px;
+  background: #fafafa;
 }
 
 #panel-left fieldset legend {
   font-size: 11px;
-  color: #aaa;
+  color: #777777;
   padding: 0 4px;
 }
 
@@ -128,7 +131,7 @@ html, body {
   padding: 4px 6px;
   border: 1px solid var(--border);
   border-radius: 3px;
-  background: var(--bg);
+  background: #ffffff;
   color: var(--text);
   font-size: 12px;
 }
@@ -143,11 +146,12 @@ html, body {
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
+  background: #fafafa;
 }
 
 .legend-box h4 {
   font-size: 11px;
-  color: #aaa;
+  color: #777777;
   margin-bottom: 6px;
 }
 
@@ -227,10 +231,10 @@ html, body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: #f3f3f3;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: #cccccc;
   border-radius: 3px;
 }

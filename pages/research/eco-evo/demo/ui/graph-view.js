@@ -10,8 +10,8 @@ const NODE_COLORS = {
   output: '#d94a4a'
 };
 
-const EDGE_POS_COLOR = '#2e7d32';
-const EDGE_NEG_COLOR = '#c62828';
+// All edges are drawn in black on a light background for clarity.
+const EDGE_COLOR = '#000000';
 const BRIDGE_BORDER_COLOR = '#ffd600';
 
 export class GraphView {
@@ -90,7 +90,7 @@ export class GraphView {
           id: eid,
           source: edge.src,
           target: edge.dst,
-          color: edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR,
+          color: EDGE_COLOR,
           thickness: Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2)
         }
       });
@@ -143,7 +143,7 @@ export class GraphView {
             id: eid,
             source: edge.src,
             target: edge.dst,
-            color: edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR,
+            color: EDGE_COLOR,
             thickness: Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2)
           }
         });
@@ -158,7 +158,7 @@ export class GraphView {
     for (const [eid, edge] of graph.edges) {
       const cyEdge = this.cy.getElementById(eid);
       if (cyEdge.length) {
-        cyEdge.data('color', edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR);
+        cyEdge.data('color', EDGE_COLOR);
         cyEdge.data('thickness', Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2));
       }
     }
