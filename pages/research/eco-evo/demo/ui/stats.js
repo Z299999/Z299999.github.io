@@ -15,7 +15,14 @@ export class Stats {
     this.elNodes.textContent = nodeCount;
     this.elEdges.textContent = edgeCount;
     if (this.elOutputNorm != null && outputNorm != null) {
-      this.elOutputNorm.textContent = outputNorm.toFixed(3);
+      // Show small values more clearly; avoid everything looking like 0.
+      if (Math.abs(outputNorm) < 1e-6) {
+        this.elOutputNorm.textContent = '0';
+      } else if (Math.abs(outputNorm) < 1e-2) {
+        this.elOutputNorm.textContent = outputNorm.toExponential(2);
+      } else {
+        this.elOutputNorm.textContent = outputNorm.toFixed(4);
+      }
     }
   }
 }
