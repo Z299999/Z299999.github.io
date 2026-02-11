@@ -9,7 +9,7 @@ import { getInputValue } from './input.js';
 const EPS_DEFAULT = 1e-3;   // default near-zero threshold
 
 // Bridge-specific constant: sqrt(2) / 2, used for the canonical 2-cycle
-// and the x_i -> z1 fan-in weight.
+// and the xi -> z1 fan-in weight.
 const BRIDGE_BASE = Math.SQRT1_2;
 
 /** Standard normal via Box-Muller transform. */
@@ -48,7 +48,7 @@ export function simulationStep(graph, t, params) {
 
   // 1) Set input node activations
   for (let i = 0; i < m; i++) {
-    const node = graph.nodes.get(`x_${i}`);
+    const node = graph.nodes.get(`x${i}`);
     if (node) {
       node.activation = getInputValue(inputSource, i, t);
     }
@@ -94,10 +94,10 @@ export function simulationStep(graph, t, params) {
   //   - Create two new internal nodes z1, z2
   //   - Add a canonical 2-cycle: z1 -> z2 = sqrt(2)/2, z2 -> z1 = sqrt(2)/2
   //   - Halve all incoming weights into z0: 2 w_i -> w_i (implemented as w_i /= 2)
-  //   - For each incoming edge x_i -> z0 (now weight w_i), add x_i -> z1 with
+  //   - For each incoming edge xi -> z0 (now weight w_i), add xi -> z1 with
   //     weight (sqrt(2)/2) * w_i
-  //   - For each outgoing edge z0 -> y_j with weight v_j, add a parallel edge
-  //     z2 -> y_j with the same weight v_j (keeping the original z0 -> y_j)
+  //   - For each outgoing edge z0 -> yj with weight v_j, add a parallel edge
+  //     z2 -> yj with the same weight v_j (keeping the original z0 -> yj)
   //   - Add stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
   for (const nodeId of triggered) {
     const z0 = graph.nodes.get(nodeId);
@@ -122,7 +122,7 @@ export function simulationStep(graph, t, params) {
       ? Array.from(graph.adjOut.get(nodeId))
       : [];
 
-    // Incoming edges: 2 w_i -> w_i, and add x_i -> z1 with (sqrt(2)/2) * w_i
+    // Incoming edges: 2 w_i -> w_i, and add xi -> z1 with (sqrt(2)/2) * w_i
     for (const eid of inEdges) {
       const edge = graph.edges.get(eid);
       if (!edge || edge.dst !== nodeId) continue;

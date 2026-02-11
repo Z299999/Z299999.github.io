@@ -18,10 +18,10 @@ export class Graph {
   static genesis(m, n) {
     const g = new Graph();
 
-    // Input nodes x_0, ..., x_{m-1}
+    // Input nodes x0, ..., x{m-1}
     const inputs = [];
     for (let i = 0; i < m; i++) {
-      const id = `x_${i}`;
+      const id = `x${i}`;
       g.addNode(id, 'input');
       inputs.push(id);
     }
@@ -29,21 +29,21 @@ export class Graph {
     // Central node z0
     g.addNode('z0', 'internal');
 
-    // Output nodes y_0, ..., y_{n-1}
+    // Output nodes y0, ..., y{n-1}
     const outputs = [];
     for (let j = 0; j < n; j++) {
-      const id = `y_${j}`;
+      const id = `y${j}`;
       g.addNode(id, 'output');
       outputs.push(id);
     }
 
-    // Edges: x_i -> z0 with weight 1/m
+    // Edges: xi -> z0 with weight 1/m
     const wIn = 1 / m;
     for (const inId of inputs) {
       g.addEdge(inId, 'z0', wIn);
     }
 
-    // Edges: z0 -> y_j with weight 1
+    // Edges: z0 -> yj with weight 1
     for (const outId of outputs) {
       g.addEdge('z0', outId, 1);
     }

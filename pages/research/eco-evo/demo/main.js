@@ -43,6 +43,7 @@ function computeOutputNorm(graph) {
 
 // History of output norms for plotting: [{ t, norm }, ...]
 const outputHistory = [];
+let recordOutput = true; // controls whether we record and plot ‖y(t)‖₂
 
 function updateModeUI() {
   const runtimeFs = document.getElementById('fieldset-runtime');
@@ -107,8 +108,10 @@ function evolveStep() {
 
   // Update stats every step
   const outputNorm = computeOutputNorm(graph);
-  outputHistory.push({ t, norm: outputNorm });
-  outputView.update(outputHistory);
+  if (recordOutput) {
+    outputHistory.push({ t, norm: outputNorm });
+    outputView.update(outputHistory);
+  }
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 
   // Update degree chart every 10 steps
@@ -131,7 +134,7 @@ function impulseTestStep() {
 
   // 1) Set input activations: impulse at k=0 on channel inputIndex, else 0.
   for (let i = 0; i < genesisM; i++) {
-    const node = graph.nodes.get(`x_${i}`);
+    const node = graph.nodes.get(`x${i}`);
     if (!node) continue;
     if (i === inputIndex && testStepIndex === 0) {
       node.activation = amplitude;
@@ -167,8 +170,10 @@ function impulseTestStep() {
   graphView.update(graph, lastBridged);
 
   const outputNorm = computeOutputNorm(graph);
-  outputHistory.push({ t: testStepIndex, norm: outputNorm });
-  outputView.update(outputHistory);
+  if (recordOutput) {
+    outputHistory.push({ t: testStepIndex, norm: outputNorm });
+    outputView.update(outputHistory);
+  }
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 
   testStepIndex++;
@@ -188,12 +193,14 @@ function runImpulseOnce() {
   for (const [, node] of graph.nodes) {
     node.activation = 0;
   }
-  outputHistory.length = 0;
+  if (recordOutput) {
+    outputHistory.length = 0;
+  }
 
   for (let k = 0; k < steps; k++) {
     // Inputs: impulse at k=0 on selected channel, otherwise 0.
     for (let i = 0; i < genesisM; i++) {
-      const node = graph.nodes.get(`x_${i}`);
+      const node = graph.nodes.get(`x${i}`);
       if (!node) continue;
       if (i === inputIndex && k === 0) {
         node.activation = amplitude;
@@ -223,16 +230,21 @@ function runImpulseOnce() {
     }
 
     const outputNorm = computeOutputNorm(graph);
-    outputHistory.push({ t: k, norm: outputNorm });
+    if (recordOutput) {
+      outputHistory.push({ t: k, norm: outputNorm });
+    }
   }
 
   // Final view/state corresponds to the last step.
   lastBridged = new Set();
   graphView.update(graph, lastBridged);
-  outputView.update(outputHistory);
-  const finalNorm = outputHistory.length
-    ? outputHistory[outputHistory.length - 1].norm
-    : computeOutputNorm(graph);
+  const finalNorm =
+    recordOutput && outputHistory.length
+      ? outputHistory[outputHistory.length - 1].norm
+      : computeOutputNorm(graph);
+  if (recordOutput) {
+    outputView.update(outputHistory);
+  }
   stats.update(t, graph.nodeCount, graph.edgeCount, finalNorm);
 }
 
@@ -302,8 +314,10 @@ function startImpulseTest() {
   for (const [, node] of graph.nodes) {
     node.activation = 0;
   }
-  outputHistory.length = 0;
-  outputView.update(outputHistory);
+  if (recordOutput) {
+    outputHistory.length = 0;
+    outputView.update(outputHistory);
+  }
   currentTest = controls.getTestParams();
   testStepIndex = 0;
   mode = 'test';
@@ -354,6 +368,11 @@ function init() {
   // Inject impulse once in test mode
   document.getElementById('btn-test-inject').addEventListener('click', () => {
     runImpulseOnce();
+  });
+
+  // Stop recording output signal plot
+  document.getElementById('btn-test-stop-recording').addEventListener('click', () => {
+    recordOutput = false;
   });
 
   // Handle window resize

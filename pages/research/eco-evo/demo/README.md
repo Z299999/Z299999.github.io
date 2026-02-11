@@ -63,12 +63,12 @@ These are currently not exposed in the UI:
 
 Each call to `step()` executes in this exact order:
 
-1. **Set input activations** — `a[x_i] = x_i(t)` from the selected input generator
+1. **Set input activations** — `a[xi] = xi(t)` from the selected input generator
 2. **Forward pass** — For each non-input node in creation order:
    - `z_i = Σ(w_ji × a_j)` over all incoming edges
    - `a_i = tanh(z_i)`
 3. **Bridging trigger** — For internal nodes, mark those where `|a_i| > T_bridge` (with cooldown `K` steps)
-4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `x_i` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
+4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `xi` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
 5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)`
 6. **Near-zero event** — If `|w| < ε_zero`:
    - With probability `p_flip`: draw a new magnitude `u ~ Uniform(0, ε_zero)` and set  
@@ -81,7 +81,7 @@ At each step the UI also shows:
 
 - `‖y(t)‖₂` — the Euclidean norm of the current output vector, computed as  
   \[
-  \|y(t)\|_2 = \sqrt{\sum_j a_{y_j}(t)^2}.
+  \|y(t)\|_2 = \sqrt{\sum_j a_{yj}(t)^2}.
   \]
 - A small line chart of `‖y(t)‖₂` over time (window can be selected as last 50/100/500/1000/5000 steps or all steps).
 

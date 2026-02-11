@@ -24,7 +24,7 @@ export class GraphView {
           selector: 'node',
           style: {
             'label': 'data(id)',
-            'font-size': '10px',
+            'font-size': 'data(fontSize)',
             'text-valign': 'center',
             'text-halign': 'center',
             'background-color': 'data(color)',
@@ -34,7 +34,7 @@ export class GraphView {
             'border-color': BRIDGE_BORDER_COLOR,
             'color': '#fff',
             'text-outline-color': '#333',
-            'text-outline-width': 1
+            'text-outline-width': 'data(textOutlineWidth)'
           }
         },
         {
@@ -87,7 +87,7 @@ export class GraphView {
     // Sort ids to keep a stable ordering
     const sortByIndex = (a, b) => {
       const parse = id => {
-        const m = id.match(/_(\d+)$/);
+        const m = id.match(/(\d+)$/);
         return m ? parseInt(m[1], 10) : 0;
       };
       return parse(a) - parse(b);
@@ -96,7 +96,7 @@ export class GraphView {
     outputs.sort(sortByIndex);
     internals.sort();
 
-    const spacingY = 80;
+    const spacingY = 60;
     const positions = new Map();
 
     const assignColumn = (ids, x) => {
@@ -124,12 +124,14 @@ export class GraphView {
     // spacing for readability.
     if (nInt > 0) {
       // Inner horizontal region reserved for internal nodes only.
-      const innerMargin = 60;
+      const innerMargin = 40;
       const innerLeft = xLeft + innerMargin;
       const innerRight = xRight - innerMargin;
       const side = innerRight - innerLeft;
 
-      const minSpacing = 40;
+      // Minimum spacing shrinks compared to the original version
+      // so that dense graphs use a tighter grid.
+      const minSpacing = 25;
       let cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
       let rows = Math.ceil(nInt / cols);
 
@@ -149,11 +151,8 @@ export class GraphView {
       internals.forEach((id, idx) => {
         const col = idx % cols;
         const row = Math.floor(idx / cols);
-        let x = innerLeft + (col + 1) * spacingX;
+        const x = innerLeft + (col + 1) * spacingX;
         const y = -side / 2 + (row + 1) * spacingGridY;
-        // Extra safety: clamp inside (xLeft, xRight)
-        if (x >= xRight) x = xRight - innerMargin * 0.5;
-        if (x <= xLeft) x = xLeft + innerMargin * 0.5;
         positions.set(id, { x, y });
       });
     }
@@ -181,12 +180,19 @@ export class GraphView {
     // Add nodes
     for (const [id, node] of graph.nodes) {
       const size = node.type === 'internal' ? internalSize : 28;
+      const fontSize =
+        node.type === 'internal'
+          ? Math.max(6, Math.round(size * 0.45))
+          : 10;
+      const textOutlineWidth = fontSize >= 10 ? 1 : 0.5;
       elements.push({
         group: 'nodes',
         data: {
           id,
           color: NODE_COLORS[node.type] || NODE_COLORS.internal,
-          size
+          size,
+          fontSize,
+          textOutlineWidth
         },
         position: positions.get(id),
         classes: bridgedSet.has(id) ? 'bridged' : ''
@@ -239,12 +245,19 @@ export class GraphView {
     for (const [id, node] of graph.nodes) {
       if (!cyNodeIds.has(id)) {
         const size = node.type === 'internal' ? internalSize : 28;
+        const fontSize =
+          node.type === 'internal'
+            ? Math.max(6, Math.round(size * 0.45))
+            : 10;
+        const textOutlineWidth = fontSize >= 10 ? 1 : 0.5;
         newElements.push({
           group: 'nodes',
           data: {
             id,
             color: NODE_COLORS[node.type] || NODE_COLORS.internal,
-            size
+            size,
+            fontSize,
+            textOutlineWidth
           },
           position: positions.get(id)
         });
@@ -281,7 +294,14 @@ export class GraphView {
         const node = graph.nodes.get(id);
         if (node) {
           const size = node.type === 'internal' ? internalSize : 28;
+          const fontSize =
+            node.type === 'internal'
+              ? Math.max(6, Math.round(size * 0.45))
+              : 10;
+          const textOutlineWidth = fontSize >= 10 ? 1 : 0.5;
           cyNode.data('size', size);
+          cyNode.data('fontSize', fontSize);
+          cyNode.data('textOutlineWidth', textOutlineWidth);
         }
       }
     }
