@@ -7,7 +7,6 @@ import { getInputValue } from './input.js';
 
 // Fixed constants that are not currently exposed in the UI
 const EPS_DEFAULT = 1e-3;   // default near-zero threshold
-const W_RESET = 1;  // magnitude after sign flip
 
 // Bridge-specific constant: sqrt(2) / 2, used for the canonical 2-cycle
 // and the x_i -> z1 fan-in weight.
@@ -158,7 +157,14 @@ export function simulationStep(graph, t, params) {
   for (const [eid, edge] of graph.edges) {
     if (Math.abs(edge.w) < epsZero) {
       if (Math.random() < pFlip) {
-        edge.w = -W_RESET;
+        // Flip sign but keep a small magnitude so that the
+        // network does not jump abruptly. Draw a new magnitude
+        // uniformly in (0, epsZero) and use the opposite sign
+        // of the current weight (falling back to a random sign
+        // if the current weight is numerically zero).
+        const oldSign = Math.sign(edge.w) || (Math.random() < 0.5 ? 1 : -1);
+        const mag = Math.random() * epsZero;
+        edge.w = -oldSign * mag;
       } else {
         edgesToRemove.push(eid);
       }

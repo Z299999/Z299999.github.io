@@ -71,7 +71,8 @@ Each call to `step()` executes in this exact order:
 4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `x_i` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
 5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)`
 6. **Near-zero event** — If `|w| < ε_zero`:
-   - With probability `p_flip`: set `w = -w_reset`
+   - With probability `p_flip`: draw a new magnitude `u ~ Uniform(0, ε_zero)` and set  
+     `w ← -sign(w) · u` (flip the sign but keep the weight small)
    - Otherwise: delete the edge
 7. **Node cleanup** — Remove any internal node with zero in-degree OR zero out-degree (and all incident edges)
 8. **Increment** — `t++`
