@@ -153,6 +153,38 @@ html, body {
   width: 100%;
 }
 
+#panel-left button {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 4px;
+  margin-top: 4px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+#panel-left button:hover {
+  background: var(--accent-dim);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+#panel-left button:disabled {
+  background: #cccccc;
+  color: #777777;
+  border-color: #dddddd;
+  cursor: default;
+  box-shadow: none;
+}
+
+#panel-left button:disabled:hover {
+  background: #cccccc;
+  box-shadow: none;
+}
+
 /* Legend box */
 .legend-box {
   margin-top: 12px;
