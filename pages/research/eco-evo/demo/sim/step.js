@@ -11,6 +11,12 @@ const EPS = 1e-3;
 const W_RESET = 1;
 const COOLDOWN_K = 10;
 
+// Bridge-specific constants
+// sqrt(2) / 2, used for the canonical 2-cycle and input fan-in
+const BRIDGE_BASE = Math.SQRT1_2;
+// Small stabilizing feedback weight epsilon > 0
+const BRIDGE_EPS = 0.05;
+
 /** Standard normal via Box-Muller transform. */
 function randn() {
   const u1 = Math.random();
@@ -68,20 +74,61 @@ export function simulationStep(graph, t, params) {
     }
   }
 
-  // 4) Bridging action: for each triggered node, add a bridge node
+  // 4) Bridging action (new bridge mechanism):
+  //
+  // For each triggered node z0:
+  //   - Create two new internal nodes z1, z2
+  //   - Add a canonical 2-cycle: z1 -> z2 = sqrt(2)/2, z2 -> z1 = sqrt(2)/2
+  //   - Halve all incoming weights into z0: 2 w_i -> w_i (implemented as w_i /= 2)
+  //   - For each incoming edge x_i -> z0 (now weight w_i), add x_i -> z1 with
+  //     weight (sqrt(2)/2) * w_i
+  //   - For each outgoing edge z0 -> y_j with weight v_j, add a parallel edge
+  //     z2 -> y_j with the same weight v_j (keeping the original z0 -> y_j)
+  //   - Add stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
   for (const nodeId of triggered) {
-    const node = graph.nodes.get(nodeId);
-    if (!node) continue;
-    node.lastBridge = t;
+    const z0 = graph.nodes.get(nodeId);
+    if (!z0) continue;
+    z0.lastBridge = t;
 
-    const bId = graph.newInternalId();
-    graph.addNode(bId, 'internal');
-    const s = Math.sign(node.activation) || 1;
+    // New internal nodes z1, z2
+    const z1Id = graph.newInternalId();
+    const z2Id = graph.newInternalId();
+    graph.addNode(z1Id, 'internal');
+    graph.addNode(z2Id, 'internal');
 
-    // i -> b_k
-    graph.addEdge(nodeId, bId, s * 1);
-    // b_k -> i
-    graph.addEdge(bId, nodeId, s * 1);
+    // Canonical 2-cycle between z1 and z2
+    graph.addEdge(z1Id, z2Id, BRIDGE_BASE);
+    graph.addEdge(z2Id, z1Id, BRIDGE_BASE);
+
+    // Snapshot of incoming and outgoing edges to z0 BEFORE we modify them
+    const inEdges = graph.adjIn.get(nodeId)
+      ? Array.from(graph.adjIn.get(nodeId))
+      : [];
+    const outEdges = graph.adjOut.get(nodeId)
+      ? Array.from(graph.adjOut.get(nodeId))
+      : [];
+
+    // Incoming edges: 2 w_i -> w_i, and add x_i -> z1 with (sqrt(2)/2) * w_i
+    for (const eid of inEdges) {
+      const edge = graph.edges.get(eid);
+      if (!edge || edge.dst !== nodeId) continue;
+      // Halve the existing weight
+      edge.w *= 0.5;
+      const w_i = edge.w;
+      const newWeight = BRIDGE_BASE * w_i;
+      graph.addEdge(edge.src, z1Id, newWeight);
+    }
+
+    // Outgoing edges: duplicate to z2 with the same weight v_j
+    for (const eid of outEdges) {
+      const edge = graph.edges.get(eid);
+      if (!edge || edge.src !== nodeId) continue;
+      graph.addEdge(z2Id, edge.dst, edge.w);
+    }
+
+    // Stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
+    graph.addEdge(z1Id, nodeId, -BRIDGE_EPS);
+    graph.addEdge(nodeId, z2Id, BRIDGE_EPS);
 
     events.bridged.push(nodeId);
   }
