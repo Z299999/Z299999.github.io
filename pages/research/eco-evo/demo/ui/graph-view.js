@@ -110,14 +110,14 @@ export class GraphView {
     };
 
     // Logical coordinates; cy.fit() will scale them to viewport.
-    // Horizontal span grows mildly with number of internal nodes
+    // Keep input/output columns at fixed positions; only the
+    // internal grid adapts within the central square.
     const nInt = internals.length;
-    const baseSide = 500;
-    const side = baseSide + (nInt > 0 ? Math.min(700, 3 * Math.sqrt(nInt)) : 0);
+    const side = 500; // fixed central square side length
     const halfSide = side / 2;
 
-    const xLeft = -halfSide;
-    const xRight = halfSide;
+    const xLeft = -250;
+    const xRight = 250;
     assignColumn(inputs, xLeft);    // left column for inputs
     assignColumn(outputs, xRight);  // right column for outputs
 
