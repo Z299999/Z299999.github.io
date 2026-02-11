@@ -111,20 +111,24 @@ export class GraphView {
 
     // Logical coordinates; cy.fit() will scale them to viewport.
     // Keep input/output columns at fixed positions; only the
-    // internal grid adapts within the central square.
+    // internal grid adapts within the central square strictly
+    // between the two columns.
     const nInt = internals.length;
-    const side = 500; // fixed central square side length
-    const halfSide = side / 2;
-
     const xLeft = -250;
     const xRight = 250;
     assignColumn(inputs, xLeft);    // left column for inputs
     assignColumn(outputs, xRight);  // right column for outputs
 
-    // Internal nodes are distributed on a grid inside the square
-    // between xLeft and xRight. The grid is roughly square, with
-    // a minimum spacing for readability.
+    // Internal nodes are distributed on a grid strictly between
+    // xLeft and xRight. The grid is roughly square, with a minimum
+    // spacing for readability.
     if (nInt > 0) {
+      // Inner horizontal region reserved for internal nodes only.
+      const innerMargin = 60;
+      const innerLeft = xLeft + innerMargin;
+      const innerRight = xRight - innerMargin;
+      const side = innerRight - innerLeft;
+
       const minSpacing = 40;
       let cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
       let rows = Math.ceil(nInt / cols);
@@ -145,8 +149,11 @@ export class GraphView {
       internals.forEach((id, idx) => {
         const col = idx % cols;
         const row = Math.floor(idx / cols);
-        const x = -halfSide + (col + 1) * spacingX;
-        const y = -halfSide + (row + 1) * spacingGridY;
+        let x = innerLeft + (col + 1) * spacingX;
+        const y = -side / 2 + (row + 1) * spacingGridY;
+        // Extra safety: clamp inside (xLeft, xRight)
+        if (x >= xRight) x = xRight - innerMargin * 0.5;
+        if (x <= xLeft) x = xLeft + innerMargin * 0.5;
         positions.set(id, { x, y });
       });
     }
