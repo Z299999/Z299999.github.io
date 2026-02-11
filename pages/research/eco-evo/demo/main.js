@@ -44,6 +44,23 @@ function computeOutputNorm(graph) {
 // History of output norms for plotting: [{ t, norm }, ...]
 const outputHistory = [];
 
+function updateModeUI() {
+  const runtimeFs = document.getElementById('fieldset-runtime');
+  const testFs = document.getElementById('fieldset-test');
+  const btnTest = document.getElementById('btn-test-toggle');
+  if (!runtimeFs || !testFs || !btnTest) return;
+
+  if (mode === 'test') {
+    runtimeFs.style.display = 'none';
+    testFs.style.display = '';
+    btnTest.textContent = 'End test';
+  } else {
+    runtimeFs.style.display = '';
+    testFs.style.display = 'none';
+    btnTest.textContent = 'Start test';
+  }
+}
+
 /** Initialize or re-initialize the simulation. */
 function reset() {
   const { m, n } = controls.getStartParams();
@@ -56,6 +73,7 @@ function reset() {
   mode = 'evolve';
   testStepIndex = 0;
   currentTest = null;
+  updateModeUI();
 
   graphView.rebuild(graph, lastBridged);
   chartView.update(graph.degreeHistogram());
@@ -209,6 +227,34 @@ function togglePlay() {
   else play();
 }
 
+function startImpulseTest() {
+  if (!graph) return;
+  pause();
+  // Reset activations to zero
+  for (const [, node] of graph.nodes) {
+    node.activation = 0;
+  }
+  outputHistory.length = 0;
+  outputView.update(outputHistory);
+  currentTest = controls.getTestParams();
+  testStepIndex = 0;
+  mode = 'test';
+  updateModeUI();
+}
+
+function endImpulseTest() {
+  pause();
+  mode = 'evolve';
+  currentTest = null;
+  testStepIndex = 0;
+  if (graph) {
+    for (const [, node] of graph.nodes) {
+      node.activation = 0;
+    }
+  }
+  updateModeUI();
+}
+
 // --- Initialize ---
 // ES modules are deferred, so the DOM is ready when this runs.
 function init() {
@@ -228,31 +274,12 @@ function init() {
     reset();
   });
 
-  // Impulse test buttons
-  document.getElementById('btn-test-start').addEventListener('click', () => {
-    if (!graph) return;
-    pause();
-    // Reset activations to zero
-    for (const [, node] of graph.nodes) {
-      node.activation = 0;
-    }
-    outputHistory.length = 0;
-    outputView.update(outputHistory);
-    currentTest = controls.getTestParams();
-    testStepIndex = 0;
-    mode = 'test';
-  });
-
-  document.getElementById('btn-test-stop').addEventListener('click', () => {
-    pause();
-    mode = 'evolve';
-    currentTest = null;
-    testStepIndex = 0;
-    // Optionally reset activations back to zero after the test
-    if (graph) {
-      for (const [, node] of graph.nodes) {
-        node.activation = 0;
-      }
+  // Impulse test toggle button
+  document.getElementById('btn-test-toggle').addEventListener('click', () => {
+    if (mode === 'test') {
+      endImpulseTest();
+    } else {
+      startImpulseTest();
     }
   });
 
@@ -261,6 +288,7 @@ function init() {
 
   // Initial reset
   reset();
+  updateModeUI();
 }
 
 if (document.readyState === 'loading') {

@@ -17,8 +17,7 @@
       <button id="btn-play" title="Play / Pause">Play</button>
       <button id="btn-step" title="Single step">Step</button>
       <button id="btn-reset" title="Reset simulation">Reset</button>
-      <button id="btn-test-start" title="Impulse response test">Start test</button>
-      <button id="btn-test-stop" title="End test and resume">End test</button>
+      <button id="btn-test-toggle" title="Impulse response test">Start test</button>
     </div>
     <div class="toolbar-group toolbar-stats">
       <span>t = <strong id="stat-step">0</strong></span>
@@ -60,7 +59,7 @@
         </label>
       </fieldset>
 
-      <fieldset>
+      <fieldset id="fieldset-runtime">
         <legend>Runtime</legend>
         <label>
           &mu; (drift)
@@ -99,7 +98,7 @@
         </label>
       </fieldset>
 
-      <fieldset>
+      <fieldset id="fieldset-test" style="display: none;">
         <legend>Impulse test (frozen graph)</legend>
         <label>
           Input index (i)
