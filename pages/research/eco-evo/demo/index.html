@@ -41,12 +41,10 @@
 
       <fieldset>
         <legend>Genesis (apply on Reset)</legend>
-        <label>
-          m (inputs)
+        <label class="inline-pair">
+          <span>m (inputs)</span>
           <input type="number" id="param-m" min="1" max="50" value="3">
-        </label>
-        <label>
-          n (outputs)
+          <span>n (outputs)</span>
           <input type="number" id="param-n" min="1" max="50" value="2">
         </label>
         <label>
@@ -55,6 +53,13 @@
             <option value="noise">Noise</option>
             <option value="constant">Constant (1)</option>
             <option value="sine">Sine</option>
+          </select>
+        </label>
+        <label>
+          Activation
+          <select id="param-activation">
+            <option value="tanh" selected>tanh</option>
+            <option value="relu">ReLU</option>
           </select>
         </label>
       </fieldset>

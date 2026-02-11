@@ -138,6 +138,20 @@ html, body {
   font-size: 12px;
 }
 
+.inline-pair {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-pair span {
+  white-space: nowrap;
+}
+
+.inline-pair input[type="number"] {
+  width: 50px;
+}
+
 #panel-left input[type="number"],
 #panel-left select {
   width: 100%;

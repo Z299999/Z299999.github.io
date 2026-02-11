@@ -23,7 +23,7 @@ function randn() {
  * Execute one simulation step.
  * @param {Graph} graph
  * @param {number} t - current step counter
- * @param {object} params - { mu, pFlip, tBridge, sigma, omega, epsilon, K, inputSource, m }
+ * @param {object} params - { mu, pFlip, tBridge, sigma, omega, epsilon, K, inputSource, m, activation }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
 export function simulationStep(graph, t, params) {
@@ -36,7 +36,8 @@ export function simulationStep(graph, t, params) {
     epsilon,
     K,
     inputSource,
-    m
+    m,
+    activation
   } = params;
 
   // Defaults if UI values are missing
@@ -53,6 +54,11 @@ export function simulationStep(graph, t, params) {
       node.activation = getInputValue(inputSource, i, t);
     }
   }
+
+  const actFn =
+    activation === 'relu'
+      ? (x) => (x > 0 ? x : 0)
+      : (x) => Math.tanh(x);
 
   // 2) Forward pass for non-input nodes (in creation order)
   const order = graph.getForwardOrder();
@@ -71,7 +77,7 @@ export function simulationStep(graph, t, params) {
         z += edge.w * srcNode.activation;
       }
     }
-    node.activation = Math.tanh(z);
+    node.activation = actFn(z);
   }
 
   // 3) Bridging trigger: mark nodes with |activation| > T_bridge.

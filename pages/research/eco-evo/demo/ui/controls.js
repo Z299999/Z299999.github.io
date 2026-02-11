@@ -8,6 +8,7 @@ export class Controls {
     this.elM = document.getElementById('param-m');
     this.elN = document.getElementById('param-n');
     this.elInputSource = document.getElementById('param-input-source');
+    this.elActivation = document.getElementById('param-activation');
 
     // Run-time params (apply immediately)
     this.elMu = document.getElementById('param-mu');
@@ -54,7 +55,8 @@ export class Controls {
     return {
       m: parseInt(this.elM.value, 10),
       n: parseInt(this.elN.value, 10),
-      inputSource: this.elInputSource.value
+      inputSource: this.elInputSource.value,
+      activation: this.elActivation?.value || 'tanh'
     };
   }
 

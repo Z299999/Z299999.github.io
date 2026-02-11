@@ -17,6 +17,7 @@ let t = 0;
 let playing = false;
 let lastBridged = new Set();
 let genesisM = 3; // track m used at last reset
+let activationKind = 'tanh';
 let mode = 'evolve'; // 'evolve' | 'test'
 let testStepIndex = 0;
 let currentTest = null; // { inputIndex, amplitude, steps }
@@ -115,9 +116,10 @@ function updateTestButtons() {
 
 /** Initialize or re-initialize the simulation. */
 function reset() {
-  const { m, n } = controls.getStartParams();
+  const { m, n, activation } = controls.getStartParams();
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
+  activationKind = activation === 'relu' ? 'relu' : 'tanh';
   graph = Graph.genesis(genesisM, safeN);
   recordOutput = true;
   t = 0;
@@ -141,7 +143,11 @@ function evolveStep() {
   if (!graph) return;
 
   // Use the m from genesis, not the current slider value
-  const runParams = { ...controls.getRunParams(), m: genesisM };
+  const runParams = {
+    ...controls.getRunParams(),
+    m: genesisM,
+    activation: activationKind
+  };
 
   const events = simulationStep(graph, t, runParams);
   t++;
@@ -192,6 +198,10 @@ function impulseTestStep() {
   }
 
   // 2) Forward pass for non-input nodes (same order as simulationStep).
+  const actFn =
+    activationKind === 'relu'
+      ? (x) => (x > 0 ? x : 0)
+      : (x) => Math.tanh(x);
   const order = graph.getForwardOrder();
   for (const nodeId of order) {
     const node = graph.nodes.get(nodeId);
@@ -208,7 +218,7 @@ function impulseTestStep() {
         z += edge.w * srcNode.activation;
       }
     }
-    node.activation = Math.tanh(z);
+    node.activation = actFn(z);
   }
 
   // No bridging / weight updates / cleanup: graph structure is frozen.
@@ -279,7 +289,7 @@ function runImpulseOnce() {
           z += edge.w * srcNode.activation;
         }
       }
-      node.activation = Math.tanh(z);
+      node.activation = actFn(z);
     }
 
     const outputNorm = computeOutputNorm(graph);
