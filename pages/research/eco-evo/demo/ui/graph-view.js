@@ -57,6 +57,8 @@ export class GraphView {
           }
         }
       ],
+      // We use explicit positions (preset layout) so that
+      // inputs stay on the left and outputs on the right.
       layout: { name: 'preset' },
       minZoom: 0.2,
       maxZoom: 5,
@@ -64,10 +66,61 @@ export class GraphView {
     });
   }
 
+  /**
+   * Compute deterministic positions so that:
+   *  - input nodes form a vertical column on the left
+   *  - output nodes form a vertical column on the right
+   *  - internal nodes are placed in a middle column
+   */
+  _computePositions(graph) {
+    const inputs = [];
+    const internals = [];
+    const outputs = [];
+
+    for (const [id, node] of graph.nodes) {
+      if (node.type === 'input') inputs.push(id);
+      else if (node.type === 'output') outputs.push(id);
+      else internals.push(id);
+    }
+
+    // Sort ids to keep a stable ordering
+    const sortByIndex = (a, b) => {
+      const parse = id => {
+        const m = id.match(/_(\d+)$/);
+        return m ? parseInt(m[1], 10) : 0;
+      };
+      return parse(a) - parse(b);
+    };
+    inputs.sort(sortByIndex);
+    outputs.sort(sortByIndex);
+    internals.sort();
+
+    const spacing = 80;
+    const positions = new Map();
+
+    const assignColumn = (ids, x) => {
+      const n = ids.length;
+      if (n === 0) return;
+      const offset = (n - 1) / 2;
+      ids.forEach((id, idx) => {
+        const y = (idx - offset) * spacing;
+        positions.set(id, { x, y });
+      });
+    };
+
+    // Logical coordinates; cy.fit() will scale them to viewport.
+    assignColumn(inputs, -200);   // left column
+    assignColumn(internals, 0);   // middle column
+    assignColumn(outputs, 200);   // right column
+
+    return positions;
+  }
+
   /** Full rebuild of the cytoscape graph from simulation graph. */
   rebuild(graph, bridgedSet) {
     this.cy.elements().remove();
 
+    const positions = this._computePositions(graph);
     const elements = [];
 
     // Add nodes
@@ -78,6 +131,7 @@ export class GraphView {
           id,
           color: NODE_COLORS[node.type] || NODE_COLORS.internal
         },
+        position: positions.get(id),
         classes: bridgedSet.has(id) ? 'bridged' : ''
       });
     }
@@ -97,7 +151,7 @@ export class GraphView {
     }
 
     this.cy.add(elements);
-    this._runLayout();
+    this.cy.fit();
   }
 
   /** Incremental update: sync node classes and edge styles without full rebuild. */
@@ -111,6 +165,9 @@ export class GraphView {
 
     const graphNodeIds = new Set(graph.nodes.keys());
     const graphEdgeIds = new Set(graph.edges.keys());
+
+    // Recompute desired positions for all nodes
+    const positions = this._computePositions(graph);
 
     // Remove nodes/edges no longer in graph
     this.cy.nodes().forEach(n => {
@@ -129,7 +186,8 @@ export class GraphView {
           data: {
             id,
             color: NODE_COLORS[node.type] || NODE_COLORS.internal
-          }
+          },
+          position: positions.get(id)
         });
       }
     }
@@ -154,6 +212,14 @@ export class GraphView {
       this.cy.add(newElements);
     }
 
+    // Update positions of all existing nodes to keep columns neat
+    for (const [id] of graph.nodes) {
+      const pos = positions.get(id);
+      if (!pos) continue;
+      const cyNode = this.cy.getElementById(id);
+      if (cyNode.length) cyNode.position(pos);
+    }
+
     // Update existing edge styles
     for (const [eid, edge] of graph.edges) {
       const cyEdge = this.cy.getElementById(eid);
@@ -172,25 +238,10 @@ export class GraphView {
       }
     });
 
-    // Layout only new nodes if any were added
+    // Keep the whole graph in view
     if (newElements.some(e => e.group === 'nodes')) {
-      this._runLayout();
+      this.cy.fit();
     }
-  }
-
-  _runLayout() {
-    this.cy.layout({
-      name: 'cose',
-      animate: false,
-      randomize: false,
-      nodeRepulsion: () => 8000,
-      idealEdgeLength: () => 60,
-      edgeElasticity: () => 100,
-      gravity: 0.5,
-      numIter: 100,
-      fit: true,
-      padding: 30
-    }).run();
   }
 
   resize() {
