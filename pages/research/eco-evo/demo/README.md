@@ -51,7 +51,7 @@ These are currently not exposed in the UI:
 
 | Name | Range | Description |
 |------|-------|-------------|
-| `μ` (mu) | `[0, 0.1]` | Deterministic drift term in weight update |
+| `μ` (mu) | `[-0.1, 0.1]` | Deterministic drift term in weight update (can be negative) |
 | `σ` (sigma) | `[0, 0.05]` | Weight noise standard deviation in `w += σ ξ + μ sign(w)` |
 | `p_flip` | `[0, 1]` | Probability of sign-flip when `|w| < ε` |
 | `T_bridge` | `[0, 1]` | Activation threshold for triggering bridges |
