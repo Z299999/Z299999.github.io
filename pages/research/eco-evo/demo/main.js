@@ -48,16 +48,22 @@ function updateModeUI() {
   const runtimeFs = document.getElementById('fieldset-runtime');
   const testFs = document.getElementById('fieldset-test');
   const btnTest = document.getElementById('btn-test-toggle');
-  if (!runtimeFs || !testFs || !btnTest) return;
+  const btnPlay = document.getElementById('btn-play');
+  const btnStep = document.getElementById('btn-step');
+  if (!runtimeFs || !testFs || !btnTest || !btnPlay || !btnStep) return;
 
   if (mode === 'test') {
     runtimeFs.style.display = 'none';
     testFs.style.display = '';
     btnTest.textContent = 'End test';
+    btnPlay.disabled = true;
+    btnStep.disabled = true;
   } else {
     runtimeFs.style.display = '';
     testFs.style.display = 'none';
     btnTest.textContent = 'Start test';
+    btnPlay.disabled = false;
+    btnStep.disabled = false;
   }
 }
 

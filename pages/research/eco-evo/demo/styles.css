@@ -69,6 +69,19 @@ html, body {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
+#toolbar button:disabled {
+  background: #cccccc;
+  color: #777777;
+  border-color: #dddddd;
+  cursor: default;
+  box-shadow: none;
+}
+
+#toolbar button:disabled:hover {
+  background: #cccccc;
+  box-shadow: none;
+}
+
 #toolbar label {
   display: flex;
   align-items: center;
