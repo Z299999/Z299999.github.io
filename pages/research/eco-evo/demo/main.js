@@ -199,7 +199,7 @@ function runImpulseOnce() {
   // tests within the same session can be concatenated on
   // the output plot instead of overwriting previous runs.
   const startT =
-    recordOutput && outputHistory.length
+    outputHistory.length
       ? outputHistory[outputHistory.length - 1].t + 1
       : 0;
 
@@ -236,21 +236,17 @@ function runImpulseOnce() {
     }
 
     const outputNorm = computeOutputNorm(graph);
-    if (recordOutput) {
-      outputHistory.push({ t: startT + k, norm: outputNorm });
-    }
+    outputHistory.push({ t: startT + k, norm: outputNorm });
   }
 
   // Final view/state corresponds to the last step.
   lastBridged = new Set();
   graphView.update(graph, lastBridged);
   const finalNorm =
-    recordOutput && outputHistory.length
+    outputHistory.length
       ? outputHistory[outputHistory.length - 1].norm
       : computeOutputNorm(graph);
-  if (recordOutput) {
-    outputView.update(outputHistory);
-  }
+  outputView.update(outputHistory);
   stats.update(t, graph.nodeCount, graph.edgeCount, finalNorm);
 }
 
