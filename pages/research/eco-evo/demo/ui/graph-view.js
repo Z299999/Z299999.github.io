@@ -71,7 +71,9 @@ export class GraphView {
    * Compute deterministic positions so that:
    *  - input nodes form a vertical column on the left
    *  - output nodes form a vertical column on the right
-   *  - internal nodes are arranged in a compact ring in the middle
+   *  - internal nodes are arranged on a regular grid inside the
+   *    square region between the two columns (side length equal
+   *    to the x-distance between input and output columns).
    */
   _computePositions(graph) {
     const inputs = [];
@@ -110,20 +112,31 @@ export class GraphView {
     };
 
     // Logical coordinates; cy.fit() will scale them to viewport.
-    assignColumn(inputs, -250);   // left column for inputs
-    assignColumn(outputs, 250);   // right column for outputs
+    const xLeft = -250;
+    const xRight = 250;
+    assignColumn(inputs, xLeft);    // left column for inputs
+    assignColumn(outputs, xRight);  // right column for outputs
 
-    // Internal nodes are distributed on a ring in the middle, which
-    // keeps the drawing compact even when there are many nodes.
+    // Internal nodes are distributed on a grid inside the square
+    // between xLeft and xRight, with side length equal to the
+    // distance between the two columns.
     const nInt = internals.length;
     if (nInt > 0) {
-      const baseRadius = 120;
-      const radius = baseRadius + Math.min(200, nInt * 2);
-      const flatten = 0.6; // make it more like an ellipse
+      const side = Math.abs(xRight - xLeft);
+      const half = side / 2;
+
+      // Choose grid dimensions roughly square.
+      const cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
+      const rows = Math.ceil(nInt / cols);
+
+      const spacingX = side / (cols + 1);
+      const spacingGridY = side / (rows + 1);
+
       internals.forEach((id, idx) => {
-        const angle = (2 * Math.PI * idx) / nInt;
-        const x = radius * Math.cos(angle);
-        const y = radius * Math.sin(angle) * flatten;
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const x = -half + (col + 1) * spacingX;
+        const y = -half + (row + 1) * spacingGridY;
         positions.set(id, { x, y });
       });
     }
