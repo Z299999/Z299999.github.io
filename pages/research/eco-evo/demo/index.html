@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eco-Evo Graph Simulation</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- CDN libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top toolbar -->
+  <header id="toolbar">
+    <div class="toolbar-group">
+      <button id="btn-play" title="Play / Pause">Play</button>
+      <button id="btn-step" title="Single step">Step</button>
+      <button id="btn-reset" title="Reset simulation">Reset</button>
+    </div>
+    <div class="toolbar-group toolbar-stats">
+      <span>t = <strong id="stat-step">0</strong></span>
+      <span>Nodes: <strong id="stat-nodes">0</strong></span>
+      <span>Edges: <strong id="stat-edges">0</strong></span>
+    </div>
+    <div class="toolbar-group">
+      <label>Speed
+        <input type="range" id="param-speed" min="1" max="200" value="10" step="1">
+        <span id="param-speed-val">10</span> steps/s
+      </label>
+    </div>
+  </header>
+
+  <!-- Main layout: left panel | center graph | right chart -->
+  <main id="layout">
+
+    <!-- Left: control panel -->
+    <aside id="panel-left">
+      <h3>Parameters</h3>
+
+      <fieldset>
+        <legend>Genesis (apply on Reset)</legend>
+        <label>
+          m (inputs)
+          <input type="number" id="param-m" min="1" max="50" value="3">
+        </label>
+        <label>
+          n (outputs)
+          <input type="number" id="param-n" min="1" max="50" value="2">
+        </label>
+        <label>
+          Input source
+          <select id="param-input-source">
+            <option value="noise">Noise</option>
+            <option value="sine">Sine</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Runtime</legend>
+        <label>
+          &mu; (drift)
+          <input type="range" id="param-mu" min="0" max="0.1" value="0.01" step="0.001">
+          <span id="param-mu-val">0.01</span>
+        </label>
+        <label>
+          p_flip
+          <input type="range" id="param-pflip" min="0" max="1" value="0.3" step="0.01">
+          <span id="param-pflip-val">0.3</span>
+        </label>
+        <label>
+          T_bridge
+          <input type="range" id="param-tbridge" min="0" max="1" value="0.8" step="0.01">
+          <span id="param-tbridge-val">0.8</span>
+        </label>
+      </fieldset>
+
+      <div class="legend-box">
+        <h4>Legend</h4>
+        <div class="legend-item"><span class="dot dot-input"></span> Input node</div>
+        <div class="legend-item"><span class="dot dot-internal"></span> Internal node</div>
+        <div class="legend-item"><span class="dot dot-output"></span> Output node</div>
+        <div class="legend-item"><span class="line line-pos"></span> Positive weight</div>
+        <div class="legend-item"><span class="line line-neg"></span> Negative weight</div>
+        <div class="legend-item"><span class="dot dot-bridged"></span> Bridging trigger</div>
+      </div>
+    </aside>
+
+    <!-- Center: graph viewport -->
+    <section id="panel-center">
+      <div id="cy"></div>
+    </section>
+
+    <!-- Right: degree distribution chart -->
+    <aside id="panel-right">
+      <h3>Degree Distribution</h3>
+      <div class="chart-container">
+        <canvas id="degree-chart"></canvas>
+      </div>
+    </aside>
+
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
