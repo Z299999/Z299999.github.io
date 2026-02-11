@@ -5,17 +5,13 @@
 
 import { getInputValue } from './input.js';
 
-// Fixed constants
-const SIGMA = 0.02;
-const EPS = 1e-3;
-const W_RESET = 1;
-const COOLDOWN_K = 10;
+// Fixed constants that are not currently exposed in the UI
+const EPS = 1e-3;   // near-zero threshold
+const W_RESET = 1;  // magnitude after sign flip
 
-// Bridge-specific constants
-// sqrt(2) / 2, used for the canonical 2-cycle and input fan-in
+// Bridge-specific constant: sqrt(2) / 2, used for the canonical 2-cycle
+// and the x_i -> z1 fan-in weight.
 const BRIDGE_BASE = Math.SQRT1_2;
-// Small stabilizing feedback weight epsilon > 0
-const BRIDGE_EPS = 0.05;
 
 /** Standard normal via Box-Muller transform. */
 function randn() {
@@ -28,11 +24,25 @@ function randn() {
  * Execute one simulation step.
  * @param {Graph} graph
  * @param {number} t - current step counter
- * @param {object} params - { mu, pFlip, tBridge, inputSource, m }
+ * @param {object} params - { mu, pFlip, tBridge, sigma, epsilon, K, inputSource, m }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
 export function simulationStep(graph, t, params) {
-  const { mu, pFlip, tBridge, inputSource, m } = params;
+  const {
+    mu,
+    pFlip,
+    tBridge,
+    sigma,
+    epsilon,
+    K,
+    inputSource,
+    m
+  } = params;
+
+  // Defaults if UI values are missing
+  const sigmaVal = Number.isFinite(sigma) ? sigma : 0.02;
+  const bridgeEps = Number.isFinite(epsilon) ? epsilon : 0.05;
+  const cooldownK = Number.isFinite(K) ? K : 10;
   const events = { bridged: [], removedEdges: 0, removedNodes: 0 };
 
   // 1) Set input node activations
@@ -71,7 +81,7 @@ export function simulationStep(graph, t, params) {
     if (node.type !== 'internal') continue;
     if (Math.abs(node.activation) > tBridge) {
       // Cooldown check
-      if (t - node.lastBridge >= COOLDOWN_K) {
+      if (t - node.lastBridge >= cooldownK) {
         triggered.push(nodeId);
       }
     }
@@ -130,15 +140,15 @@ export function simulationStep(graph, t, params) {
     }
 
     // Stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
-    graph.addEdge(z1Id, nodeId, -BRIDGE_EPS);
-    graph.addEdge(nodeId, z2Id, BRIDGE_EPS);
+    graph.addEdge(z1Id, nodeId, -bridgeEps);
+    graph.addEdge(nodeId, z2Id, bridgeEps);
 
     events.bridged.push(nodeId);
   }
 
   // 5) Weight update for every edge
   for (const [, edge] of graph.edges) {
-    edge.w += SIGMA * randn() + mu * Math.sign(edge.w);
+    edge.w += sigmaVal * randn() + mu * Math.sign(edge.w);
   }
 
   // 6) Near-zero event

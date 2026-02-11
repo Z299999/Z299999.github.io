@@ -16,6 +16,12 @@ export class Controls {
     this.elPFlipVal = document.getElementById('param-pflip-val');
     this.elTBridge = document.getElementById('param-tbridge');
     this.elTBridgeVal = document.getElementById('param-tbridge-val');
+    this.elSigma = document.getElementById('param-sigma');
+    this.elSigmaVal = document.getElementById('param-sigma-val');
+    this.elEpsilon = document.getElementById('param-epsilon');
+    this.elEpsilonVal = document.getElementById('param-epsilon-val');
+    this.elK = document.getElementById('param-K');
+    this.elKVal = document.getElementById('param-K-val');
     this.elSpeed = document.getElementById('param-speed');
     this.elSpeedVal = document.getElementById('param-speed-val');
 
@@ -23,6 +29,9 @@ export class Controls {
     this._bindSliderDisplay(this.elMu, this.elMuVal);
     this._bindSliderDisplay(this.elPFlip, this.elPFlipVal);
     this._bindSliderDisplay(this.elTBridge, this.elTBridgeVal);
+    this._bindSliderDisplay(this.elSigma, this.elSigmaVal);
+    this._bindSliderDisplay(this.elEpsilon, this.elEpsilonVal);
+    this._bindSliderDisplay(this.elK, this.elKVal);
     this._bindSliderDisplay(this.elSpeed, this.elSpeedVal);
   }
 
@@ -47,6 +56,9 @@ export class Controls {
       mu: parseFloat(this.elMu.value),
       pFlip: parseFloat(this.elPFlip.value),
       tBridge: parseFloat(this.elTBridge.value),
+       sigma: parseFloat(this.elSigma.value),
+       epsilon: parseFloat(this.elEpsilon.value),
+       K: parseInt(this.elK.value, 10),
       inputSource: this.elInputSource.value
     };
   }

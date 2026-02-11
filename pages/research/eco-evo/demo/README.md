@@ -40,12 +40,23 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 
 ### Fixed Constants
 
+These are currently not exposed in the UI:
+
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `σ` (sigma) | 0.02 | Weight noise standard deviation |
 | `ε` (eps) | 0.001 | Near-zero edge threshold |
 | `w_reset` | 1.0 | Weight magnitude after flip |
-| `K` (cooldown) | 10 | Steps between bridging triggers per node |
+
+### Runtime Parameters (UI)
+
+| Name | Range | Description |
+|------|-------|-------------|
+| `μ` (mu) | `[0, 0.1]` | Deterministic drift term in weight update |
+| `σ` (sigma) | `[0, 0.05]` | Weight noise standard deviation in `w += σ ξ + μ sign(w)` |
+| `p_flip` | `[0, 1]` | Probability of sign-flip when `|w| < ε` |
+| `T_bridge` | `[0, 1]` | Activation threshold for triggering bridges |
+| `ε_bridge` | `[0, 0.2]` | Bridge feedback strength for edges `z1 → z0 = -ε` and `z0 → z2 = ε` |
+| `K` (cooldown) | `[0, 50]` | Minimum steps between two bridge events on the same node |
 
 ## Simulation Step Order
 
@@ -55,10 +66,8 @@ Each call to `step()` executes in this exact order:
 2. **Forward pass** — For each non-input node in creation order:
    - `z_i = Σ(w_ji × a_j)` over all incoming edges
    - `a_i = tanh(z_i)`
-3. **Bridging trigger** — Mark nodes where `|a_i| > T_bridge` (with cooldown K=10 steps)
-4. **Bridging action** — For each triggered node `i`, create a new internal node `b_k` with:
-   - Edge `i → b_k` with weight `sign(a_i) × 1`
-   - Edge `b_k → i` with weight `sign(a_i) × 1`
+3. **Bridging trigger** — For internal nodes, mark those where `|a_i| > T_bridge` (with cooldown `K` steps)
+4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating `z1_k`, `z2_k`, a 2-cycle, fan-in from `x_i` to `z1_k`, duplicated outputs from `z2_k`, and feedback edges of size `±ε_bridge`).
 5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)`
 6. **Near-zero event** — If `|w| < ε`:
    - With probability `p_flip`: set `w = -w_reset`
