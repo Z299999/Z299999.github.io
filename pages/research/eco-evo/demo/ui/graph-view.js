@@ -28,8 +28,8 @@ export class GraphView {
             'text-valign': 'center',
             'text-halign': 'center',
             'background-color': 'data(color)',
-            'width': 28,
-            'height': 28,
+            'width': 'data(size)',
+            'height': 'data(size)',
             'border-width': 0,
             'border-color': BRIDGE_BORDER_COLOR,
             'color': '#fff',
@@ -41,9 +41,7 @@ export class GraphView {
           selector: 'node.bridged',
           style: {
             'border-width': 4,
-            'border-color': BRIDGE_BORDER_COLOR,
-            'width': 34,
-            'height': 34
+            'border-color': BRIDGE_BORDER_COLOR
           }
         },
         {
@@ -112,52 +110,76 @@ export class GraphView {
     };
 
     // Logical coordinates; cy.fit() will scale them to viewport.
-    const xLeft = -250;
-    const xRight = 250;
+    // Horizontal span grows mildly with number of internal nodes
+    const nInt = internals.length;
+    const baseSide = 500;
+    const side = baseSide + (nInt > 0 ? Math.min(700, 3 * Math.sqrt(nInt)) : 0);
+    const halfSide = side / 2;
+
+    const xLeft = -halfSide;
+    const xRight = halfSide;
     assignColumn(inputs, xLeft);    // left column for inputs
     assignColumn(outputs, xRight);  // right column for outputs
 
     // Internal nodes are distributed on a grid inside the square
-    // between xLeft and xRight, with side length equal to the
-    // distance between the two columns.
-    const nInt = internals.length;
+    // between xLeft and xRight. The grid is roughly square, with
+    // a minimum spacing for readability.
     if (nInt > 0) {
-      const side = Math.abs(xRight - xLeft);
-      const half = side / 2;
+      const minSpacing = 40;
+      let cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
+      let rows = Math.ceil(nInt / cols);
 
-      // Choose grid dimensions roughly square.
-      const cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
-      const rows = Math.ceil(nInt / cols);
-
-      const spacingX = side / (cols + 1);
-      const spacingGridY = side / (rows + 1);
+      let spacingX = side / (cols + 1);
+      if (spacingX < minSpacing) {
+        cols = Math.max(1, Math.floor(side / minSpacing));
+        rows = Math.ceil(nInt / cols);
+        spacingX = side / (cols + 1);
+      }
+      let spacingGridY = side / (rows + 1);
+      if (spacingGridY < minSpacing) {
+        rows = Math.max(1, Math.floor(side / minSpacing));
+        cols = Math.ceil(nInt / rows);
+        spacingGridY = side / (rows + 1);
+      }
 
       internals.forEach((id, idx) => {
         const col = idx % cols;
         const row = Math.floor(idx / cols);
-        const x = -half + (col + 1) * spacingX;
-        const y = -half + (row + 1) * spacingGridY;
+        const x = -halfSide + (col + 1) * spacingX;
+        const y = -halfSide + (row + 1) * spacingGridY;
         positions.set(id, { x, y });
       });
     }
 
-    return positions;
+    // Also return a recommended size for internal nodes so the caller
+    // can shrink them when there are many.
+    const baseSize = 28;
+    const minSize = 10;
+    const N0 = 100;
+    const internalSize =
+      nInt > 0
+        ? Math.max(minSize, baseSize * Math.sqrt(N0 / (nInt + N0)))
+        : baseSize;
+
+    return { positions, internalSize, xLeft, xRight };
   }
 
   /** Full rebuild of the cytoscape graph from simulation graph. */
   rebuild(graph, bridgedSet) {
     this.cy.elements().remove();
 
-    const positions = this._computePositions(graph);
+    const { positions, internalSize } = this._computePositions(graph);
     const elements = [];
 
     // Add nodes
     for (const [id, node] of graph.nodes) {
+      const size = node.type === 'internal' ? internalSize : 28;
       elements.push({
         group: 'nodes',
         data: {
           id,
-          color: NODE_COLORS[node.type] || NODE_COLORS.internal
+          color: NODE_COLORS[node.type] || NODE_COLORS.internal,
+          size
         },
         position: positions.get(id),
         classes: bridgedSet.has(id) ? 'bridged' : ''
@@ -194,8 +216,8 @@ export class GraphView {
     const graphNodeIds = new Set(graph.nodes.keys());
     const graphEdgeIds = new Set(graph.edges.keys());
 
-    // Recompute desired positions for all nodes
-    const positions = this._computePositions(graph);
+    // Recompute desired positions and internal node size
+    const { positions, internalSize } = this._computePositions(graph);
 
     // Remove nodes/edges no longer in graph
     this.cy.nodes().forEach(n => {
@@ -209,11 +231,13 @@ export class GraphView {
     const newElements = [];
     for (const [id, node] of graph.nodes) {
       if (!cyNodeIds.has(id)) {
+        const size = node.type === 'internal' ? internalSize : 28;
         newElements.push({
           group: 'nodes',
           data: {
             id,
-            color: NODE_COLORS[node.type] || NODE_COLORS.internal
+            color: NODE_COLORS[node.type] || NODE_COLORS.internal,
+            size
           },
           position: positions.get(id)
         });
@@ -240,12 +264,19 @@ export class GraphView {
       this.cy.add(newElements);
     }
 
-    // Update positions of all existing nodes to keep columns neat
+    // Update positions and sizes of all existing nodes to keep columns neat
     for (const [id] of graph.nodes) {
       const pos = positions.get(id);
       if (!pos) continue;
       const cyNode = this.cy.getElementById(id);
-      if (cyNode.length) cyNode.position(pos);
+      if (cyNode.length) {
+        cyNode.position(pos);
+        const node = graph.nodes.get(id);
+        if (node) {
+          const size = node.type === 'internal' ? internalSize : 28;
+          cyNode.data('size', size);
+        }
+      }
     }
 
     // Update existing edge styles
