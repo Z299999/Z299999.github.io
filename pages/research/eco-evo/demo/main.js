@@ -20,6 +20,7 @@ let genesisM = 3; // track m used at last reset
 let mode = 'evolve'; // 'evolve' | 'test'
 let testStepIndex = 0;
 let currentTest = null; // { inputIndex, amplitude, steps }
+let testRunning = false; // within test mode: running vs idle
 
 // --- UI components (initialized after DOM ready) ---
 let controls, graphView, chartView, outputView, stats;
@@ -65,6 +66,32 @@ function updateModeUI() {
     btnTest.textContent = 'Start test';
     btnPlay.disabled = false;
     btnStep.disabled = false;
+  }
+
+  updateTestButtons();
+}
+
+function updateTestButtons() {
+  const btnInject = document.getElementById('btn-test-inject');
+  const btnStop = document.getElementById('btn-test-stop-recording');
+  const btnReset = document.getElementById('btn-test-reset');
+  if (!btnInject || !btnStop || !btnReset) return;
+
+  if (mode !== 'test') {
+    btnInject.disabled = true;
+    btnStop.disabled = true;
+    btnReset.disabled = true;
+    return;
+  }
+
+  if (testRunning) {
+    btnInject.disabled = true;
+    btnStop.disabled = false;
+    btnReset.disabled = false;
+  } else {
+    btnInject.disabled = false;
+    btnStop.disabled = true;
+    btnReset.disabled = true;
   }
 }
 
@@ -129,7 +156,9 @@ function impulseTestStep() {
   if (testStepIndex >= steps) {
     // Auto-stop test playback but stay in test mode until user ends it.
     playing = false;
+    testRunning = false;
     document.getElementById('btn-play').textContent = 'Play';
+    updateTestButtons();
     return;
   }
 
@@ -293,6 +322,10 @@ function loop(timestamp) {
 function play() {
   if (playing) return;
   playing = true;
+  if (mode === 'test') {
+    testRunning = true;
+    updateTestButtons();
+  }
   lastFrameTime = 0;
   accumulator = 0;
   document.getElementById('btn-play').textContent = 'Pause';
@@ -302,6 +335,10 @@ function play() {
 function pause() {
   playing = false;
   document.getElementById('btn-play').textContent = 'Play';
+  if (mode === 'test') {
+    testRunning = false;
+    updateTestButtons();
+  }
 }
 
 function togglePlay() {
@@ -312,16 +349,14 @@ function togglePlay() {
 function startImpulseTest() {
   if (!graph) return;
   pause();
-  recordOutput = true;
   // Reset activations to zero
   for (const [, node] of graph.nodes) {
     node.activation = 0;
   }
-  outputHistory.length = 0;
-  outputView.update(outputHistory);
   currentTest = controls.getTestParams();
   testStepIndex = 0;
   mode = 'test';
+  testRunning = false;
   updateModeUI();
 }
 
@@ -330,6 +365,7 @@ function endImpulseTest() {
   mode = 'evolve';
   currentTest = null;
   testStepIndex = 0;
+  testRunning = false;
   if (graph) {
     for (const [, node] of graph.nodes) {
       node.activation = 0;
@@ -368,12 +404,41 @@ function init() {
 
   // Inject impulse once in test mode
   document.getElementById('btn-test-inject').addEventListener('click', () => {
-    runImpulseOnce();
+    if (!graph || mode !== 'test' || testRunning) return;
+    recordOutput = true;
+    // Reset activations and history for a fresh run
+    for (const [, node] of graph.nodes) {
+      node.activation = 0;
+    }
+    outputHistory.length = 0;
+    outputView.update(outputHistory);
+    currentTest = controls.getTestParams();
+    testStepIndex = 0;
+    testRunning = true;
+    updateTestButtons();
+    play();
   });
 
-  // Stop recording output signal plot
+  // Stop current impulse test run
   document.getElementById('btn-test-stop-recording').addEventListener('click', () => {
-    recordOutput = false;
+    if (mode !== 'test') return;
+    pause();
+  });
+
+  // Reset graph state and output signal while in a running test.
+  document.getElementById('btn-test-reset').addEventListener('click', () => {
+    if (mode !== 'test' || !testRunning) return;
+    // Clear activations
+    if (graph) {
+      for (const [, node] of graph.nodes) {
+        node.activation = 0;
+      }
+      lastBridged = new Set();
+      graphView.update(graph, lastBridged);
+    }
+    // Clear output signal
+    outputHistory.length = 0;
+    outputView.update(outputHistory);
   });
 
   // Handle window resize
