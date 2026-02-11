@@ -61,7 +61,7 @@
         <legend>Runtime</legend>
         <label>
           &mu; (drift)
-          <input type="range" id="param-mu" min="-0.1" max="0.1" value="0.01" step="0.001">
+          <input type="range" id="param-mu" min="-0.1" max="0.1" value="0.0" step="0.001">
           <span id="param-mu-val">0.01</span>
         </label>
         <label>
@@ -119,6 +119,18 @@
         <div class="output-label">‖y(t)‖<sub>2</sub></div>
         <div class="output-value" id="stat-output-norm">0.00</div>
       </div>
+
+      <div class="output-chart-container">
+        <canvas id="output-chart"></canvas>
+      </div>
+      <select id="output-window" class="output-window">
+        <option value="50">last 50 steps</option>
+        <option value="100" selected>last 100 steps</option>
+        <option value="500">last 500 steps</option>
+        <option value="1000">last 1000 steps</option>
+        <option value="5000">last 5000 steps</option>
+        <option value="all">all steps</option>
+      </select>
 
       <h3>Degree Distribution</h3>
       <div class="chart-container">

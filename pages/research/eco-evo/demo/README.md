@@ -83,6 +83,7 @@ At each step the UI also shows:
   \[
   \|y(t)\|_2 = \sqrt{\sum_j a_{y_j}(t)^2}.
   \]
+- A small line chart of `‖y(t)‖₂` over time (window can be selected as last 50/100/500/1000/5000 steps or all steps).
 
 ## File Structure
 
@@ -99,6 +100,7 @@ demo/
 │   ├── controls.js     # Parameter panel reader
 │   ├── graph-view.js   # Cytoscape.js wrapper
 │   ├── chart-view.js   # Chart.js degree histogram
+│   ├── output-view.js  # Chart.js output norm time-series
 │   └── stats.js        # Read-only stat counters
 └── README.md
 ```

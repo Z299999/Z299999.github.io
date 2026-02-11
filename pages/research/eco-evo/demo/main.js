@@ -8,6 +8,7 @@ import { simulationStep } from './sim/step.js';
 import { Controls } from './ui/controls.js';
 import { GraphView } from './ui/graph-view.js';
 import { ChartView } from './ui/chart-view.js';
+import { OutputView } from './ui/output-view.js';
 import { Stats } from './ui/stats.js';
 
 // --- State ---
@@ -18,7 +19,7 @@ let lastBridged = new Set();
 let genesisM = 3; // track m used at last reset
 
 // --- UI components (initialized after DOM ready) ---
-let controls, graphView, chartView, stats;
+let controls, graphView, chartView, outputView, stats;
 
 // --- Timing ---
 let lastFrameTime = 0;
@@ -37,6 +38,9 @@ function computeOutputNorm(graph) {
   return Math.sqrt(sumSq);
 }
 
+// History of output norms for plotting: [{ t, norm }, ...]
+const outputHistory = [];
+
 /** Initialize or re-initialize the simulation. */
 function reset() {
   const { m, n } = controls.getStartParams();
@@ -45,10 +49,13 @@ function reset() {
   graph = Graph.genesis(genesisM, safeN);
   t = 0;
   lastBridged = new Set();
+  outputHistory.length = 0;
 
   graphView.rebuild(graph, lastBridged);
   chartView.update(graph.degreeHistogram());
   const outputNorm = computeOutputNorm(graph);
+  outputHistory.push({ t, norm: outputNorm });
+  outputView.update(outputHistory);
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 }
 
@@ -70,6 +77,8 @@ function step() {
 
   // Update stats every step
   const outputNorm = computeOutputNorm(graph);
+  outputHistory.push({ t, norm: outputNorm });
+  outputView.update(outputHistory);
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 
   // Update degree chart every 10 steps
@@ -134,6 +143,7 @@ function init() {
   controls = new Controls();
   graphView = new GraphView('cy');
   chartView = new ChartView('degree-chart');
+  outputView = new OutputView('output-chart', 'output-window');
   stats = new Stats();
 
   // Button bindings
