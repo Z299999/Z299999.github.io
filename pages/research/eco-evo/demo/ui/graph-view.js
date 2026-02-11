@@ -66,39 +66,87 @@ export class GraphView {
   }
 
   /**
-   * Compute deterministic positions for all nodes on a simple
-   * square grid, independent of node type.
+   * Compute deterministic positions using three non-overlapping
+   * regions from left to right:
+   *  - left:  vertical column grid for input nodes x*
+   *  - middle: square grid for internal nodes z*
+   *  - right: vertical column grid for output nodes y*
+   *
+   * Input/output columns keep the same shape and x-positions; the
+   * central z grid adapts to the number of internal nodes.
    */
   _computePositions(graph) {
-    const ids = [];
-    for (const [id] of graph.nodes) {
-      ids.push(id);
-    }
-
-    // Sort ids to keep a stable, deterministic ordering.
-    ids.sort();
-
-    const n = ids.length;
     const positions = new Map();
 
-    if (n === 0) {
-      return positions;
+    const inputs = [];
+    const internals = [];
+    const outputs = [];
+
+    for (const [id, node] of graph.nodes) {
+      if (node.type === 'input') inputs.push(id);
+      else if (node.type === 'output') outputs.push(id);
+      else internals.push(id);
     }
 
-    // Arrange nodes on a roughly square grid centred around (0, 0).
-    const cols = Math.ceil(Math.sqrt(n));
-    const rows = Math.ceil(n / cols);
-    const spacing = 60;
-    const width = (cols - 1) * spacing;
-    const height = (rows - 1) * spacing;
+    // Stable ordering within each group: sort by trailing index if present.
+    const sortByIndex = (a, b) => {
+      const parse = id => {
+        const m = id.match(/(\d+)$/);
+        return m ? parseInt(m[1], 10) : 0;
+      };
+      return parse(a) - parse(b);
+    };
+    inputs.sort(sortByIndex);
+    outputs.sort(sortByIndex);
+    internals.sort();
 
-    ids.forEach((id, idx) => {
-      const col = idx % cols;
-      const row = Math.floor(idx / cols);
-      const x = col * spacing - width / 2;
-      const y = row * spacing - height / 2;
-      positions.set(id, { x, y });
-    });
+    // Fixed x-positions for left/middle/right regions.
+    const xInput = -300;
+    const xOutput = 300;
+    const inputOutputSpacingY = 60;
+
+    // Place input nodes in a vertical grid on the left.
+    const nIn = inputs.length;
+    if (nIn > 0) {
+      const offsetIn = (nIn - 1) / 2;
+      inputs.forEach((id, idx) => {
+        const y = (idx - offsetIn) * inputOutputSpacingY;
+        positions.set(id, { x: xInput, y });
+      });
+    }
+
+    // Place output nodes in a vertical grid on the right.
+    const nOut = outputs.length;
+    if (nOut > 0) {
+      const offsetOut = (nOut - 1) / 2;
+      outputs.forEach((id, idx) => {
+        const y = (idx - offsetOut) * inputOutputSpacingY;
+        positions.set(id, { x: xOutput, y });
+      });
+    }
+
+    // Central square region for internal nodes z*, between the two columns.
+    const nInt = internals.length;
+    if (nInt > 0) {
+      const innerMargin = 60;
+      const innerLeft = xInput + innerMargin;
+      const innerRight = xOutput - innerMargin;
+      const side = Math.max(200, innerRight - innerLeft); // ensure a minimal square
+
+      const cols = Math.ceil(Math.sqrt(nInt));
+      const rows = Math.ceil(nInt / cols);
+      const spacing = side / Math.max(cols - 1, 1);
+      const width = (cols - 1) * spacing;
+      const height = (rows - 1) * spacing;
+
+      internals.forEach((id, idx) => {
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const x = innerLeft + col * spacing;
+        const y = row * spacing - height / 2;
+        positions.set(id, { x, y });
+      });
+    }
 
     return positions;
   }

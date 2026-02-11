@@ -74,6 +74,7 @@ function reset() {
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
   graph = Graph.genesis(genesisM, safeN);
+  recordOutput = true;
   t = 0;
   lastBridged = new Set();
   outputHistory.length = 0;
@@ -193,9 +194,14 @@ function runImpulseOnce() {
   for (const [, node] of graph.nodes) {
     node.activation = 0;
   }
-  if (recordOutput) {
-    outputHistory.length = 0;
-  }
+
+  // Determine starting time index so that multiple impulse
+  // tests within the same session can be concatenated on
+  // the output plot instead of overwriting previous runs.
+  const startT =
+    recordOutput && outputHistory.length
+      ? outputHistory[outputHistory.length - 1].t + 1
+      : 0;
 
   for (let k = 0; k < steps; k++) {
     // Inputs: impulse at k=0 on selected channel, otherwise 0.
@@ -231,7 +237,7 @@ function runImpulseOnce() {
 
     const outputNorm = computeOutputNorm(graph);
     if (recordOutput) {
-      outputHistory.push({ t: k, norm: outputNorm });
+      outputHistory.push({ t: startT + k, norm: outputNorm });
     }
   }
 
@@ -310,14 +316,13 @@ function togglePlay() {
 function startImpulseTest() {
   if (!graph) return;
   pause();
+  recordOutput = true;
   // Reset activations to zero
   for (const [, node] of graph.nodes) {
     node.activation = 0;
   }
-  if (recordOutput) {
-    outputHistory.length = 0;
-    outputView.update(outputHistory);
-  }
+  outputHistory.length = 0;
+  outputView.update(outputHistory);
   currentTest = controls.getTestParams();
   testStepIndex = 0;
   mode = 'test';
