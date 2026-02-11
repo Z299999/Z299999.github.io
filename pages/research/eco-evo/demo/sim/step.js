@@ -6,7 +6,7 @@
 import { getInputValue } from './input.js';
 
 // Fixed constants that are not currently exposed in the UI
-const EPS = 1e-3;   // near-zero threshold
+const EPS_DEFAULT = 1e-3;   // default near-zero threshold
 const W_RESET = 1;  // magnitude after sign flip
 
 // Bridge-specific constant: sqrt(2) / 2, used for the canonical 2-cycle
@@ -24,7 +24,7 @@ function randn() {
  * Execute one simulation step.
  * @param {Graph} graph
  * @param {number} t - current step counter
- * @param {object} params - { mu, pFlip, tBridge, sigma, epsilon, K, inputSource, m }
+ * @param {object} params - { mu, pFlip, tBridge, sigma, omega, epsilon, K, inputSource, m }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
 export function simulationStep(graph, t, params) {
@@ -33,6 +33,7 @@ export function simulationStep(graph, t, params) {
     pFlip,
     tBridge,
     sigma,
+    omega,
     epsilon,
     K,
     inputSource,
@@ -41,7 +42,8 @@ export function simulationStep(graph, t, params) {
 
   // Defaults if UI values are missing
   const sigmaVal = Number.isFinite(sigma) ? sigma : 0.02;
-  const bridgeEps = Number.isFinite(epsilon) ? epsilon : 0.05;
+  const omegaVal = Number.isFinite(omega) ? omega : 0.05;
+  const epsZero = Number.isFinite(epsilon) ? epsilon : EPS_DEFAULT;
   const cooldownK = Number.isFinite(K) ? K : 10;
   const events = { bridged: [], removedEdges: 0, removedNodes: 0 };
 
@@ -139,9 +141,9 @@ export function simulationStep(graph, t, params) {
       graph.addEdge(z2Id, edge.dst, edge.w);
     }
 
-    // Stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
-    graph.addEdge(z1Id, nodeId, -bridgeEps);
-    graph.addEdge(nodeId, z2Id, bridgeEps);
+    // Stabilizing feedback edges: z1 -> z0 = -omega, z0 -> z2 = omega
+    graph.addEdge(z1Id, nodeId, -omegaVal);
+    graph.addEdge(nodeId, z2Id, omegaVal);
 
     events.bridged.push(nodeId);
   }
@@ -154,7 +156,7 @@ export function simulationStep(graph, t, params) {
   // 6) Near-zero event
   const edgesToRemove = [];
   for (const [eid, edge] of graph.edges) {
-    if (Math.abs(edge.w) < EPS) {
+    if (Math.abs(edge.w) < epsZero) {
       if (Math.random() < pFlip) {
         edge.w = -W_RESET;
       } else {

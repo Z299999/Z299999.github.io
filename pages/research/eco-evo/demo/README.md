@@ -53,9 +53,10 @@ These are currently not exposed in the UI:
 |------|-------|-------------|
 | `μ` (mu) | `[-0.1, 0.1]` | Deterministic drift term in weight update (can be negative) |
 | `σ` (sigma) | `[0, 0.05]` | Weight noise standard deviation in `w += σ ξ + μ sign(w)` |
-| `p_flip` | `[0, 1]` | Probability of sign-flip when `|w| < ε` |
+| `p_flip` | `[0, 1]` | Probability of sign-flip when `|w| < ε_zero` |
 | `T_bridge` | `[0, 1]` | Activation threshold for triggering bridges |
-| `ε_bridge` | `[0, 0.2]` | Bridge feedback strength for edges `z1 → z0 = -ε` and `z0 → z2 = ε` |
+| `ω_bridge` | `[0, 0.2]` | Bridge feedback strength for edges `z1 → z0 = -ω` and `z0 → z2 = ω` |
+| `ε_zero` | `[0, 0.01]` | Near-zero threshold used to decide when edges are flipped or deleted |
 | `K` (cooldown) | `[0, 50]` | Minimum steps between two bridge events on the same node |
 
 ## Simulation Step Order
@@ -67,9 +68,9 @@ Each call to `step()` executes in this exact order:
    - `z_i = Σ(w_ji × a_j)` over all incoming edges
    - `a_i = tanh(z_i)`
 3. **Bridging trigger** — For internal nodes, mark those where `|a_i| > T_bridge` (with cooldown `K` steps)
-4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating `z1_k`, `z2_k`, a 2-cycle, fan-in from `x_i` to `z1_k`, duplicated outputs from `z2_k`, and feedback edges of size `±ε_bridge`).
+4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `x_i` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
 5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)`
-6. **Near-zero event** — If `|w| < ε`:
+6. **Near-zero event** — If `|w| < ε_zero`:
    - With probability `p_flip`: set `w = -w_reset`
    - Otherwise: delete the edge
 7. **Node cleanup** — Remove any internal node with zero in-degree OR zero out-degree (and all incident edges)
