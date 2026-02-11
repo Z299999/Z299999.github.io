@@ -50,25 +50,43 @@ function updateModeUI() {
   const runtimeFs = document.getElementById('fieldset-runtime');
   const testFs = document.getElementById('fieldset-test');
   const btnTest = document.getElementById('btn-test-toggle');
-  const btnPlay = document.getElementById('btn-play');
-  const btnStep = document.getElementById('btn-step');
-  if (!runtimeFs || !testFs || !btnTest || !btnPlay || !btnStep) return;
+  if (!runtimeFs || !testFs || !btnTest) return;
 
   if (mode === 'test') {
     runtimeFs.style.display = 'none';
     testFs.style.display = '';
     btnTest.textContent = 'End test';
-    btnPlay.disabled = true;
-    btnStep.disabled = true;
   } else {
     runtimeFs.style.display = '';
     testFs.style.display = 'none';
     btnTest.textContent = 'Start test';
-    btnPlay.disabled = false;
-    btnStep.disabled = false;
   }
 
+  updateTopButtons();
   updateTestButtons();
+}
+
+function updateTopButtons() {
+  const btnPlay = document.getElementById('btn-play');
+  const btnStep = document.getElementById('btn-step');
+  const btnReset = document.getElementById('btn-reset');
+  if (!btnPlay || !btnStep || !btnReset) return;
+
+  if (mode === 'test') {
+    btnPlay.disabled = true;
+    btnStep.disabled = true;
+    // In test mode we still allow a full reset when not playing.
+    btnReset.disabled = playing;
+  } else {
+    btnPlay.disabled = false;
+    if (playing) {
+      btnStep.disabled = true;
+      btnReset.disabled = true;
+    } else {
+      btnStep.disabled = false;
+      btnReset.disabled = false;
+    }
+  }
 }
 
 function updateTestButtons() {
@@ -326,6 +344,7 @@ function play() {
     testRunning = true;
     updateTestButtons();
   }
+  updateTopButtons();
   lastFrameTime = 0;
   accumulator = 0;
   document.getElementById('btn-play').textContent = 'Pause';
@@ -339,6 +358,7 @@ function pause() {
     testRunning = false;
     updateTestButtons();
   }
+   updateTopButtons();
 }
 
 function togglePlay() {
