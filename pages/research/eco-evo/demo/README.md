@@ -27,7 +27,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 |-----------|-------|-------------|
 | `m` | 1–50 | Number of input nodes |
 | `n` | 1–50 | Number of output nodes |
-| Input source | noise / sine | Input signal generator |
+| Input source | noise / constant / sine | Input signal generator |
 
 ### Runtime (applied immediately)
 

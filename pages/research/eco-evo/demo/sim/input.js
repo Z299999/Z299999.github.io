@@ -7,6 +7,11 @@ function noiseGenerator(_i, _t) {
   return Math.random() * 2 - 1;
 }
 
+/** Constant input: always 1. */
+function constantGenerator(_i, _t) {
+  return 1;
+}
+
 /** Sine wave with varied frequency per input index. */
 function sineGenerator(i, t) {
   const period = 100;
@@ -17,6 +22,7 @@ function sineGenerator(i, t) {
 
 const generators = {
   noise: noiseGenerator,
+  constant: constantGenerator,
   sine: sineGenerator
 };
 
