@@ -75,6 +75,13 @@ Each call to `step()` executes in this exact order:
 7. **Node cleanup** — Remove any internal node with zero in-degree OR zero out-degree (and all incident edges)
 8. **Increment** — `t++`
 
+At each step the UI also shows:
+
+- `‖y(t)‖₂` — the Euclidean norm of the current output vector, computed as  
+  \[
+  \|y(t)\|_2 = \sqrt{\sum_j a_{y_j}(t)^2}.
+  \]
+
 ## File Structure
 
 ```

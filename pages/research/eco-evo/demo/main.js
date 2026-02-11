@@ -24,6 +24,19 @@ let controls, graphView, chartView, stats;
 let lastFrameTime = 0;
 let accumulator = 0;
 
+/** Compute L2 norm of output activations ‖y(t)‖₂. */
+function computeOutputNorm(graph) {
+  if (!graph) return 0;
+  let sumSq = 0;
+  for (const [, node] of graph.nodes) {
+    if (node.type === 'output') {
+      const a = node.activation || 0;
+      sumSq += a * a;
+    }
+  }
+  return Math.sqrt(sumSq);
+}
+
 /** Initialize or re-initialize the simulation. */
 function reset() {
   const { m, n } = controls.getStartParams();
@@ -35,7 +48,8 @@ function reset() {
 
   graphView.rebuild(graph, lastBridged);
   chartView.update(graph.degreeHistogram());
-  stats.update(t, graph.nodeCount, graph.edgeCount);
+  const outputNorm = computeOutputNorm(graph);
+  stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 }
 
 /** Run a single simulation step and update the UI. */
@@ -55,7 +69,8 @@ function step() {
   graphView.update(graph, lastBridged);
 
   // Update stats every step
-  stats.update(t, graph.nodeCount, graph.edgeCount);
+  const outputNorm = computeOutputNorm(graph);
+  stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
 
   // Update degree chart every 10 steps
   if (t % 10 === 0) {
