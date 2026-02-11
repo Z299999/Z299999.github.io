@@ -71,7 +71,7 @@ export class GraphView {
    * Compute deterministic positions so that:
    *  - input nodes form a vertical column on the left
    *  - output nodes form a vertical column on the right
-   *  - internal nodes are placed in a middle column
+   *  - internal nodes are arranged in a compact ring in the middle
    */
   _computePositions(graph) {
     const inputs = [];
@@ -113,20 +113,17 @@ export class GraphView {
     assignColumn(inputs, -250);   // left column for inputs
     assignColumn(outputs, 250);   // right column for outputs
 
-    // Internal nodes are distributed in a compact grid in the middle,
-    // rather than forced into a single tall column.
+    // Internal nodes are distributed on a ring in the middle, which
+    // keeps the drawing compact even when there are many nodes.
     const nInt = internals.length;
     if (nInt > 0) {
-      const cols = Math.max(1, Math.ceil(Math.sqrt(nInt)));
-      const rows = Math.ceil(nInt / cols);
-      const spacingX = 140;
-      const offsetCol = (cols - 1) / 2;
-      const offsetRow = (rows - 1) / 2;
+      const baseRadius = 120;
+      const radius = baseRadius + Math.min(200, nInt * 2);
+      const flatten = 0.6; // make it more like an ellipse
       internals.forEach((id, idx) => {
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        const x = (col - offsetCol) * spacingX;
-        const y = (row - offsetRow) * spacingY;
+        const angle = (2 * Math.PI * idx) / nInt;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle) * flatten;
         positions.set(id, { x, y });
       });
     }
