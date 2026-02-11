@@ -51,7 +51,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 
 Each call to `step()` executes in this exact order:
 
-1. **Set input activations** — `a[in_i] = x_i(t)` from the selected input generator
+1. **Set input activations** — `a[x_i] = x_i(t)` from the selected input generator
 2. **Forward pass** — For each non-input node in creation order:
    - `z_i = Σ(w_ji × a_j)` over all incoming edges
    - `a_i = tanh(z_i)`

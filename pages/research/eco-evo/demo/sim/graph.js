@@ -9,7 +9,8 @@ export class Graph {
     this.edges = new Map();   // id -> { id, src, dst, w }
     this.adjOut = new Map();  // src -> Set of edge ids
     this.adjIn = new Map();   // dst -> Set of edge ids
-    this._nextNodeId = 0;
+    // Counters for bridge nodes z1_k, z2_k and edges
+    this._nextBridgeIndex = 0;
     this._nextEdgeId = 0;
   }
 
@@ -17,34 +18,34 @@ export class Graph {
   static genesis(m, n) {
     const g = new Graph();
 
-    // Input nodes
+    // Input nodes x_0, ..., x_{m-1}
     const inputs = [];
     for (let i = 0; i < m; i++) {
-      const id = `in_${i}`;
+      const id = `x_${i}`;
       g.addNode(id, 'input');
       inputs.push(id);
     }
 
-    // Central node
-    g.addNode('c', 'internal');
+    // Central node z0
+    g.addNode('z0', 'internal');
 
-    // Output nodes
+    // Output nodes y_0, ..., y_{n-1}
     const outputs = [];
     for (let j = 0; j < n; j++) {
-      const id = `out_${j}`;
+      const id = `y_${j}`;
       g.addNode(id, 'output');
       outputs.push(id);
     }
 
-    // Edges: in_i -> c with weight 1/m
+    // Edges: x_i -> z0 with weight 1/m
     const wIn = 1 / m;
     for (const inId of inputs) {
-      g.addEdge(inId, 'c', wIn);
+      g.addEdge(inId, 'z0', wIn);
     }
 
-    // Edges: c -> out_j with weight 1
+    // Edges: z0 -> y_j with weight 1
     for (const outId of outputs) {
-      g.addEdge('c', outId, 1);
+      g.addEdge('z0', outId, 1);
     }
 
     return g;
@@ -62,9 +63,15 @@ export class Graph {
     this.adjIn.set(id, new Set());
   }
 
-  /** Generate a unique internal node id. */
-  newInternalId() {
-    return `b_${this._nextNodeId++}`;
+  /** Generate unique ids for bridge nodes z1_k and z2_k. */
+  newZ1Id() {
+    const id = `z1_${this._nextBridgeIndex++}`;
+    return id;
+  }
+
+  newZ2Id() {
+    const id = `z2_${this._nextBridgeIndex++}`;
+    return id;
   }
 
   /** Generate a unique edge id. */

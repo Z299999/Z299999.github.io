@@ -37,7 +37,7 @@ export function simulationStep(graph, t, params) {
 
   // 1) Set input node activations
   for (let i = 0; i < m; i++) {
-    const node = graph.nodes.get(`in_${i}`);
+    const node = graph.nodes.get(`x_${i}`);
     if (node) {
       node.activation = getInputValue(inputSource, i, t);
     }
@@ -63,9 +63,12 @@ export function simulationStep(graph, t, params) {
     node.activation = Math.tanh(z);
   }
 
-  // 3) Bridging trigger: mark nodes with |activation| > T_bridge
+  // 3) Bridging trigger: mark nodes with |activation| > T_bridge.
+  // Only internal nodes (z0 and all bridge nodes z1_k, z2_k) are allowed to
+  // trigger bridges; inputs/outputs are excluded.
   const triggered = [];
   for (const [nodeId, node] of graph.nodes) {
+    if (node.type !== 'internal') continue;
     if (Math.abs(node.activation) > tBridge) {
       // Cooldown check
       if (t - node.lastBridge >= COOLDOWN_K) {
@@ -90,9 +93,9 @@ export function simulationStep(graph, t, params) {
     if (!z0) continue;
     z0.lastBridge = t;
 
-    // New internal nodes z1, z2
-    const z1Id = graph.newInternalId();
-    const z2Id = graph.newInternalId();
+    // New internal bridge nodes z1_k (closer to inputs) and z2_k (closer to outputs)
+    const z1Id = graph.newZ1Id();
+    const z2Id = graph.newZ2Id();
     graph.addNode(z1Id, 'internal');
     graph.addNode(z2Id, 'internal');
 
