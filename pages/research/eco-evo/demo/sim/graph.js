@@ -9,8 +9,8 @@ export class Graph {
     this.edges = new Map();   // id -> { id, src, dst, w }
     this.adjOut = new Map();  // src -> Set of edge ids
     this.adjIn = new Map();   // dst -> Set of edge ids
-    // Counters for bridge nodes z1_k, z2_k and edges
-    this._nextBridgeIndex = 0;
+    // Counter for internal bridge nodes z1, z2, z3, ...
+    this._nextZIndex = 1;     // z0 is reserved for the central node
     this._nextEdgeId = 0;
   }
 
@@ -63,14 +63,9 @@ export class Graph {
     this.adjIn.set(id, new Set());
   }
 
-  /** Generate unique ids for bridge nodes z1_k and z2_k. */
-  newZ1Id() {
-    const id = `z1_${this._nextBridgeIndex++}`;
-    return id;
-  }
-
-  newZ2Id() {
-    const id = `z2_${this._nextBridgeIndex++}`;
+  /** Generate a unique internal node id: z1, z2, z3, ... */
+  newInternalId() {
+    const id = `z${this._nextZIndex++}`;
     return id;
   }
 

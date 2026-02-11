@@ -74,7 +74,7 @@ export function simulationStep(graph, t, params) {
   }
 
   // 3) Bridging trigger: mark nodes with |activation| > T_bridge.
-  // Only internal nodes (z0 and all bridge nodes z1_k, z2_k) are allowed to
+  // Only internal nodes (z0 and all bridge nodes z1, z2, ...) are allowed to
   // trigger bridges; inputs/outputs are excluded.
   const triggered = [];
   for (const [nodeId, node] of graph.nodes) {
@@ -103,9 +103,9 @@ export function simulationStep(graph, t, params) {
     if (!z0) continue;
     z0.lastBridge = t;
 
-    // New internal bridge nodes z1_k (closer to inputs) and z2_k (closer to outputs)
-    const z1Id = graph.newZ1Id();
-    const z2Id = graph.newZ2Id();
+    // New internal bridge nodes (closer to inputs / closer to outputs)
+    const z1Id = graph.newInternalId();
+    const z2Id = graph.newInternalId();
     graph.addNode(z1Id, 'internal');
     graph.addNode(z2Id, 'internal');
 
