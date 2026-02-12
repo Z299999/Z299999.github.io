@@ -172,7 +172,12 @@ function evolveStep() {
     outputView.update(outputHistory);
   }
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
-
+  if (activationView) {
+    activationView.update(computeActivationHistogram(graph));
+  }
+  if (weightView) {
+    weightView.update(computeWeightHistogram(graph));
+  }
   // Update degree chart every 10 steps
   if (t % 10 === 0) {
     chartView.update(graph.degreeHistogram());
@@ -247,6 +252,9 @@ function impulseTestStep() {
     outputView.update(outputHistory);
   }
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
+  if (weightView) {
+    weightView.update(computeWeightHistogram(graph));
+  }
 
   testStepIndex++;
 }
@@ -315,6 +323,9 @@ function runImpulseOnce() {
   graphView.update(graph, lastBridged);
   if (activationView) {
     activationView.update(computeActivationHistogram(graph));
+  }
+  if (weightView) {
+    weightView.update(computeWeightHistogram(graph));
   }
   const finalNorm =
     outputHistory.length
