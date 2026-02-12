@@ -55,10 +55,14 @@ export function simulationStep(graph, t, params) {
     }
   }
 
-  const actFn =
-    activation === 'relu'
-      ? (x) => (x > 0 ? x : 0)
-      : (x) => Math.tanh(x);
+  let actFn;
+  if (activation === 'relu') {
+    actFn = x => (x > 0 ? x : 0);
+  } else if (activation === 'identity') {
+    actFn = x => x;
+  } else {
+    actFn = x => Math.tanh(x);
+  }
 
   // 2) Forward pass for non-input nodes (in creation order)
   const order = graph.getForwardOrder();

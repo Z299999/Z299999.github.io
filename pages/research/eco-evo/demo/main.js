@@ -8,6 +8,7 @@ import { simulationStep } from './sim/step.js';
 import { Controls } from './ui/controls.js';
 import { GraphView } from './ui/graph-view.js';
 import { ChartView } from './ui/chart-view.js';
+import { ActivationView } from './ui/activation-view.js';
 import { OutputView } from './ui/output-view.js';
 import { Stats } from './ui/stats.js';
 
@@ -24,7 +25,7 @@ let currentTest = null; // { inputIndex, amplitude, steps }
 let testRunning = false; // within test mode: running vs idle
 
 // --- UI components (initialized after DOM ready) ---
-let controls, graphView, chartView, outputView, stats;
+let controls, graphView, chartView, activationView, outputView, stats;
 
 // --- Timing ---
 let lastFrameTime = 0;
@@ -93,24 +94,20 @@ function updateTopButtons() {
 function updateTestButtons() {
   const btnInject = document.getElementById('btn-test-inject');
   const btnStop = document.getElementById('btn-test-stop-recording');
-  const btnReset = document.getElementById('btn-test-reset');
-  if (!btnInject || !btnStop || !btnReset) return;
+  if (!btnInject || !btnStop) return;
 
   if (mode !== 'test') {
     btnInject.disabled = true;
     btnStop.disabled = true;
-    btnReset.disabled = true;
     return;
   }
 
   if (testRunning) {
     btnInject.disabled = true;
     btnStop.disabled = false;
-    btnReset.disabled = false;
   } else {
     btnInject.disabled = false;
     btnStop.disabled = true;
-    btnReset.disabled = true;
   }
 }
 
@@ -119,7 +116,10 @@ function reset() {
   const { m, n, activation } = controls.getStartParams();
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
-  activationKind = activation === 'relu' ? 'relu' : 'tanh';
+  activationKind =
+    activation === 'relu' || activation === 'identity'
+      ? activation
+      : 'tanh';
   graph = Graph.genesis(genesisM, safeN);
   recordOutput = true;
   t = 0;
@@ -169,6 +169,9 @@ function evolveStep() {
   // Update degree chart every 10 steps
   if (t % 10 === 0) {
     chartView.update(graph.degreeHistogram());
+    if (activationView) {
+      activationView.update(computeActivationHistogram(graph));
+    }
   }
 }
 
@@ -198,10 +201,14 @@ function impulseTestStep() {
   }
 
   // 2) Forward pass for non-input nodes (same order as simulationStep).
-  const actFn =
-    activationKind === 'relu'
-      ? (x) => (x > 0 ? x : 0)
-      : (x) => Math.tanh(x);
+  let actFn;
+  if (activationKind === 'relu') {
+    actFn = x => (x > 0 ? x : 0);
+  } else if (activationKind === 'identity') {
+    actFn = x => x;
+  } else {
+    actFn = x => Math.tanh(x);
+  }
   const order = graph.getForwardOrder();
   for (const nodeId of order) {
     const node = graph.nodes.get(nodeId);
@@ -226,6 +233,9 @@ function impulseTestStep() {
 
   // Update view and statistics. Use local testStepIndex on the time axis.
   graphView.update(graph, lastBridged);
+  if (activationView) {
+    activationView.update(computeActivationHistogram(graph));
+  }
 
   const outputNorm = computeOutputNorm(graph);
   if (recordOutput) {
@@ -299,6 +309,9 @@ function runImpulseOnce() {
   // Final view/state corresponds to the last step.
   lastBridged = new Set();
   graphView.update(graph, lastBridged);
+  if (activationView) {
+    activationView.update(computeActivationHistogram(graph));
+  }
   const finalNorm =
     outputHistory.length
       ? outputHistory[outputHistory.length - 1].norm
@@ -376,6 +389,43 @@ function togglePlay() {
   else play();
 }
 
+function computeActivationHistogram(graph) {
+  const activations = [];
+  for (const [, node] of graph.nodes) {
+    if (node.activation == null || Number.isNaN(node.activation)) continue;
+    activations.push(node.activation);
+  }
+  if (activations.length === 0) {
+    return { centers: [], counts: [] };
+  }
+
+  let maxAbs = 0;
+  for (const a of activations) {
+    const v = Math.abs(a);
+    if (v > maxAbs) maxAbs = v;
+  }
+  // Keep a reasonable window; clip extreme outliers.
+  const limit = Math.min(Math.max(maxAbs, 1), 10);
+  const minVal = -limit;
+  const maxVal = limit;
+  const bins = 21;
+  const width = (maxVal - minVal) / bins;
+  const counts = new Array(bins).fill(0);
+
+  for (const a of activations) {
+    let idx = Math.floor((Math.max(Math.min(a, maxVal - 1e-9), minVal) - minVal) / width);
+    if (idx < 0) idx = 0;
+    if (idx >= bins) idx = bins - 1;
+    counts[idx]++;
+  }
+
+  const centers = [];
+  for (let i = 0; i < bins; i++) {
+    centers.push(minVal + (i + 0.5) * width);
+  }
+  return { centers, counts };
+}
+
 function startImpulseTest() {
   if (!graph) return;
   pause();
@@ -410,6 +460,7 @@ function init() {
   controls = new Controls();
   graphView = new GraphView('cy');
   chartView = new ChartView('degree-chart');
+  activationView = new ActivationView('activation-chart');
   outputView = new OutputView('output-chart', 'output-window');
   stats = new Stats();
 
@@ -453,22 +504,6 @@ function init() {
   document.getElementById('btn-test-stop-recording').addEventListener('click', () => {
     if (mode !== 'test') return;
     pause();
-  });
-
-  // Reset graph state and output signal while in a running test.
-  document.getElementById('btn-test-reset').addEventListener('click', () => {
-    if (mode !== 'test' || !testRunning) return;
-    // Clear activations
-    if (graph) {
-      for (const [, node] of graph.nodes) {
-        node.activation = 0;
-      }
-      lastBridged = new Set();
-      graphView.update(graph, lastBridged);
-    }
-    // Clear output signal
-    outputHistory.length = 0;
-    outputView.update(outputHistory);
   });
 
   // Handle window resize
