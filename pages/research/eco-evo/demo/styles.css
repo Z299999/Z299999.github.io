@@ -152,16 +152,6 @@ html, body {
   width: 50px;
 }
 
-.inline-checkbox {
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-}
-
-.inline-checkbox input[type="checkbox"] {
-  width: auto;
-}
-
 #panel-left input[type="number"],
 #panel-left select {
   width: 100%;

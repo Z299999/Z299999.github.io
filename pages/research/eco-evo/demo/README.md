@@ -33,6 +33,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `n` | 1–50 | Number of output nodes |
 | Input source | noise / constant / sine | Input signal generator |
 | Activation | tanh / ReLU / Identity | Node activation nonlinearity (applied to all non-input nodes) |
+| Edge weight control | vanilla / tanh(w) | Whether the forward pass uses raw `w` or `tanh(w)` as the effective edge weight |
 
 ### Runtime (applied immediately)
 
@@ -46,7 +47,6 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `ε_zero` | 0–0.01 | 0.001 | Near-zero threshold for edge deletion / flip |
 | `K` (cooldown) | 0–50 | 10 | Minimum steps between two bridge events on the same node |
 | Speed | 1–200 | 10 | Simulation steps per second |
-| Use tanh(w) | checkbox | off | If enabled, forward pass uses `tanh(w)` as the effective edge weight while the underlying raw `w` continues to evolve |
 
 ## Simulation Step Order
 

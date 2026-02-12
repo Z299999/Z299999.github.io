@@ -20,6 +20,7 @@ let playing = false;
 let lastBridged = new Set();
 let genesisM = 3; // track m used at last reset
 let activationKind = 'tanh';
+let weightControlKind = 'vanilla';
 let mode = 'evolve'; // 'evolve' | 'test'
 let testStepIndex = 0;
 let currentTest = null; // { inputIndex, amplitude, steps }
@@ -114,13 +115,17 @@ function updateTestButtons() {
 
 /** Initialize or re-initialize the simulation. */
 function reset() {
-  const { m, n, activation } = controls.getStartParams();
+  const { m, n, activation, weightControl } = controls.getStartParams();
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
   activationKind =
     activation === 'relu' || activation === 'identity'
       ? activation
       : 'tanh';
+  weightControlKind =
+    weightControl === 'tanh'
+      ? 'tanh'
+      : 'vanilla';
   graph = Graph.genesis(genesisM, safeN);
   recordOutput = true;
   t = 0;
@@ -153,7 +158,8 @@ function evolveStep() {
   const runParams = {
     ...controls.getRunParams(),
     m: genesisM,
-    activation: activationKind
+    activation: activationKind,
+    weightTanh: weightControlKind === 'tanh'
   };
 
   const events = simulationStep(graph, t, runParams);
@@ -210,8 +216,10 @@ function impulseTestStep() {
   }
 
   // 2) Forward pass for non-input nodes (same order as simulationStep).
-  const { weightTanh } = controls.getRunParams();
-  const weightFn = weightTanh ? w => Math.tanh(w) : w => w;
+  const weightFn =
+    weightControlKind === 'tanh'
+      ? w => Math.tanh(w)
+      : w => w;
   let actFn;
   if (activationKind === 'relu') {
     actFn = x => (x > 0 ? x : 0);
@@ -284,8 +292,10 @@ function runImpulseOnce() {
       ? outputHistory[outputHistory.length - 1].t + 1
       : 0;
 
-  const { weightTanh } = controls.getRunParams();
-  const weightFn = weightTanh ? w => Math.tanh(w) : w => w;
+  const weightFn =
+    weightControlKind === 'tanh'
+      ? w => Math.tanh(w)
+      : w => w;
 
   for (let k = 0; k < steps; k++) {
     // Inputs: impulse at k=0 on selected channel, otherwise 0.

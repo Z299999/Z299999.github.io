@@ -63,6 +63,13 @@
             <option value="identity">Identity</option>
           </select>
         </label>
+        <label>
+          Edge weight control
+          <select id="param-weight-control">
+            <option value="vanilla" selected>vanilla</option>
+            <option value="tanh">tanh(w)</option>
+          </select>
+        </label>
       </fieldset>
 
       <fieldset id="fieldset-runtime">
@@ -101,10 +108,6 @@
           K (bridge cooldown)
           <input type="range" id="param-K" min="0" max="50" value="10" step="1">
           <span id="param-K-val">10</span>
-        </label>
-        <label class="inline-checkbox">
-          <input type="checkbox" id="param-weight-tanh">
-          <span>Use tanh(w) as effective weight</span>
         </label>
       </fieldset>
 

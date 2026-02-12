@@ -9,6 +9,7 @@ export class Controls {
     this.elN = document.getElementById('param-n');
     this.elInputSource = document.getElementById('param-input-source');
     this.elActivation = document.getElementById('param-activation');
+    this.elWeightControl = document.getElementById('param-weight-control');
 
     // Run-time params (apply immediately)
     this.elMu = document.getElementById('param-mu');
@@ -27,7 +28,6 @@ export class Controls {
     this.elKVal = document.getElementById('param-K-val');
     this.elSpeed = document.getElementById('param-speed');
     this.elSpeedVal = document.getElementById('param-speed-val');
-    this.elWeightTanh = document.getElementById('param-weight-tanh');
 
     // Impulse test params
     this.elTestInput = document.getElementById('param-test-input');
@@ -57,7 +57,8 @@ export class Controls {
       m: parseInt(this.elM.value, 10),
       n: parseInt(this.elN.value, 10),
       inputSource: this.elInputSource.value,
-      activation: this.elActivation?.value || 'tanh'
+      activation: this.elActivation?.value || 'tanh',
+      weightControl: this.elWeightControl?.value || 'vanilla'
     };
   }
 
@@ -71,8 +72,7 @@ export class Controls {
       omega: parseFloat(this.elOmega.value),
       epsilon: parseFloat(this.elEpsZero.value),
       K: parseInt(this.elK.value, 10),
-      inputSource: this.elInputSource.value,
-      weightTanh: !!this.elWeightTanh?.checked
+      inputSource: this.elInputSource.value
     };
   }
 
