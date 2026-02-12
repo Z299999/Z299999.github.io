@@ -515,6 +515,18 @@ function endImpulseTest() {
       node.activation = 0;
     }
   }
+  // Clear output history so the main mode starts a fresh trace
+  // after leaving test mode.
+  outputHistory.length = 0;
+  outputView.update(outputHistory);
+  const outputNorm = computeOutputNorm(graph);
+  stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
+  if (activationView) {
+    activationView.update(computeActivationHistogram(graph));
+  }
+  if (weightView) {
+    weightView.update(computeWeightHistogram(graph));
+  }
   updateModeUI();
 }
 
