@@ -74,7 +74,12 @@ Your content here...
 The interactive eco-evolutionary neural ecosystem lives under `pages/research/eco-evo/`:
 
 - Edit project text in `pages/research/eco-evo/index.md`
-- Edit demo HTML / styles / JS in `demo.html`, `style.css`, and `viewer.js`
+- Edit the interactive demo in `pages/research/eco-evo/demo/`:
+  - Structure and UI: `index.html`
+  - Styles: `styles.css`
+  - Orchestrator / logic: `main.js`
+  - Simulation core: `sim/graph.js`, `sim/step.js`, `sim/input.js`
+  - Visual components: files under `ui/` (graph view, charts, controls, stats)
 
 All top-level sections (`research.md`, `films.md`, `writing.md`, `life.md`) are kept as simple, mostly static HTML pages; new subpages are only needed if you want additional project-specific sections like the eco-evo demo.
 
