@@ -404,8 +404,15 @@ function computeActivationHistogram(graph) {
     const v = Math.abs(a);
     if (v > maxAbs) maxAbs = v;
   }
-  // Keep a reasonable window; clip extreme outliers.
-  const limit = Math.min(Math.max(maxAbs, 1), 10);
+  // Window tightly around current activations; only clip extreme outliers.
+  // This avoids everything collapsing into a single central bin when
+  // activations are very small.
+  let limit;
+  if (maxAbs < 1e-6) {
+    limit = 1e-3;
+  } else {
+    limit = Math.min(maxAbs * 1.2, 10);
+  }
   const minVal = -limit;
   const maxVal = limit;
   const bins = 21;
