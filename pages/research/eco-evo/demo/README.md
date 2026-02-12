@@ -31,6 +31,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 |-----------|-------|-------------|
 | `m` | 1–50 | Number of input nodes |
 | `n` | 1–50 | Number of output nodes |
+| `k` | 1–50 | Number of internal nodes at genesis (z0, ..., z_{k-1} fully connected; each x_i connects to every z_j, and each z_j connects to every y_l) |
 | Input source | noise / constant / sine | Input signal generator |
 | Activation | tanh / ReLU / Identity | Node activation nonlinearity (applied to all non-input nodes) |
 | Edge weight control | vanilla / tanh(w) / OU | - `vanilla`: Brownian weight dynamics + raw `w` in forward pass; `tanh(w)`: Brownian dynamics + `tanh(w)` as effective weight; `OU`: Ornstein–Uhlenbeck dynamics with mean `m` and raw `w` in forward pass |

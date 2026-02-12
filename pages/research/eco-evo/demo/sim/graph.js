@@ -9,13 +9,19 @@ export class Graph {
     this.edges = new Map();   // id -> { id, src, dst, w }
     this.adjOut = new Map();  // src -> Set of edge ids
     this.adjIn = new Map();   // dst -> Set of edge ids
-    // Counter for internal bridge nodes z1, z2, z3, ...
-    this._nextZIndex = 1;     // z0 is reserved for the central node
+    // Counter for internal nodes z1, z2, z3, ...
+    // z0 (and any additional z's created at genesis) use explicit ids.
+    this._nextZIndex = 1;
     this._nextEdgeId = 0;
   }
 
-  /** Create the genesis graph with m inputs, 1 central node, n outputs. */
-  static genesis(m, n) {
+  /**
+   * Create the genesis graph with m inputs, k internal nodes, and n outputs.
+   * Internal nodes z0, z1, ..., z{k-1} form a fully connected directed
+   * graph (no self-loops). Every input x_i connects to every z_j, and
+   * every z_j connects to every output y_l.
+   */
+  static genesis(m, n, k = 1) {
     const g = new Graph();
 
     // Input nodes x0, ..., x{m-1}
@@ -26,8 +32,14 @@ export class Graph {
       inputs.push(id);
     }
 
-    // Central node z0
-    g.addNode('z0', 'internal');
+    // Internal nodes z0, z1, ..., z{k-1}
+    const internals = [];
+    const kInt = Math.max(1, k | 0);
+    for (let j = 0; j < kInt; j++) {
+      const id = j === 0 ? 'z0' : g.newInternalId();
+      g.addNode(id, 'internal');
+      internals.push(id);
+    }
 
     // Output nodes y0, ..., y{n-1}
     const outputs = [];
@@ -37,15 +49,31 @@ export class Graph {
       outputs.push(id);
     }
 
-    // Edges: xi -> z0 with weight 1/m
-    const wIn = 1 / m;
-    for (const inId of inputs) {
-      g.addEdge(inId, 'z0', wIn);
+    // Edges: fully connect internal nodes (no self-loops)
+    if (internals.length > 1) {
+      const wZZ = 1 / internals.length;
+      for (const src of internals) {
+        for (const dst of internals) {
+          if (src === dst) continue;
+          g.addEdge(src, dst, wZZ);
+        }
+      }
     }
 
-    // Edges: z0 -> yj with weight 1
-    for (const outId of outputs) {
-      g.addEdge('z0', outId, 1);
+    // Edges: xi -> z_j with weight 1/m
+    const wIn = 1 / m;
+    for (const inId of inputs) {
+      for (const zId of internals) {
+        g.addEdge(inId, zId, wIn);
+      }
+    }
+
+    // Edges: z_j -> y_l with weight 1/kInt
+    const wOut = 1 / kInt;
+    for (const zId of internals) {
+      for (const outId of outputs) {
+        g.addEdge(zId, outId, wOut);
+      }
     }
 
     return g;

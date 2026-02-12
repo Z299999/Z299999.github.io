@@ -113,7 +113,7 @@ function updateTestButtons() {
 
 /** Initialize or re-initialize the simulation. */
 function reset() {
-  const { m, n, activation, weightControl } = controls.getStartParams();
+  const { m, n, kInternal, activation, weightControl } = controls.getStartParams();
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
   activationKind =
@@ -124,7 +124,8 @@ function reset() {
     weightControl === 'tanh' || weightControl === 'ou'
       ? weightControl
       : 'vanilla';
-  graph = Graph.genesis(genesisM, safeN);
+  const safeK = Math.max(1, kInternal | 0);
+  graph = Graph.genesis(genesisM, safeN, safeK);
   recordOutput = true;
   t = 0;
   lastBridged = new Set();

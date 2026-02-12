@@ -7,6 +7,7 @@ export class Controls {
     // Start-time params (apply on Reset)
     this.elM = document.getElementById('param-m');
     this.elN = document.getElementById('param-n');
+    this.elKInternal = document.getElementById('param-k');
     this.elInputSource = document.getElementById('param-input-source');
     this.elActivation = document.getElementById('param-activation');
     this.elWeightControl = document.getElementById('param-weight-control');
@@ -61,6 +62,7 @@ export class Controls {
     return {
       m: parseInt(this.elM.value, 10),
       n: parseInt(this.elN.value, 10),
+       kInternal: this.elKInternal ? parseInt(this.elKInternal.value, 10) || 1 : 1,
       inputSource: this.elInputSource.value,
       activation: this.elActivation?.value || 'tanh',
       weightControl: this.elWeightControl?.value || 'vanilla'
