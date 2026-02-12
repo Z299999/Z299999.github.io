@@ -46,6 +46,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `ε_zero` | 0–0.01 | 0.001 | Near-zero threshold for edge deletion / flip |
 | `K` (cooldown) | 0–50 | 10 | Minimum steps between two bridge events on the same node |
 | Speed | 1–200 | 10 | Simulation steps per second |
+| Use tanh(w) | checkbox | off | If enabled, forward pass uses `tanh(w)` as the effective edge weight while the underlying raw `w` continues to evolve |
 
 ## Simulation Step Order
 
@@ -60,7 +61,7 @@ Each call to `step()` executes in this exact order:
      - `Identity(x) = x` (fully linear graph)
 3. **Bridging trigger** — For internal nodes, mark those where `|a_i| > T_bridge` (with cooldown `K` steps)
 4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `xi` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
-5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)`
+5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)` (to be replaced by OU updates in future versions)
 6. **Near-zero event** — If `|w| < ε_zero`:
    - With probability `p_flip`: draw a new magnitude `u ~ Uniform(0, ε_zero)` and set  
      `w ← -sign(w) · u` (flip the sign but keep the weight small)

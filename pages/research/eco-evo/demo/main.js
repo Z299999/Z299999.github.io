@@ -210,6 +210,8 @@ function impulseTestStep() {
   }
 
   // 2) Forward pass for non-input nodes (same order as simulationStep).
+  const { weightTanh } = controls.getRunParams();
+  const weightFn = weightTanh ? w => Math.tanh(w) : w => w;
   let actFn;
   if (activationKind === 'relu') {
     actFn = x => (x > 0 ? x : 0);
@@ -231,7 +233,7 @@ function impulseTestStep() {
         if (!edge) continue;
         const srcNode = graph.nodes.get(edge.src);
         if (!srcNode) continue;
-        z += edge.w * srcNode.activation;
+        z += weightFn(edge.w) * srcNode.activation;
       }
     }
     node.activation = actFn(z);
@@ -282,6 +284,9 @@ function runImpulseOnce() {
       ? outputHistory[outputHistory.length - 1].t + 1
       : 0;
 
+  const { weightTanh } = controls.getRunParams();
+  const weightFn = weightTanh ? w => Math.tanh(w) : w => w;
+
   for (let k = 0; k < steps; k++) {
     // Inputs: impulse at k=0 on selected channel, otherwise 0.
     for (let i = 0; i < genesisM; i++) {
@@ -308,7 +313,7 @@ function runImpulseOnce() {
           if (!edge) continue;
           const srcNode = graph.nodes.get(edge.src);
           if (!srcNode) continue;
-          z += edge.w * srcNode.activation;
+          z += weightFn(edge.w) * srcNode.activation;
         }
       }
       node.activation = actFn(z);

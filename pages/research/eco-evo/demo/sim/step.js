@@ -23,7 +23,7 @@ function randn() {
  * Execute one simulation step.
  * @param {Graph} graph
  * @param {number} t - current step counter
- * @param {object} params - { mu, pFlip, tBridge, sigma, omega, epsilon, K, inputSource, m, activation }
+ * @param {object} params - { mu, pFlip, tBridge, sigma, omega, epsilon, K, inputSource, m, activation, weightTanh }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
 export function simulationStep(graph, t, params) {
@@ -37,7 +37,8 @@ export function simulationStep(graph, t, params) {
     K,
     inputSource,
     m,
-    activation
+    activation,
+    weightTanh
   } = params;
 
   // Defaults if UI values are missing
@@ -64,6 +65,8 @@ export function simulationStep(graph, t, params) {
     actFn = x => Math.tanh(x);
   }
 
+  const weightFn = weightTanh ? w => Math.tanh(w) : w => w;
+
   // 2) Forward pass for non-input nodes (in creation order)
   const order = graph.getForwardOrder();
   for (const nodeId of order) {
@@ -78,7 +81,7 @@ export function simulationStep(graph, t, params) {
         if (!edge) continue;
         const srcNode = graph.nodes.get(edge.src);
         if (!srcNode) continue;
-        z += edge.w * srcNode.activation;
+        z += weightFn(edge.w) * srcNode.activation;
       }
     }
     node.activation = actFn(z);
