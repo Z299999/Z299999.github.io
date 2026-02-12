@@ -168,14 +168,20 @@ export function simulationStep(graph, t, params) {
 
   // 5) Weight update for every edge
   if (useOU) {
-    // Ornstein–Uhlenbeck update with mean reversion to ouMean.
+    // Ornstein–Uhlenbeck update with mean reversion.
+    // We interpret ouMean as a magnitude m >= 0 and use
+    // a sign-dependent mean: +m for positive edges and
+    // -m for negative edges. This gives each sign its own
+    // stable position at ±m.
     const gamma = 0.05; // fixed mean-reversion rate for now
     const a = Math.exp(-gamma);
     const b = sigmaVal * Math.sqrt((1 - a * a) / (2 * gamma));
-    const mOU = Number.isFinite(ouMean) ? ouMean : 0;
+    const mMag = Number.isFinite(ouMean) ? Math.abs(ouMean) : 0;
     for (const [, edge] of graph.edges) {
       const w = edge.w;
-      edge.w = mOU + a * (w - mOU) + b * randn();
+      const s = Math.sign(w) || (Math.random() < 0.5 ? 1 : -1);
+      const mE = s * mMag;
+      edge.w = mE + a * (w - mE) + b * randn();
     }
   } else {
     for (const [, edge] of graph.edges) {
