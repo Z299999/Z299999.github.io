@@ -100,9 +100,7 @@ demo/
 ├── ui/
 │   ├── controls.js     # Parameter panel reader
 │   ├── graph-view.js   # Cytoscape.js wrapper
-│   ├── chart-view.js   # Chart.js degree histogram
-│   ├── activation-view.js # Chart.js node activation value histogram
-│   ├── weight-view.js  # Chart.js edge weight histogram
+│   ├── distributions.js # Chart.js histograms (degree, node activation, edge weight)
 │   ├── output-view.js  # Chart.js output norm time-series
 │   └── stats.js        # Read-only stat counters
 └── README.md

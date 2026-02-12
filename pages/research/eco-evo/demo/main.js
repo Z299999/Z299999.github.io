@@ -7,9 +7,7 @@ import { Graph } from './sim/graph.js';
 import { simulationStep } from './sim/step.js';
 import { Controls } from './ui/controls.js';
 import { GraphView } from './ui/graph-view.js';
-import { ChartView } from './ui/chart-view.js';
-import { ActivationView } from './ui/activation-view.js';
-import { WeightView } from './ui/weight-view.js';
+import { ChartView, ActivationView, WeightView } from './ui/distributions.js';
 import { OutputView } from './ui/output-view.js';
 import { Stats } from './ui/stats.js';
 
