@@ -18,7 +18,8 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 - **Center** — Interactive graph (Cytoscape.js) with zoom/pan
 - **Right panel** —  
   - Output signal `‖y(t)‖₂` (value + time series)  
-  - Activation value distribution histogram (all node activations)  
+  - Node activation value distribution histogram (all node activations)  
+  - Edge weight distribution histogram  
   - Degree distribution histogram  
 - **Top toolbar** — Play/Pause, Step, Reset, Speed slider, live stats
 
@@ -74,7 +75,8 @@ At each step the UI also shows:
   \|y(t)\|_2 = \sqrt{\sum_j a_{yj}(t)^2}.
   \]
   plus a line chart of `‖y(t)‖₂` over time (window selectable as last 50/100/500/1000/5000 steps or all steps).
-- **Activation histogram** — a live bar chart of node activation values binned over a symmetric range `[-L, L]` (with `L` automatically chosen between 1 and 10 based on current activations).
+- **Node activation histogram** — a live bar chart of node activation values binned over a symmetric range `[-L, L]` (with `L` automatically chosen between 1 and 10 based on current activations).
+- **Edge weight histogram** — a live bar chart of edge weights binned over a symmetric range `[-L, L]` (with `L` chosen based on the current maximum absolute weight).
 
 ## File Structure
 
@@ -91,7 +93,8 @@ demo/
 │   ├── controls.js     # Parameter panel reader
 │   ├── graph-view.js   # Cytoscape.js wrapper
 │   ├── chart-view.js   # Chart.js degree histogram
-│   ├── activation-view.js # Chart.js activation value histogram
+│   ├── activation-view.js # Chart.js node activation value histogram
+│   ├── weight-view.js  # Chart.js edge weight histogram
 │   ├── output-view.js  # Chart.js output norm time-series
 │   └── stats.js        # Read-only stat counters
 └── README.md
