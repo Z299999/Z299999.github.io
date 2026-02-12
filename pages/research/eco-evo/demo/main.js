@@ -136,6 +136,9 @@ function reset() {
   outputHistory.push({ t, norm: outputNorm });
   outputView.update(outputHistory);
   stats.update(t, graph.nodeCount, graph.edgeCount, outputNorm);
+  if (activationView) {
+    activationView.update(computeActivationHistogram(graph));
+  }
 }
 
 /** Run a single eco-evo evolution step and update the UI. */
@@ -169,9 +172,6 @@ function evolveStep() {
   // Update degree chart every 10 steps
   if (t % 10 === 0) {
     chartView.update(graph.degreeHistogram());
-    if (activationView) {
-      activationView.update(computeActivationHistogram(graph));
-    }
   }
 }
 
