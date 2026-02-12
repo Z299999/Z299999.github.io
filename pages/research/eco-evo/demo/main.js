@@ -520,6 +520,21 @@ function startImpulseTest() {
   updateModeUI();
 }
 
+function updateWeightDynamicsUI() {
+  const sel = document.getElementById('param-weight-control');
+  const muSlider = document.getElementById('param-mu');
+  const ouSlider = document.getElementById('param-ou-mean');
+  if (!sel || !muSlider || !ouSlider) return;
+  const modeVal = sel.value;
+  if (modeVal === 'ou') {
+    muSlider.disabled = true;
+    ouSlider.disabled = false;
+  } else {
+    muSlider.disabled = false;
+    ouSlider.disabled = true;
+  }
+}
+
 function endImpulseTest() {
   pause();
   mode = 'evolve';
@@ -556,6 +571,14 @@ function init() {
   weightView = new WeightView('weight-chart');
   outputView = new OutputView('output-chart', 'output-window');
   stats = new Stats();
+
+  // Weight dynamics UI: disable/enable μ vs OU mean based on Genesis selection
+  const weightCtrlSelect = document.getElementById('param-weight-control');
+  if (weightCtrlSelect) {
+    weightCtrlSelect.addEventListener('change', updateWeightDynamicsUI);
+    // Initialize once based on current selection
+    updateWeightDynamicsUI();
+  }
 
   // Button bindings
   document.getElementById('btn-play').addEventListener('click', togglePlay);

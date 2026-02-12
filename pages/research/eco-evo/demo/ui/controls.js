@@ -29,6 +29,7 @@ export class Controls {
     this.elSpeed = document.getElementById('param-speed');
     this.elSpeedVal = document.getElementById('param-speed-val');
     this.elOuMean = document.getElementById('param-ou-mean');
+    this.elOuMeanVal = document.getElementById('param-ou-mean-val');
 
     // Impulse test params
     this.elTestInput = document.getElementById('param-test-input');
@@ -44,6 +45,9 @@ export class Controls {
     this._bindSliderDisplay(this.elEpsZero, this.elEpsZeroVal);
     this._bindSliderDisplay(this.elK, this.elKVal);
     this._bindSliderDisplay(this.elSpeed, this.elSpeedVal);
+    if (this.elOuMean && this.elOuMeanVal) {
+      this._bindSliderDisplay(this.elOuMean, this.elOuMeanVal);
+    }
   }
 
   _bindSliderDisplay(slider, display) {
