@@ -23,7 +23,11 @@ function randn() {
  * Execute one simulation step.
  * @param {Graph} graph
  * @param {number} t - current step counter
- * @param {object} params - { mu, pFlip, tBridge, sigma, omega, epsilon, K, inputSource, m, activation, weightTanh }
+ * @param {object} params - {
+ *   mu, pFlip, tBridge, sigma, omega, epsilon, K,
+ *   inputSource, m, activation,
+ *   weightTanh, useOU, ouMean
+ * }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
 export function simulationStep(graph, t, params) {
@@ -38,7 +42,9 @@ export function simulationStep(graph, t, params) {
     inputSource,
     m,
     activation,
-    weightTanh
+    weightTanh,
+    useOU,
+    ouMean
   } = params;
 
   // Defaults if UI values are missing
@@ -161,8 +167,20 @@ export function simulationStep(graph, t, params) {
   }
 
   // 5) Weight update for every edge
-  for (const [, edge] of graph.edges) {
-    edge.w += sigmaVal * randn() + mu * Math.sign(edge.w);
+  if (useOU) {
+    // Ornstein–Uhlenbeck update with mean reversion to ouMean.
+    const gamma = 0.05; // fixed mean-reversion rate for now
+    const a = Math.exp(-gamma);
+    const b = sigmaVal * Math.sqrt((1 - a * a) / (2 * gamma));
+    const mOU = Number.isFinite(ouMean) ? ouMean : 0;
+    for (const [, edge] of graph.edges) {
+      const w = edge.w;
+      edge.w = mOU + a * (w - mOU) + b * randn();
+    }
+  } else {
+    for (const [, edge] of graph.edges) {
+      edge.w += sigmaVal * randn() + mu * Math.sign(edge.w);
+    }
   }
 
   // 6) Near-zero event

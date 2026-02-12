@@ -33,14 +33,15 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `n` | 1–50 | Number of output nodes |
 | Input source | noise / constant / sine | Input signal generator |
 | Activation | tanh / ReLU / Identity | Node activation nonlinearity (applied to all non-input nodes) |
-| Edge weight control | vanilla / tanh(w) | Whether the forward pass uses raw `w` or `tanh(w)` as the effective edge weight |
+| Edge weight control | vanilla / tanh(w) / OU | - `vanilla`: Brownian weight dynamics + raw `w` in forward pass; `tanh(w)`: Brownian dynamics + `tanh(w)` as effective weight; `OU`: Ornstein–Uhlenbeck dynamics with mean `m` and raw `w` in forward pass |
 
 ### Runtime (applied immediately)
 
 | Parameter | Range | Default | Description |
 |-----------|-------|---------|-------------|
 | `μ` (mu) | -0.1–0.1 | 0.0 | Drift term in `w += σ ξ + μ sign(w)` (can be negative) |
-| `σ` (sigma) | 0–0.05 | 0.02 | Weight noise standard deviation |
+| `σ` (sigma) | 0–0.05 | 0.02 | Weight noise standard deviation (used in both Brownian and OU dynamics) |
+| OU mean `m` | free | 0.0 | Target mean for OU weight dynamics (only used when edge weight control is set to OU) |
 | `p_flip` | 0–1 | 0.3 | Probability of sign-flip when `|w|` is near zero |
 | `T_bridge` | 0–1 | 0.8 | Activation threshold for triggering bridges |
 | `ω` (omega) | 0–0.2 | 0.05 | Bridge feedback strength for edges `z1 → z0 = -ω`, `z0 → z2 = ω` |
@@ -61,7 +62,13 @@ Each call to `step()` executes in this exact order:
      - `Identity(x) = x` (fully linear graph)
 3. **Bridging trigger** — For internal nodes, mark those where `|a_i| > T_bridge` (with cooldown `K` steps)
 4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `xi` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
-5. **Weight update** — For every edge: `w += σ × N(0,1) + μ × sign(w)` (to be replaced by OU updates in future versions)
+5. **Weight update** — For every edge:
+   - If edge weight control is `vanilla` or `tanh(w)`: `w += σ × N(0,1) + μ × sign(w)`  
+   - If edge weight control is `OU`: Ornstein–Uhlenbeck update  
+     \[
+     w \leftarrow m + a(w - m) + b\,\xi, \quad a = e^{-\gamma},\; b = \sigma \sqrt{\frac{1-a^2}{2\gamma}}
+     \]
+     with fixed mean-reversion rate `γ = 0.05`, user-controlled mean `m`, and shared `σ`.
 6. **Near-zero event** — If `|w| < ε_zero`:
    - With probability `p_flip`: draw a new magnitude `u ~ Uniform(0, ε_zero)` and set  
      `w ← -sign(w) · u` (flip the sign but keep the weight small)

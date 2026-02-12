@@ -123,8 +123,8 @@ function reset() {
       ? activation
       : 'tanh';
   weightControlKind =
-    weightControl === 'tanh'
-      ? 'tanh'
+    weightControl === 'tanh' || weightControl === 'ou'
+      ? weightControl
       : 'vanilla';
   graph = Graph.genesis(genesisM, safeN);
   recordOutput = true;
@@ -159,7 +159,8 @@ function evolveStep() {
     ...controls.getRunParams(),
     m: genesisM,
     activation: activationKind,
-    weightTanh: weightControlKind === 'tanh'
+    weightTanh: weightControlKind === 'tanh',
+    useOU: weightControlKind === 'ou'
   };
 
   const events = simulationStep(graph, t, runParams);

@@ -28,6 +28,7 @@ export class Controls {
     this.elKVal = document.getElementById('param-K-val');
     this.elSpeed = document.getElementById('param-speed');
     this.elSpeedVal = document.getElementById('param-speed-val');
+    this.elOuMean = document.getElementById('param-ou-mean');
 
     // Impulse test params
     this.elTestInput = document.getElementById('param-test-input');
@@ -72,7 +73,8 @@ export class Controls {
       omega: parseFloat(this.elOmega.value),
       epsilon: parseFloat(this.elEpsZero.value),
       K: parseInt(this.elK.value, 10),
-      inputSource: this.elInputSource.value
+      inputSource: this.elInputSource.value,
+      ouMean: this.elOuMean ? parseFloat(this.elOuMean.value) || 0 : 0
     };
   }
 
