@@ -9,6 +9,7 @@ import { Controls } from './ui/controls.js';
 import { GraphView } from './ui/graph-view.js';
 import { ChartView } from './ui/chart-view.js';
 import { ActivationView } from './ui/activation-view.js';
+import { WeightView } from './ui/weight-view.js';
 import { OutputView } from './ui/output-view.js';
 import { Stats } from './ui/stats.js';
 
@@ -25,7 +26,7 @@ let currentTest = null; // { inputIndex, amplitude, steps }
 let testRunning = false; // within test mode: running vs idle
 
 // --- UI components (initialized after DOM ready) ---
-let controls, graphView, chartView, activationView, outputView, stats;
+let controls, graphView, chartView, activationView, weightView, outputView, stats;
 
 // --- Timing ---
 let lastFrameTime = 0;
@@ -132,6 +133,9 @@ function reset() {
 
   graphView.rebuild(graph, lastBridged);
   chartView.update(graph.degreeHistogram());
+  if (weightView) {
+    weightView.update(computeWeightHistogram(graph));
+  }
   const outputNorm = computeOutputNorm(graph);
   outputHistory.push({ t, norm: outputNorm });
   outputView.update(outputHistory);
@@ -433,6 +437,48 @@ function computeActivationHistogram(graph) {
   return { centers, counts };
 }
 
+function computeWeightHistogram(graph) {
+  const weights = [];
+  for (const [, edge] of graph.edges) {
+    if (edge.w == null || Number.isNaN(edge.w)) continue;
+    weights.push(edge.w);
+  }
+  if (weights.length === 0) {
+    return { centers: [], counts: [] };
+  }
+
+  let maxAbs = 0;
+  for (const w of weights) {
+    const v = Math.abs(w);
+    if (v > maxAbs) maxAbs = v;
+  }
+  let limit;
+  if (maxAbs < 1e-6) {
+    limit = 1e-3;
+  } else {
+    limit = Math.min(maxAbs * 1.2, 10);
+  }
+  const minVal = -limit;
+  const maxVal = limit;
+  const bins = 21;
+  const width = (maxVal - minVal) / bins;
+  const counts = new Array(bins).fill(0);
+
+  for (const w of weights) {
+    let clamped = Math.max(Math.min(w, maxVal - 1e-9), minVal);
+    let idx = Math.floor((clamped - minVal) / width);
+    if (idx < 0) idx = 0;
+    if (idx >= bins) idx = bins - 1;
+    counts[idx]++;
+  }
+
+  const centers = [];
+  for (let i = 0; i < bins; i++) {
+    centers.push(minVal + (i + 0.5) * width);
+  }
+  return { centers, counts };
+}
+
 function startImpulseTest() {
   if (!graph) return;
   pause();
@@ -468,6 +514,7 @@ function init() {
   graphView = new GraphView('cy');
   chartView = new ChartView('degree-chart');
   activationView = new ActivationView('activation-chart');
+  weightView = new WeightView('weight-chart');
   outputView = new OutputView('output-chart', 'output-window');
   stats = new Stats();
 
