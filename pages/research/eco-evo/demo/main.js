@@ -523,13 +523,19 @@ function updateWeightDynamicsUI() {
   const muSlider = document.getElementById('param-mu');
   const ouSlider = document.getElementById('param-ou-mean');
   if (!sel || !muSlider || !ouSlider) return;
+   const muLabel = muSlider.closest('label');
+   const ouLabel = ouSlider.closest('label');
   const modeVal = sel.value;
   if (modeVal === 'ou') {
     muSlider.disabled = true;
     ouSlider.disabled = false;
+    if (muLabel) muLabel.classList.add('disabled-slider');
+    if (ouLabel) ouLabel.classList.remove('disabled-slider');
   } else {
     muSlider.disabled = false;
     ouSlider.disabled = true;
+    if (muLabel) muLabel.classList.remove('disabled-slider');
+    if (ouLabel) ouLabel.classList.add('disabled-slider');
   }
 }
 
