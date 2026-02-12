@@ -142,10 +142,12 @@ html, body {
   flex-direction: row;
   align-items: center;
   gap: 6px;
+  justify-content: flex-start;
 }
 
 .inline-pair span {
   white-space: nowrap;
+  text-align: left;
 }
 
 .inline-pair input[type="number"] {
