@@ -634,6 +634,33 @@ function endImpulseTest() {
   updateModeUI();
 }
 
+function updateConstructionUI() {
+  const constructionSelect = document.getElementById('param-construction');
+  const tBridgeSlider = document.getElementById('param-tbridge');
+  const omegaSlider = document.getElementById('param-omega');
+  const kSlider = document.getElementById('param-K');
+  if (!constructionSelect || !tBridgeSlider || !omegaSlider || !kSlider) return;
+
+  const tBridgeLabel = tBridgeSlider.closest('label');
+  const omegaLabel = omegaSlider.closest('label');
+  const kLabel = kSlider.closest('label');
+
+  const isRandom = constructionSelect.value === 'random';
+  tBridgeSlider.disabled = isRandom;
+  omegaSlider.disabled = isRandom;
+  kSlider.disabled = isRandom;
+
+  const applyClass = (label, disabled) => {
+    if (!label) return;
+    if (disabled) label.classList.add('disabled-slider');
+    else label.classList.remove('disabled-slider');
+  };
+
+  applyClass(tBridgeLabel, isRandom);
+  applyClass(omegaLabel, isRandom);
+  applyClass(kLabel, isRandom);
+}
+
 // --- Initialize ---
 // ES modules are deferred, so the DOM is ready when this runs.
 function init() {
@@ -651,6 +678,13 @@ function init() {
     weightCtrlSelect.addEventListener('change', updateWeightDynamicsUI);
     // Initialize once based on current selection
     updateWeightDynamicsUI();
+  }
+
+  // Construction UI: disable T_bridge, omega, K when using random construction.
+  const constructionSelect = document.getElementById('param-construction');
+  if (constructionSelect) {
+    constructionSelect.addEventListener('change', updateConstructionUI);
+    updateConstructionUI();
   }
 
   // Activation UI: enable θ slider only for thresholded ReLU.
