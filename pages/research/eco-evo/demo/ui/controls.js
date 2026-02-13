@@ -9,6 +9,7 @@ export class Controls {
     this.elN = document.getElementById('param-n');
     this.elKInternal = document.getElementById('param-k');
     this.elInputSource = document.getElementById('param-input-source');
+    this.elConstruction = document.getElementById('param-construction');
     this.elActivation = document.getElementById('param-activation');
     this.elWeightControl = document.getElementById('param-weight-control');
 
@@ -68,7 +69,8 @@ export class Controls {
        kInternal: this.elKInternal ? parseInt(this.elKInternal.value, 10) || 1 : 1,
       inputSource: this.elInputSource.value,
       activation: this.elActivation?.value || 'tanh',
-      weightControl: this.elWeightControl?.value || 'vanilla'
+      weightControl: this.elWeightControl?.value || 'vanilla',
+      construction: this.elConstruction?.value || 'bridge'
     };
   }
 

@@ -19,6 +19,149 @@ function randn() {
   return Math.sqrt(-2 * Math.log(u1 || 1e-30)) * Math.cos(2 * Math.PI * u2);
 }
 
+// --- Random growth helpers (used when construction === 'random') ---
+
+// Small probabilities for random structural growth.
+const P_ADD_EDGE = 0.01;
+const P_ADD_NODE = 0.005;
+
+/**
+ * Sample an integer distance d ∈ {1, ..., dMax} from a discrete power-law
+ * distribution P(d) ∝ 1 / d^alpha.
+ */
+function sampleDistance(dMax, alpha) {
+  const weights = [];
+  let total = 0;
+  for (let d = 1; d <= dMax; d++) {
+    const w = 1 / Math.pow(d, alpha);
+    weights.push({ d, w });
+    total += w;
+  }
+  let u = Math.random() * total;
+  for (const { d, w } of weights) {
+    if (u <= w) return d;
+    u -= w;
+  }
+  return dMax;
+}
+
+/**
+ * Randomly add a new weak edge from an internal node to another node that is
+ * "nearby" in graph distance (power-law over distances). Edges are only added
+ * from internal nodes to internal or output nodes, and we avoid duplicate
+ * edges.
+ */
+function randomEdgeGrowth(graph) {
+  if (Math.random() >= P_ADD_EDGE) return;
+
+  const internalIds = [];
+  for (const [id, node] of graph.nodes) {
+    if (node.type === 'internal') internalIds.push(id);
+  }
+  if (internalIds.length === 0) return;
+
+  const srcId = internalIds[Math.floor(Math.random() * internalIds.length)];
+
+  const dMax = 4;
+  const alpha = 1.5;
+  const targetDistance = sampleDistance(dMax, alpha);
+
+  // BFS in the underlying undirected graph to find nodes at the target distance.
+  const queue = [srcId];
+  const dist = new Map([[srcId, 0]]);
+  const candidates = [];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const d = dist.get(current);
+    if (d >= targetDistance) continue;
+
+    const neighbors = new Set();
+    const outEdges = graph.adjOut.get(current);
+    if (outEdges) {
+      for (const eid of outEdges) {
+        const e = graph.edges.get(eid);
+        if (e) neighbors.add(e.dst);
+      }
+    }
+    const inEdges = graph.adjIn.get(current);
+    if (inEdges) {
+      for (const eid of inEdges) {
+        const e = graph.edges.get(eid);
+        if (e) neighbors.add(e.src);
+      }
+    }
+
+    for (const nb of neighbors) {
+      if (dist.has(nb)) continue;
+      const nd = d + 1;
+      dist.set(nb, nd);
+      if (nd < targetDistance) {
+        queue.push(nb);
+      } else if (nd === targetDistance) {
+        const node = graph.nodes.get(nb);
+        if (!node) continue;
+        if (nb === srcId) continue;
+        if (node.type === 'internal' || node.type === 'output') {
+          candidates.push(nb);
+        }
+      }
+    }
+  }
+
+  if (candidates.length === 0) return;
+
+  const dstId = candidates[Math.floor(Math.random() * candidates.length)];
+
+  // Avoid duplicate edges from srcId to dstId.
+  const outEdgesFromSrc = graph.adjOut.get(srcId);
+  if (outEdgesFromSrc) {
+    for (const eid of outEdgesFromSrc) {
+      const e = graph.edges.get(eid);
+      if (e && e.dst === dstId) {
+        return;
+      }
+    }
+  }
+
+  const wNew = 0.02 * randn(); // small initial weight
+  graph.addEdge(srcId, dstId, wNew);
+}
+
+/**
+ * Randomly insert a new internal node along an existing edge, without removing
+ * the original edge. The original edge remains unchanged; the new node gets
+ * two weak incident edges so that the structural perturbation is small.
+ */
+function randomNodeGrowth(graph) {
+  if (Math.random() >= P_ADD_NODE) return;
+
+  const candidateEdges = [];
+  for (const [eid, edge] of graph.edges) {
+    const src = graph.nodes.get(edge.src);
+    const dst = graph.nodes.get(edge.dst);
+    if (!src || !dst) continue;
+    if (src.type === 'internal' &&
+        (dst.type === 'internal' || dst.type === 'output')) {
+      candidateEdges.push(edge);
+    }
+  }
+  if (candidateEdges.length === 0) return;
+
+  const edge = candidateEdges[Math.floor(Math.random() * candidateEdges.length)];
+  const srcId = edge.src;
+  const dstId = edge.dst;
+
+  const newId = graph.newInternalId();
+  graph.addNode(newId, 'internal');
+
+  const base = 0.02;
+  const wIn = base * randn();
+  const wOut = base * randn();
+  graph.addEdge(srcId, newId, wIn);
+  graph.addEdge(newId, dstId, wOut);
+}
+
 /**
  * Recursively prune internal sink nodes (nodes with out-degree 0).
  * Starting from `startId`, any internal node with no outgoing edges is
@@ -110,7 +253,7 @@ function deleteInternalEdgeWithStructure(graph, edgeId, edge, epsZero, events) {
  * @param {number} t - current step counter
  * @param {object} params - {
  *   mu, pFlip, tBridge, sigma, omega, epsilon, K, theta,
- *   inputSource, m, activation,
+ *   inputSource, m, activation, construction,
  *   weightTanh, useOU, ouMean
  * }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
@@ -128,6 +271,7 @@ export function simulationStep(graph, t, params) {
     inputSource,
     m,
     activation,
+    construction,
     weightTanh,
     useOU,
     ouMean
@@ -207,77 +351,83 @@ export function simulationStep(graph, t, params) {
     }
   }
 
-  // 3) Bridging trigger: mark nodes with |activation| > T_bridge.
-  // Only internal nodes (z0 and all bridge nodes z1, z2, ...) are allowed to
-  // trigger bridges; inputs/outputs are excluded.
-  const triggered = [];
-  for (const [nodeId, node] of graph.nodes) {
-    if (node.type !== 'internal') continue;
-    if (Math.abs(node.activation) > tBridge) {
-      // Cooldown check
-      if (t - node.lastBridge >= cooldownK) {
-        triggered.push(nodeId);
+  if (construction !== 'random') {
+    // 3) Bridging trigger: mark nodes with |activation| > T_bridge.
+    // Only internal nodes (z0 and all bridge nodes z1, z2, ...) are allowed to
+    // trigger bridges; inputs/outputs are excluded.
+    const triggered = [];
+    for (const [nodeId, node] of graph.nodes) {
+      if (node.type !== 'internal') continue;
+      if (Math.abs(node.activation) > tBridge) {
+        // Cooldown check
+        if (t - node.lastBridge >= cooldownK) {
+          triggered.push(nodeId);
+        }
       }
     }
-  }
 
-  // 4) Bridging action (new bridge mechanism):
-  //
-  // For each triggered node z0:
-  //   - Create two new internal nodes z1, z2
-  //   - Add a canonical 2-cycle: z1 -> z2 = sqrt(2)/2, z2 -> z1 = sqrt(2)/2
-  //   - Halve all incoming weights into z0: 2 w_i -> w_i (implemented as w_i /= 2)
-  //   - For each incoming edge xi -> z0 (now weight w_i), add xi -> z1 with
-  //     weight (sqrt(2)/2) * w_i
-  //   - For each outgoing edge z0 -> yj with weight v_j, add a parallel edge
-  //     z2 -> yj with the same weight v_j (keeping the original z0 -> yj)
-  //   - Add stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
-  for (const nodeId of triggered) {
-    const z0 = graph.nodes.get(nodeId);
-    if (!z0) continue;
-    z0.lastBridge = t;
+    // 4) Bridging action (new bridge mechanism):
+    //
+    // For each triggered node z0:
+    //   - Create two new internal nodes z1, z2
+    //   - Add a canonical 2-cycle: z1 -> z2 = sqrt(2)/2, z2 -> z1 = sqrt(2)/2
+    //   - Halve all incoming weights into z0: 2 w_i -> w_i (implemented as w_i /= 2)
+    //   - For each incoming edge xi -> z0 (now weight w_i), add xi -> z1 with
+    //     weight (sqrt(2)/2) * w_i
+    //   - For each outgoing edge z0 -> yj with weight v_j, add a parallel edge
+    //     z2 -> yj with the same weight v_j (keeping the original z0 -> yj)
+    //   - Add stabilizing feedback edges: z1 -> z0 = -epsilon, z0 -> z2 = epsilon
+    for (const nodeId of triggered) {
+      const z0 = graph.nodes.get(nodeId);
+      if (!z0) continue;
+      z0.lastBridge = t;
 
-    // New internal bridge nodes (closer to inputs / closer to outputs)
-    const z1Id = graph.newInternalId();
-    const z2Id = graph.newInternalId();
-    graph.addNode(z1Id, 'internal');
-    graph.addNode(z2Id, 'internal');
+      // New internal bridge nodes (closer to inputs / closer to outputs)
+      const z1Id = graph.newInternalId();
+      const z2Id = graph.newInternalId();
+      graph.addNode(z1Id, 'internal');
+      graph.addNode(z2Id, 'internal');
 
-    // Canonical 2-cycle between z1 and z2
-    graph.addEdge(z1Id, z2Id, BRIDGE_BASE);
-    graph.addEdge(z2Id, z1Id, BRIDGE_BASE);
+      // Canonical 2-cycle between z1 and z2
+      graph.addEdge(z1Id, z2Id, BRIDGE_BASE);
+      graph.addEdge(z2Id, z1Id, BRIDGE_BASE);
 
-    // Snapshot of incoming and outgoing edges to z0 BEFORE we modify them
-    const inEdges = graph.adjIn.get(nodeId)
-      ? Array.from(graph.adjIn.get(nodeId))
-      : [];
-    const outEdges = graph.adjOut.get(nodeId)
-      ? Array.from(graph.adjOut.get(nodeId))
-      : [];
+      // Snapshot of incoming and outgoing edges to z0 BEFORE we modify them
+      const inEdges = graph.adjIn.get(nodeId)
+        ? Array.from(graph.adjIn.get(nodeId))
+        : [];
+      const outEdges = graph.adjOut.get(nodeId)
+        ? Array.from(graph.adjOut.get(nodeId))
+        : [];
 
-    // Incoming edges: 2 w_i -> w_i, and add xi -> z1 with (sqrt(2)/2) * w_i
-    for (const eid of inEdges) {
-      const edge = graph.edges.get(eid);
-      if (!edge || edge.dst !== nodeId) continue;
-      // Halve the existing weight
-      edge.w *= 0.5;
-      const w_i = edge.w;
-      const newWeight = BRIDGE_BASE * w_i;
-      graph.addEdge(edge.src, z1Id, newWeight);
+      // Incoming edges: 2 w_i -> w_i, and add xi -> z1 with (sqrt(2)/2) * w_i
+      for (const eid of inEdges) {
+        const edge = graph.edges.get(eid);
+        if (!edge || edge.dst !== nodeId) continue;
+        // Halve the existing weight
+        edge.w *= 0.5;
+        const w_i = edge.w;
+        const newWeight = BRIDGE_BASE * w_i;
+        graph.addEdge(edge.src, z1Id, newWeight);
+      }
+
+      // Outgoing edges: duplicate to z2 with the same weight v_j
+      for (const eid of outEdges) {
+        const edge = graph.edges.get(eid);
+        if (!edge || edge.src !== nodeId) continue;
+        graph.addEdge(z2Id, edge.dst, edge.w);
+      }
+
+      // Stabilizing feedback edges: z1 -> z0 = -omega, z0 -> z2 = omega
+      graph.addEdge(z1Id, nodeId, -omegaVal);
+      graph.addEdge(nodeId, z2Id, omegaVal);
+
+      events.bridged.push(nodeId);
     }
-
-    // Outgoing edges: duplicate to z2 with the same weight v_j
-    for (const eid of outEdges) {
-      const edge = graph.edges.get(eid);
-      if (!edge || edge.src !== nodeId) continue;
-      graph.addEdge(z2Id, edge.dst, edge.w);
-    }
-
-    // Stabilizing feedback edges: z1 -> z0 = -omega, z0 -> z2 = omega
-    graph.addEdge(z1Id, nodeId, -omegaVal);
-    graph.addEdge(nodeId, z2Id, omegaVal);
-
-    events.bridged.push(nodeId);
+  } else {
+    // Random construction mode: skip bridging and instead apply random growth.
+    randomEdgeGrowth(graph);
+    randomNodeGrowth(graph);
   }
 
   // 5) Weight update for every edge
