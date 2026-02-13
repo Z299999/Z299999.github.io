@@ -639,16 +639,28 @@ function updateConstructionUI() {
   const tBridgeSlider = document.getElementById('param-tbridge');
   const omegaSlider = document.getElementById('param-omega');
   const kSlider = document.getElementById('param-K');
+  const pAddEdgeSlider = document.getElementById('param-p-add-edge');
+  const pAddNodeSlider = document.getElementById('param-p-add-node');
+  const randAlphaSlider = document.getElementById('param-rand-alpha');
+  const randDMaxSlider = document.getElementById('param-rand-dmax');
   if (!constructionSelect || !tBridgeSlider || !omegaSlider || !kSlider) return;
 
   const tBridgeLabel = tBridgeSlider.closest('label');
   const omegaLabel = omegaSlider.closest('label');
   const kLabel = kSlider.closest('label');
+  const pAddEdgeLabel = pAddEdgeSlider ? pAddEdgeSlider.closest('label') : null;
+  const pAddNodeLabel = pAddNodeSlider ? pAddNodeSlider.closest('label') : null;
+  const randAlphaLabel = randAlphaSlider ? randAlphaSlider.closest('label') : null;
+  const randDMaxLabel = randDMaxSlider ? randDMaxSlider.closest('label') : null;
 
   const isRandom = constructionSelect.value === 'random';
   tBridgeSlider.disabled = isRandom;
   omegaSlider.disabled = isRandom;
   kSlider.disabled = isRandom;
+  if (pAddEdgeSlider) pAddEdgeSlider.disabled = !isRandom;
+  if (pAddNodeSlider) pAddNodeSlider.disabled = !isRandom;
+  if (randAlphaSlider) randAlphaSlider.disabled = !isRandom;
+  if (randDMaxSlider) randDMaxSlider.disabled = !isRandom;
 
   const applyClass = (label, disabled) => {
     if (!label) return;
@@ -659,6 +671,10 @@ function updateConstructionUI() {
   applyClass(tBridgeLabel, isRandom);
   applyClass(omegaLabel, isRandom);
   applyClass(kLabel, isRandom);
+  applyClass(pAddEdgeLabel, !isRandom);
+  applyClass(pAddNodeLabel, !isRandom);
+  applyClass(randAlphaLabel, !isRandom);
+  applyClass(randDMaxLabel, !isRandom);
 }
 
 // --- Initialize ---

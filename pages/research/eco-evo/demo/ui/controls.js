@@ -26,6 +26,14 @@ export class Controls {
     this.elOmegaVal = document.getElementById('param-omega-val');
     this.elEpsZero = document.getElementById('param-epszero');
     this.elEpsZeroVal = document.getElementById('param-epszero-val');
+    this.elPAddEdge = document.getElementById('param-p-add-edge');
+    this.elPAddEdgeVal = document.getElementById('param-p-add-edge-val');
+    this.elPAddNode = document.getElementById('param-p-add-node');
+    this.elPAddNodeVal = document.getElementById('param-p-add-node-val');
+    this.elRandAlpha = document.getElementById('param-rand-alpha');
+    this.elRandAlphaVal = document.getElementById('param-rand-alpha-val');
+    this.elRandDMax = document.getElementById('param-rand-dmax');
+    this.elRandDMaxVal = document.getElementById('param-rand-dmax-val');
     this.elTheta = document.getElementById('param-theta');
     this.elThetaVal = document.getElementById('param-theta-val');
     this.elK = document.getElementById('param-K');
@@ -47,6 +55,10 @@ export class Controls {
     this._bindSliderDisplay(this.elSigma, this.elSigmaVal);
     this._bindSliderDisplay(this.elOmega, this.elOmegaVal);
     this._bindSliderDisplay(this.elEpsZero, this.elEpsZeroVal);
+    this._bindSliderDisplay(this.elPAddEdge, this.elPAddEdgeVal);
+    this._bindSliderDisplay(this.elPAddNode, this.elPAddNodeVal);
+    this._bindSliderDisplay(this.elRandAlpha, this.elRandAlphaVal);
+    this._bindSliderDisplay(this.elRandDMax, this.elRandDMaxVal);
     this._bindSliderDisplay(this.elTheta, this.elThetaVal);
     this._bindSliderDisplay(this.elK, this.elKVal);
     this._bindSliderDisplay(this.elSpeed, this.elSpeedVal);
@@ -86,6 +98,10 @@ export class Controls {
       K: parseInt(this.elK.value, 10),
       inputSource: this.elInputSource.value,
       theta: this.elTheta ? parseFloat(this.elTheta.value) : 0,
+      pAddEdge: this.elPAddEdge ? parseFloat(this.elPAddEdge.value) : 0.01,
+      pAddNode: this.elPAddNode ? parseFloat(this.elPAddNode.value) : 0.005,
+      randAlpha: this.elRandAlpha ? parseFloat(this.elRandAlpha.value) : 1.5,
+      randDMax: this.elRandDMax ? parseInt(this.elRandDMax.value, 10) || 4 : 4,
       ouMean: this.elOuMean ? parseFloat(this.elOuMean.value) || 0 : 0
     };
   }

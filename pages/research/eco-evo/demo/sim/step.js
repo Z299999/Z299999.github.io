@@ -20,11 +20,6 @@ function randn() {
 }
 
 // --- Random growth helpers (used when construction === 'random') ---
-
-// Small probabilities for random structural growth.
-const P_ADD_EDGE = 0.01;
-const P_ADD_NODE = 0.005;
-
 /**
  * Sample an integer distance d ∈ {1, ..., dMax} from a discrete power-law
  * distribution P(d) ∝ 1 / d^alpha.
@@ -51,8 +46,9 @@ function sampleDistance(dMax, alpha) {
  * from internal nodes to internal or output nodes, and we avoid duplicate
  * edges.
  */
-function randomEdgeGrowth(graph) {
-  if (Math.random() >= P_ADD_EDGE) return;
+function randomEdgeGrowth(graph, pAddEdge, alpha, dMax) {
+  if (pAddEdge <= 0) return;
+  if (Math.random() >= pAddEdge) return;
 
   const internalIds = [];
   for (const [id, node] of graph.nodes) {
@@ -62,8 +58,6 @@ function randomEdgeGrowth(graph) {
 
   const srcId = internalIds[Math.floor(Math.random() * internalIds.length)];
 
-  const dMax = 4;
-  const alpha = 1.5;
   const targetDistance = sampleDistance(dMax, alpha);
 
   // BFS in the underlying undirected graph to find nodes at the target distance.
@@ -133,8 +127,9 @@ function randomEdgeGrowth(graph) {
  * the original edge. The original edge remains unchanged; the new node gets
  * two weak incident edges so that the structural perturbation is small.
  */
-function randomNodeGrowth(graph) {
-  if (Math.random() >= P_ADD_NODE) return;
+function randomNodeGrowth(graph, pAddNode) {
+  if (pAddNode <= 0) return;
+  if (Math.random() >= pAddNode) return;
 
   const candidateEdges = [];
   for (const [eid, edge] of graph.edges) {
@@ -272,6 +267,10 @@ export function simulationStep(graph, t, params) {
     m,
     activation,
     construction,
+    pAddEdge,
+    pAddNode,
+    randAlpha,
+    randDMax,
     weightTanh,
     useOU,
     ouMean
@@ -282,6 +281,10 @@ export function simulationStep(graph, t, params) {
   const omegaVal = Number.isFinite(omega) ? omega : 0.05;
   const epsZero = Number.isFinite(epsilon) ? epsilon : EPS_DEFAULT;
   const cooldownK = Number.isFinite(K) ? K : 10;
+  const pAddEdgeVal = Number.isFinite(pAddEdge) ? Math.max(0, pAddEdge) : 0.01;
+  const pAddNodeVal = Number.isFinite(pAddNode) ? Math.max(0, pAddNode) : 0.005;
+  const alphaVal = Number.isFinite(randAlpha) ? Math.max(0.1, randAlpha) : 1.5;
+  const dMaxVal = Number.isFinite(randDMax) ? Math.max(1, Math.min(10, Math.floor(randDMax))) : 4;
   const events = { bridged: [], removedEdges: 0, removedNodes: 0 };
 
   // 1) Set input node activations
@@ -426,8 +429,8 @@ export function simulationStep(graph, t, params) {
     }
   } else {
     // Random construction mode: skip bridging and instead apply random growth.
-    randomEdgeGrowth(graph);
-    randomNodeGrowth(graph);
+    randomEdgeGrowth(graph, pAddEdgeVal, alphaVal, dMaxVal);
+    randomNodeGrowth(graph, pAddNodeVal);
   }
 
   // 5) Weight update for every edge
