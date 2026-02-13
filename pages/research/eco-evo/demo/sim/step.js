@@ -67,6 +67,9 @@ export function simulationStep(graph, t, params) {
     actFn = x => (x > 0 ? x : 0);
   } else if (activation === 'identity') {
     actFn = x => x;
+  } else if (activation === 'maxabs') {
+    // handled explicitly below; actFn unused
+    actFn = null;
   } else {
     actFn = x => Math.tanh(x);
   }
@@ -80,17 +83,36 @@ export function simulationStep(graph, t, params) {
     if (!node || node.type === 'input') continue;
 
     const inEdges = graph.adjIn.get(nodeId);
-    let z = 0;
-    if (inEdges) {
-      for (const eid of inEdges) {
-        const edge = graph.edges.get(eid);
-        if (!edge) continue;
-        const srcNode = graph.nodes.get(edge.src);
-        if (!srcNode) continue;
-        z += weightFn(edge.w) * srcNode.activation;
+    if (activation === 'maxabs') {
+      let best = 0;
+      let hasInput = false;
+      if (inEdges) {
+        for (const eid of inEdges) {
+          const edge = graph.edges.get(eid);
+          if (!edge) continue;
+          const srcNode = graph.nodes.get(edge.src);
+          if (!srcNode) continue;
+          const contrib = weightFn(edge.w) * srcNode.activation;
+          if (!hasInput || Math.abs(contrib) > Math.abs(best)) {
+            best = contrib;
+            hasInput = true;
+          }
+        }
       }
+      node.activation = hasInput ? best : 0;
+    } else {
+      let z = 0;
+      if (inEdges) {
+        for (const eid of inEdges) {
+          const edge = graph.edges.get(eid);
+          if (!edge) continue;
+          const srcNode = graph.nodes.get(edge.src);
+          if (!srcNode) continue;
+          z += weightFn(edge.w) * srcNode.activation;
+        }
+      }
+      node.activation = actFn(z);
     }
-    node.activation = actFn(z);
   }
 
   // 3) Bridging trigger: mark nodes with |activation| > T_bridge.

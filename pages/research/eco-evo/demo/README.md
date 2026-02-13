@@ -1,6 +1,6 @@
 # Eco-Evo Graph Simulation Demo
 
-Interactive browser demo of a directed weighted graph simulation with configurable activations (`tanh`, `ReLU`, `Identity`), stochastic weight dynamics, and bridging growth.
+Interactive browser demo of a directed weighted graph simulation with configurable activations (`tanh`, `ReLU`, `Identity`, `max |w_i x_i|`), stochastic weight dynamics, and bridging growth.
 
 ## How to Open
 
@@ -33,7 +33,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `n` | 1–50 | Number of output nodes |
 | `k` | 1–50 | Number of internal nodes at genesis (z0, ..., z_{k-1} fully connected; each x_i connects to every z_j, and each z_j connects to every y_l) |
 | Input source | noise / constant / sine | Input signal generator |
-| Activation | tanh / ReLU / Identity | Node activation nonlinearity (applied to all non-input nodes) |
+| Activation | tanh / ReLU / Identity / max \|w_i x_i\| | Node activation nonlinearity (applied to all non-input nodes) |
 | Edge weight control | vanilla / tanh(w) / OU | - `vanilla`: Brownian weight dynamics + raw `w` in forward pass; `tanh(w)`: Brownian dynamics + `tanh(w)` as effective weight; `OU`: Ornstein–Uhlenbeck dynamics with mean `m` and raw `w` in forward pass |
 
 ### Runtime (applied immediately)
@@ -56,11 +56,18 @@ Each call to `step()` executes in this exact order:
 
 1. **Set input activations** — `a[xi] = xi(t)` from the selected input generator
 2. **Forward pass** — For each non-input node in creation order:
-   - `z_i = Σ(w_ji × a_j)` over all incoming edges  
-   - `a_i = φ(z_i)` where `φ` is:
-     - `tanh` (default), or  
-     - `ReLU(x) = max(0, x)`, or  
-     - `Identity(x) = x` (fully linear graph)
+   - For standard activations:
+     - `z_i = Σ(w_ji × a_j)` over all incoming edges  
+     - `a_i = φ(z_i)` where `φ` is:
+       - `tanh` (default), or  
+       - `ReLU(x) = max(0, x)`, or  
+       - `Identity(x) = x` (fully linear graph)
+   - For `max |w_i x_i|`:
+     - For each incoming edge, compute the contribution `c_j = w_ji × a_j`
+     - Set `a_i` to the contribution with largest absolute value (preserving sign):  
+       \[
+       a_i = \operatorname*{arg\,max}_j |c_j|.
+       \]
 3. **Bridging trigger** — For internal nodes, mark those where `|a_i| > T_bridge` (with cooldown `K` steps)
 4. **Bridging action** — For each triggered node `z0`, apply the bridge construction described in the paper (creating internal nodes `z1, z2, ...`, a 2-cycle, fan-in from `xi` to `z1`, duplicated outputs from `z2`, and feedback edges of size `±ω_bridge`).
 5. **Weight update** — For every edge:

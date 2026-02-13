@@ -117,7 +117,7 @@ function reset() {
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
   activationKind =
-    activation === 'relu' || activation === 'identity'
+    activation === 'relu' || activation === 'identity' || activation === 'maxabs'
       ? activation
       : 'tanh';
   weightControlKind =
@@ -225,6 +225,8 @@ function impulseTestStep() {
     actFn = x => (x > 0 ? x : 0);
   } else if (activationKind === 'identity') {
     actFn = x => x;
+  } else if (activationKind === 'maxabs') {
+    actFn = null;
   } else {
     actFn = x => Math.tanh(x);
   }
@@ -234,17 +236,36 @@ function impulseTestStep() {
     if (!node || node.type === 'input') continue;
 
     const inEdges = graph.adjIn.get(nodeId);
-    let z = 0;
-    if (inEdges) {
-      for (const eid of inEdges) {
-        const edge = graph.edges.get(eid);
-        if (!edge) continue;
-        const srcNode = graph.nodes.get(edge.src);
-        if (!srcNode) continue;
-        z += weightFn(edge.w) * srcNode.activation;
+    if (activationKind === 'maxabs') {
+      let best = 0;
+      let hasInput = false;
+      if (inEdges) {
+        for (const eid of inEdges) {
+          const edge = graph.edges.get(eid);
+          if (!edge) continue;
+          const srcNode = graph.nodes.get(edge.src);
+          if (!srcNode) continue;
+          const contrib = weightFn(edge.w) * srcNode.activation;
+          if (!hasInput || Math.abs(contrib) > Math.abs(best)) {
+            best = contrib;
+            hasInput = true;
+          }
+        }
       }
+      node.activation = hasInput ? best : 0;
+    } else {
+      let z = 0;
+      if (inEdges) {
+        for (const eid of inEdges) {
+          const edge = graph.edges.get(eid);
+          if (!edge) continue;
+          const srcNode = graph.nodes.get(edge.src);
+          if (!srcNode) continue;
+          z += weightFn(edge.w) * srcNode.activation;
+        }
+      }
+      node.activation = actFn(z);
     }
-    node.activation = actFn(z);
   }
 
   // No bridging / weight updates / cleanup: graph structure is frozen.
@@ -296,6 +317,16 @@ function runImpulseOnce() {
     weightControlKind === 'tanh'
       ? w => Math.tanh(w)
       : w => w;
+  let actFn;
+  if (activationKind === 'relu') {
+    actFn = x => (x > 0 ? x : 0);
+  } else if (activationKind === 'identity') {
+    actFn = x => x;
+  } else if (activationKind === 'maxabs') {
+    actFn = null;
+  } else {
+    actFn = x => Math.tanh(x);
+  }
 
   for (let k = 0; k < steps; k++) {
     // Inputs: impulse at k=0 on selected channel, otherwise 0.
@@ -316,17 +347,36 @@ function runImpulseOnce() {
       if (!node || node.type === 'input') continue;
 
       const inEdges = graph.adjIn.get(nodeId);
-      let z = 0;
-      if (inEdges) {
-        for (const eid of inEdges) {
-          const edge = graph.edges.get(eid);
-          if (!edge) continue;
-          const srcNode = graph.nodes.get(edge.src);
-          if (!srcNode) continue;
-          z += weightFn(edge.w) * srcNode.activation;
+      if (activationKind === 'maxabs') {
+        let best = 0;
+        let hasInput = false;
+        if (inEdges) {
+          for (const eid of inEdges) {
+            const edge = graph.edges.get(eid);
+            if (!edge) continue;
+            const srcNode = graph.nodes.get(edge.src);
+            if (!srcNode) continue;
+            const contrib = weightFn(edge.w) * srcNode.activation;
+            if (!hasInput || Math.abs(contrib) > Math.abs(best)) {
+              best = contrib;
+              hasInput = true;
+            }
+          }
         }
+        node.activation = hasInput ? best : 0;
+      } else {
+        let z = 0;
+        if (inEdges) {
+          for (const eid of inEdges) {
+            const edge = graph.edges.get(eid);
+            if (!edge) continue;
+            const srcNode = graph.nodes.get(edge.src);
+            if (!srcNode) continue;
+            z += weightFn(edge.w) * srcNode.activation;
+          }
+        }
+        node.activation = actFn(z);
       }
-      node.activation = actFn(z);
     }
 
     const outputNorm = computeOutputNorm(graph);
