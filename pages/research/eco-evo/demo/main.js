@@ -649,6 +649,23 @@ function init() {
     updateWeightDynamicsUI();
   }
 
+  // Activation UI: enable θ slider only for thresholded ReLU.
+  const activationSelect = document.getElementById('param-activation');
+  const thetaSlider = document.getElementById('param-theta');
+  if (activationSelect && thetaSlider) {
+    const thetaLabel = thetaSlider.closest('label');
+    const updateThetaUI = () => {
+      const isThresh = activationSelect.value === 'relu-thresh';
+      thetaSlider.disabled = !isThresh;
+      if (thetaLabel) {
+        if (isThresh) thetaLabel.classList.remove('disabled-slider');
+        else thetaLabel.classList.add('disabled-slider');
+      }
+    };
+    activationSelect.addEventListener('change', updateThetaUI);
+    updateThetaUI();
+  }
+
   // Button bindings
   document.getElementById('btn-play').addEventListener('click', togglePlay);
   document.getElementById('btn-step').addEventListener('click', () => {
