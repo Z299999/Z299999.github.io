@@ -1,6 +1,6 @@
 # Eco-Evo Graph Simulation Demo
 
-Interactive browser demo of a directed weighted graph simulation with configurable activations (`tanh`, `ReLU`, `Identity`, `max |w_i x_i|`), stochastic weight dynamics, and bridging growth.
+Interactive browser demo of a directed weighted graph simulation with configurable activations (`tanh`, `ReLU`, `ReLU with threshold`, `Identity`, `max |w_i x_i|`), stochastic weight dynamics, and bridging growth.
 
 ## How to Open
 
@@ -33,7 +33,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `n` | 1–50 | Number of output nodes |
 | `k` | 1–50 | Number of internal nodes at genesis (z0, ..., z_{k-1} fully connected; each x_i connects to every z_j, and each z_j connects to every y_l) |
 | Input source | noise / constant / sine | Input signal generator |
-| Activation | tanh / ReLU / Identity / max \|w_i x_i\| | Node activation nonlinearity (applied to all non-input nodes) |
+| Activation | tanh / ReLU / ReLU (with threshold) / Identity / max \|w_i x_i\| | Node activation nonlinearity (applied to all non-input nodes) |
 | Edge weight control | vanilla / tanh(w) / OU | - `vanilla`: Brownian weight dynamics + raw `w` in forward pass; `tanh(w)`: Brownian dynamics + `tanh(w)` as effective weight; `OU`: Ornstein–Uhlenbeck dynamics with mean `m` and raw `w` in forward pass |
 
 ### Runtime (applied immediately)
@@ -42,6 +42,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 |-----------|-------|---------|-------------|
 | `μ` (mu) | -0.1–0.1 | 0.0 | Drift term in `w += σ ξ + μ sign(w)` (can be negative) |
 | `σ` (sigma) | 0–0.05 | 0.02 | Weight noise standard deviation (used in both Brownian and OU dynamics) |
+| `θ` (activation threshold) | 0–1 | 0.0 | Global threshold used only when activation is set to “ReLU (with threshold)”; nodes apply `ReLU(z - θ)` to their aggregated input |
 | OU mean `m` | free | 0.0 | Target mean for OU weight dynamics (only used when edge weight control is set to OU) |
 | `p_flip` | 0–1 | 0.3 | Probability of sign-flip when `|w|` is near zero |
 | `T_bridge` | 0–1 | 0.8 | Activation threshold for triggering bridges |
@@ -61,6 +62,7 @@ Each call to `step()` executes in this exact order:
      - `a_i = φ(z_i)` where `φ` is:
        - `tanh` (default), or  
        - `ReLU(x) = max(0, x)`, or  
+       - **ReLU with threshold:** `ReLU(z_i - θ) = max(0, z_i - θ)` using the global runtime threshold `θ`, or  
        - `Identity(x) = x` (fully linear graph)
    - For `max |w_i x_i|`:
      - For each incoming edge, compute the contribution `c_j = w_ji × a_j`

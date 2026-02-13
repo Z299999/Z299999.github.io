@@ -25,6 +25,8 @@ export class Controls {
     this.elOmegaVal = document.getElementById('param-omega-val');
     this.elEpsZero = document.getElementById('param-epszero');
     this.elEpsZeroVal = document.getElementById('param-epszero-val');
+    this.elTheta = document.getElementById('param-theta');
+    this.elThetaVal = document.getElementById('param-theta-val');
     this.elK = document.getElementById('param-K');
     this.elKVal = document.getElementById('param-K-val');
     this.elSpeed = document.getElementById('param-speed');
@@ -44,6 +46,7 @@ export class Controls {
     this._bindSliderDisplay(this.elSigma, this.elSigmaVal);
     this._bindSliderDisplay(this.elOmega, this.elOmegaVal);
     this._bindSliderDisplay(this.elEpsZero, this.elEpsZeroVal);
+    this._bindSliderDisplay(this.elTheta, this.elThetaVal);
     this._bindSliderDisplay(this.elK, this.elKVal);
     this._bindSliderDisplay(this.elSpeed, this.elSpeedVal);
     if (this.elOuMean && this.elOuMeanVal) {
@@ -80,6 +83,7 @@ export class Controls {
       epsilon: parseFloat(this.elEpsZero.value),
       K: parseInt(this.elK.value, 10),
       inputSource: this.elInputSource.value,
+      theta: this.elTheta ? parseFloat(this.elTheta.value) : 0,
       ouMean: this.elOuMean ? parseFloat(this.elOuMean.value) || 0 : 0
     };
   }

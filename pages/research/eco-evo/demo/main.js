@@ -117,7 +117,7 @@ function reset() {
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
   activationKind =
-    activation === 'relu' || activation === 'identity' || activation === 'maxabs'
+    activation === 'relu' || activation === 'relu-thresh' || activation === 'identity' || activation === 'maxabs'
       ? activation
       : 'tanh';
   weightControlKind =
@@ -216,6 +216,8 @@ function impulseTestStep() {
   }
 
   // 2) Forward pass for non-input nodes (same order as simulationStep).
+  const { theta } = controls.getRunParams();
+  const thetaVal = Number.isFinite(theta) ? theta : 0;
   const weightFn =
     weightControlKind === 'tanh'
       ? w => Math.tanh(w)
@@ -223,6 +225,11 @@ function impulseTestStep() {
   let actFn;
   if (activationKind === 'relu') {
     actFn = x => (x > 0 ? x : 0);
+  } else if (activationKind === 'relu-thresh') {
+    actFn = x => {
+      const s = x - thetaVal;
+      return s > 0 ? s : 0;
+    };
   } else if (activationKind === 'identity') {
     actFn = x => x;
   } else if (activationKind === 'maxabs') {
@@ -317,9 +324,16 @@ function runImpulseOnce() {
     weightControlKind === 'tanh'
       ? w => Math.tanh(w)
       : w => w;
+  const { theta: thetaRun } = controls.getRunParams();
+  const thetaRunVal = Number.isFinite(thetaRun) ? thetaRun : 0;
   let actFn;
   if (activationKind === 'relu') {
     actFn = x => (x > 0 ? x : 0);
+  } else if (activationKind === 'relu-thresh') {
+    actFn = x => {
+      const s = x - thetaRunVal;
+      return s > 0 ? s : 0;
+    };
   } else if (activationKind === 'identity') {
     actFn = x => x;
   } else if (activationKind === 'maxabs') {

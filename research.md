@@ -15,7 +15,7 @@ My research sits at the intersection of analysis, dynamical systems, and complex
 - Deep learning 
 - Network theory 
 
-#### *Eco-evolutionary Neural Ecosystem*
+#### *Evolutionary Neural Networks Ecosystem*
 
 A computational framework for studying the emergence of complex behaviours through the co-evolution of neural agents and their environment; see the interactive <a href="/pages/research/eco-evo/demo/">demo</a>.
 

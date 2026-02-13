@@ -109,7 +109,7 @@ function deleteInternalEdgeWithStructure(graph, edgeId, edge, epsZero, events) {
  * @param {Graph} graph
  * @param {number} t - current step counter
  * @param {object} params - {
- *   mu, pFlip, tBridge, sigma, omega, epsilon, K,
+ *   mu, pFlip, tBridge, sigma, omega, epsilon, K, theta,
  *   inputSource, m, activation,
  *   weightTanh, useOU, ouMean
  * }
@@ -124,6 +124,7 @@ export function simulationStep(graph, t, params) {
     omega,
     epsilon,
     K,
+    theta,
     inputSource,
     m,
     activation,
@@ -148,8 +149,14 @@ export function simulationStep(graph, t, params) {
   }
 
   let actFn;
+  const thetaVal = Number.isFinite(theta) ? theta : 0;
   if (activation === 'relu') {
     actFn = x => (x > 0 ? x : 0);
+  } else if (activation === 'relu-thresh') {
+    actFn = x => {
+      const s = x - thetaVal;
+      return s > 0 ? s : 0;
+    };
   } else if (activation === 'identity') {
     actFn = x => x;
   } else if (activation === 'maxabs') {
