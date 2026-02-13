@@ -20,6 +20,91 @@ function randn() {
 }
 
 /**
+ * Recursively prune internal sink nodes (nodes with out-degree 0).
+ * Starting from `startId`, any internal node with no outgoing edges is
+ * removed together with all its incoming edges. Predecessors of a
+ * removed node are re-checked, propagating the pruning upstream.
+ */
+function pruneSinkCascade(graph, startId, events) {
+  const queue = [startId];
+  const visited = new Set();
+
+  while (queue.length > 0) {
+    const nodeId = queue.pop();
+    if (visited.has(nodeId)) continue;
+    visited.add(nodeId);
+
+    const node = graph.nodes.get(nodeId);
+    if (!node) continue;
+    if (node.type === 'input' || node.type === 'output') continue;
+
+    if (graph.outDegree(nodeId) > 0) continue;
+
+    const inEdges = graph.adjIn.get(nodeId)
+      ? Array.from(graph.adjIn.get(nodeId))
+      : [];
+    const predecessors = [];
+    for (const eid of inEdges) {
+      const e = graph.edges.get(eid);
+      if (e) predecessors.push(e.src);
+    }
+
+    graph.removeNode(nodeId);
+    events.removedNodes++;
+
+    for (const srcId of predecessors) {
+      queue.push(srcId);
+    }
+  }
+}
+
+/**
+ * Apply the structural deletion rules for a near-zero internal edge
+ * z1 -> z2 with weight w12:
+ *  - First remove the edge.
+ *  - If z2 becomes a source (deg-(z2)=0, deg+(z2)>0), rewire all
+ *    outgoing edges z2 -> y to z1 -> y with
+ *      w_new = epsZero * w_{z2y} * sign(w12),
+ *    then delete z2.
+ *  - Otherwise, treat z1 as a potential sink and prune sinks recursively.
+ */
+function deleteInternalEdgeWithStructure(graph, edgeId, edge, epsZero, events) {
+  const z1Id = edge.src;
+  const z2Id = edge.dst;
+  const w12 = edge.w;
+
+  graph.removeEdge(edgeId);
+  events.removedEdges++;
+
+  const z1 = graph.nodes.get(z1Id);
+  const z2 = graph.nodes.get(z2Id);
+  if (!z1 || !z2) return;
+
+  const degIn2 = graph.inDegree(z2Id);
+  const degOut2 = graph.outDegree(z2Id);
+
+  // Case 1: z2 becomes a source (no incoming edges, but has outgoing edges)
+  if (degIn2 === 0 && degOut2 > 0) {
+    const outEdges = graph.adjOut.get(z2Id)
+      ? Array.from(graph.adjOut.get(z2Id))
+      : [];
+    const signW12 = Math.sign(w12) || (Math.random() < 0.5 ? 1 : -1);
+    for (const oeid of outEdges) {
+      const e = graph.edges.get(oeid);
+      if (!e) continue;
+      const newW = epsZero * e.w * signW12;
+      graph.addEdge(z1Id, e.dst, newW);
+    }
+    graph.removeNode(z2Id);
+    events.removedNodes++;
+    return;
+  }
+
+  // Case 2: z2 does not become a source — prune sinks starting from z1.
+  pruneSinkCascade(graph, z1Id, events);
+}
+
+/**
  * Execute one simulation step.
  * @param {Graph} graph
  * @param {number} t - current step counter
@@ -211,40 +296,46 @@ export function simulationStep(graph, t, params) {
     }
   }
 
-  // 6) Near-zero event
-  const edgesToRemove = [];
+  // 6) Near-zero event with structural deletion and rewiring.
+  // First collect candidate edges to avoid mutating the map while iterating.
+  const nearZeroEdges = [];
   for (const [eid, edge] of graph.edges) {
     if (Math.abs(edge.w) < epsZero) {
-      if (Math.random() < pFlip) {
-        // Flip sign but keep a small magnitude so that the
-        // network does not jump abruptly. Draw a new magnitude
-        // uniformly in (0, epsZero) and use the opposite sign
-        // of the current weight (falling back to a random sign
-        // if the current weight is numerically zero).
-        const oldSign = Math.sign(edge.w) || (Math.random() < 0.5 ? 1 : -1);
-        const mag = Math.random() * epsZero;
-        edge.w = -oldSign * mag;
-      } else {
-        edgesToRemove.push(eid);
-      }
+      nearZeroEdges.push(eid);
     }
-  }
-  for (const eid of edgesToRemove) {
-    graph.removeEdge(eid);
-    events.removedEdges++;
   }
 
-  // 7) Node cleanup: remove internal nodes with zero in-degree OR zero out-degree
-  const nodesToRemove = [];
-  for (const [nodeId, node] of graph.nodes) {
-    if (node.type === 'input' || node.type === 'output') continue;
-    if (graph.inDegree(nodeId) === 0 || graph.outDegree(nodeId) === 0) {
-      nodesToRemove.push(nodeId);
+  for (const eid of nearZeroEdges) {
+    const edge = graph.edges.get(eid);
+    if (!edge) continue;
+
+    // With probability pFlip, perform a small sign-flip and keep the edge.
+    if (Math.random() < pFlip) {
+      const oldSign = Math.sign(edge.w) || (Math.random() < 0.5 ? 1 : -1);
+      const mag = Math.random() * epsZero;
+      edge.w = -oldSign * mag;
+      continue;
     }
-  }
-  for (const nodeId of nodesToRemove) {
-    graph.removeNode(nodeId);
-    events.removedNodes++;
+
+    const srcNode = graph.nodes.get(edge.src);
+    const dstNode = graph.nodes.get(edge.dst);
+
+    // Apply the full structural rule only for internal -> internal edges.
+    if (srcNode && dstNode &&
+        srcNode.type === 'internal' &&
+        dstNode.type === 'internal') {
+      deleteInternalEdgeWithStructure(graph, eid, edge, epsZero, events);
+    } else {
+      // For all other edges, simply remove the edge. If the source is an
+      // internal node that becomes a sink, prune sinks recursively.
+      const srcId = edge.src;
+      graph.removeEdge(eid);
+      events.removedEdges++;
+      const src = graph.nodes.get(srcId);
+      if (src && src.type === 'internal') {
+        pruneSinkCascade(graph, srcId, events);
+      }
+    }
   }
 
   return events;
