@@ -595,10 +595,10 @@ function updateWeightDynamicsUI() {
   const etaHebbSlider = document.getElementById('param-eta-hebb');
   const hebbThreshSlider = document.getElementById('param-hebb-thresh');
   if (!sel || !muSlider || !ouSlider) return;
-  const muLabel = muSlider.closest('label');
-  const ouLabel = ouSlider.closest('label');
-  const etaHebbLabel = etaHebbSlider ? etaHebbSlider.closest('label') : null;
-  const hebbThreshLabel = hebbThreshSlider ? hebbThreshSlider.closest('label') : null;
+  const muLabel = document.getElementById('label-mu');
+  const ouLabel = document.getElementById('label-ou-mean');
+  const etaHebbLabel = document.getElementById('label-eta-hebb');
+  const hebbThreshLabel = document.getElementById('label-hebb-thresh');
   const modeVal = sel.value;
 
   const setSliderState = (slider, label, enabled) => {

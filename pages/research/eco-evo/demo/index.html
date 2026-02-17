@@ -89,7 +89,7 @@
 
       <fieldset id="fieldset-runtime">
         <legend>Runtime</legend>
-        <label>
+        <label id="label-mu">
           &mu; (drift)
           <input type="range" id="param-mu" min="-0.1" max="0.1" value="0.0" step="0.001">
           <span id="param-mu-val">0.01</span>
@@ -109,12 +109,12 @@
           <input type="range" id="param-sigma" min="0" max="0.05" value="0.02" step="0.001">
           <span id="param-sigma-val">0.02</span>
         </label>
-        <label class="disabled-slider">
+        <label id="label-eta-hebb" class="disabled-slider">
           η_hebb (Hebbian drift)
           <input type="range" id="param-eta-hebb" min="0" max="2" value="0.1" step="0.01" disabled>
           <span id="param-eta-hebb-val">0.1</span>
         </label>
-        <label class="disabled-slider">
+        <label id="label-hebb-thresh" class="disabled-slider">
           θ_hebb (Hebbian |x_A x_B| threshold)
           <input type="range" id="param-hebb-thresh" min="0" max="1" value="0.1" step="0.01" disabled>
           <span id="param-hebb-thresh-val">0.1</span>
@@ -159,7 +159,7 @@
           <input type="range" id="param-theta" min="0" max="1" value="0" step="0.01">
           <span id="param-theta-val">0.0</span>
         </label>
-        <label>
+        <label id="label-ou-mean">
           m (OU mean)
           <input type="range" id="param-ou-mean" min="0" max="1" value="0" step="0.05">
           <span id="param-ou-mean-val">0.0</span>
