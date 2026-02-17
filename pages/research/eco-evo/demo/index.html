@@ -170,6 +170,13 @@
       <fieldset id="fieldset-test" style="display: none;">
         <legend>Impulse test (frozen graph)</legend>
         <label>
+          Signal type
+          <select id="param-test-signal-type">
+            <option value="impulse" selected>Impulse (one-step)</option>
+            <option value="constant">Constant (all steps)</option>
+          </select>
+        </label>
+        <label>
           Input index (i)
           <input type="number" id="param-test-input" min="0" value="0" step="1">
         </label>

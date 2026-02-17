@@ -202,7 +202,7 @@ function evolveStep() {
 function impulseTestStep() {
   if (!graph || !currentTest) return;
 
-  const { inputIndex, amplitude, steps } = currentTest;
+  const { inputIndex, amplitude, steps, signalType } = currentTest;
   if (testStepIndex >= steps) {
     // Auto-stop test playback but stay in test mode until user ends it.
     playing = false;
@@ -212,11 +212,17 @@ function impulseTestStep() {
     return;
   }
 
-  // 1) Set input activations: impulse at k=0 on channel inputIndex, else 0.
+  const useImpulse = !signalType || signalType === 'impulse';
+
+  // 1) Set input activations:
+  //    - impulse: amplitude only at k=0,
+  //    - constant: amplitude at all steps.
   for (let i = 0; i < genesisM; i++) {
     const node = graph.nodes.get(`x${i}`);
     if (!node) continue;
-    if (i === inputIndex && testStepIndex === 0) {
+    const isActiveStep =
+      useImpulse ? testStepIndex === 0 : true;
+    if (i === inputIndex && isActiveStep) {
       node.activation = amplitude;
     } else {
       node.activation = 0;
@@ -323,7 +329,7 @@ function runImpulseOnce() {
   if (mode !== 'test') return;
 
   const params = controls.getTestParams();
-  const { inputIndex, amplitude, steps } = params;
+  const { inputIndex, amplitude, steps, signalType } = params;
   currentTest = params;
   testStepIndex = 0;
 
@@ -360,12 +366,19 @@ function runImpulseOnce() {
     actFn = x => Math.tanh(x);
   }
 
+  const useImpulse = !signalType || signalType === 'impulse';
+
   for (let k = 0; k < steps; k++) {
-    // Inputs: impulse at k=0 on selected channel, otherwise 0.
+    // Inputs:
+    //   - impulse: amplitude only at k=0 on selected channel,
+    //   - constant: amplitude for all k on selected channel,
+    //   - other channels: 0.
     for (let i = 0; i < genesisM; i++) {
       const node = graph.nodes.get(`x${i}`);
       if (!node) continue;
-      if (i === inputIndex && k === 0) {
+      const isActiveStep =
+        useImpulse ? k === 0 : true;
+      if (i === inputIndex && isActiveStep) {
         node.activation = amplitude;
       } else {
         node.activation = 0;

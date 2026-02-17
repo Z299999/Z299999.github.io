@@ -51,6 +51,7 @@ export class Controls {
     this.elTestInput = document.getElementById('param-test-input');
     this.elTestAmp = document.getElementById('param-test-amp');
     this.elTestSteps = document.getElementById('param-test-steps');
+    this.elTestSignalType = document.getElementById('param-test-signal-type');
 
     // Show live values next to sliders
     this._bindSliderDisplay(this.elMu, this.elMuVal);
@@ -128,7 +129,8 @@ export class Controls {
     return {
       inputIndex: parseInt(this.elTestInput.value, 10) || 0,
       amplitude: parseFloat(this.elTestAmp.value) || 1,
-      steps: parseInt(this.elTestSteps.value, 10) || 200
+      steps: parseInt(this.elTestSteps.value, 10) || 200,
+      signalType: this.elTestSignalType ? this.elTestSignalType.value || 'impulse' : 'impulse'
     };
   }
 }
