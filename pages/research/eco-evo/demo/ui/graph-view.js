@@ -343,8 +343,11 @@ export class GraphView {
   _showInfoPopup(text, renderedPosition) {
     if (!this.infoPopup) return;
     this.infoPopup.textContent = text;
-    this.infoPopup.style.left = `${renderedPosition.x + 8}px`;
-    this.infoPopup.style.top = `${renderedPosition.y + 8}px`;
+    const rect = this.container.getBoundingClientRect();
+    const x = renderedPosition.x - rect.left;
+    const y = renderedPosition.y - rect.top;
+    this.infoPopup.style.left = `${x + 8}px`;
+    this.infoPopup.style.top = `${y + 8}px`;
     this.infoPopup.style.display = 'block';
   }
 
@@ -361,7 +364,10 @@ export class GraphView {
       const a = node.data('activation');
       const val =
         a == null || Number.isNaN(a) ? 'n/a' : a.toFixed(4);
-      const pos = evt.renderedPosition || this.cy.renderer().projectToRenderedPosition(node.position());
+      const oe = evt.originalEvent;
+      const pos = oe && typeof oe.clientX === 'number'
+        ? { x: oe.clientX, y: oe.clientY }
+        : evt.renderedPosition;
       this._showInfoPopup(`node ${id}\nactivation = ${val}`, pos);
     });
 
@@ -372,7 +378,10 @@ export class GraphView {
       const w = edge.data('weight');
       const val =
         w == null || Number.isNaN(w) ? 'n/a' : w.toFixed(4);
-      const pos = evt.renderedPosition || this.cy.renderer().projectToRenderedPosition(edge.midpoint());
+      const oe = evt.originalEvent;
+      const pos = oe && typeof oe.clientX === 'number'
+        ? { x: oe.clientX, y: oe.clientY }
+        : evt.renderedPosition;
       this._showInfoPopup(`edge ${id}\nweight = ${val}`, pos);
     });
 
