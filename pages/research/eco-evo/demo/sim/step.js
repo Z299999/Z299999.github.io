@@ -318,8 +318,6 @@ export function simulationStep(graph, t, params) {
     actFn = x => Math.tanh(x);
   }
 
-  const weightFn = weightTanh ? w => Math.tanh(w) : w => w;
-
   // 2) Forward pass for non-input nodes (in creation order)
   const order = graph.getForwardOrder();
   for (const nodeId of order) {
@@ -336,7 +334,13 @@ export function simulationStep(graph, t, params) {
           if (!edge) continue;
           const srcNode = graph.nodes.get(edge.src);
           if (!srcNode) continue;
-          const contrib = weightFn(edge.w) * srcNode.activation;
+          const x = srcNode.activation;
+          let contrib;
+          if (weightTanh) {
+            contrib = Math.tanh(edge.w * x);
+          } else {
+            contrib = edge.w * x;
+          }
           if (!hasInput || Math.abs(contrib) > Math.abs(best)) {
             best = contrib;
             hasInput = true;
@@ -352,7 +356,12 @@ export function simulationStep(graph, t, params) {
           if (!edge) continue;
           const srcNode = graph.nodes.get(edge.src);
           if (!srcNode) continue;
-          z += weightFn(edge.w) * srcNode.activation;
+          const x = srcNode.activation;
+          if (weightTanh) {
+            z += Math.tanh(edge.w * x);
+          } else {
+            z += edge.w * x;
+          }
         }
       }
       node.activation = actFn(z);

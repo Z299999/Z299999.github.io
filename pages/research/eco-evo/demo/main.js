@@ -226,10 +226,8 @@ function impulseTestStep() {
   // 2) Forward pass for non-input nodes (same order as simulationStep).
   const { theta } = controls.getRunParams();
   const thetaVal = Number.isFinite(theta) ? theta : 0;
-  const weightFn =
-    weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh'
-      ? w => Math.tanh(w)
-      : w => w;
+  const useTanhConstraint =
+    weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh';
   let actFn;
   if (activationKind === 'relu') {
     actFn = x => (x > 0 ? x : 0);
@@ -260,7 +258,13 @@ function impulseTestStep() {
           if (!edge) continue;
           const srcNode = graph.nodes.get(edge.src);
           if (!srcNode) continue;
-          const contrib = weightFn(edge.w) * srcNode.activation;
+          const x = srcNode.activation;
+          let contrib;
+          if (useTanhConstraint) {
+            contrib = Math.tanh(edge.w * x);
+          } else {
+            contrib = edge.w * x;
+          }
           if (!hasInput || Math.abs(contrib) > Math.abs(best)) {
             best = contrib;
             hasInput = true;
@@ -276,7 +280,12 @@ function impulseTestStep() {
           if (!edge) continue;
           const srcNode = graph.nodes.get(edge.src);
           if (!srcNode) continue;
-          z += weightFn(edge.w) * srcNode.activation;
+          const x = srcNode.activation;
+          if (useTanhConstraint) {
+            z += Math.tanh(edge.w * x);
+          } else {
+            z += edge.w * x;
+          }
         }
       }
       node.activation = actFn(z);
@@ -328,10 +337,8 @@ function runImpulseOnce() {
       ? outputHistory[outputHistory.length - 1].t + 1
       : 0;
 
-  const weightFn =
-    weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh'
-      ? w => Math.tanh(w)
-      : w => w;
+  const useTanhConstraint =
+    weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh';
   const { theta: thetaRun } = controls.getRunParams();
   const thetaRunVal = Number.isFinite(thetaRun) ? thetaRun : 0;
   let actFn;
@@ -378,7 +385,13 @@ function runImpulseOnce() {
             if (!edge) continue;
             const srcNode = graph.nodes.get(edge.src);
             if (!srcNode) continue;
-            const contrib = weightFn(edge.w) * srcNode.activation;
+            const x = srcNode.activation;
+            let contrib;
+            if (useTanhConstraint) {
+              contrib = Math.tanh(edge.w * x);
+            } else {
+              contrib = edge.w * x;
+            }
             if (!hasInput || Math.abs(contrib) > Math.abs(best)) {
               best = contrib;
               hasInput = true;
@@ -394,7 +407,12 @@ function runImpulseOnce() {
             if (!edge) continue;
             const srcNode = graph.nodes.get(edge.src);
             if (!srcNode) continue;
-            z += weightFn(edge.w) * srcNode.activation;
+            const x = srcNode.activation;
+            if (useTanhConstraint) {
+              z += Math.tanh(edge.w * x);
+            } else {
+              z += edge.w * x;
+            }
           }
         }
         node.activation = actFn(z);
