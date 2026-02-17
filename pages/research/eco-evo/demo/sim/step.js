@@ -318,7 +318,16 @@ export function simulationStep(graph, t, params) {
     actFn = x => Math.tanh(x);
   }
 
-  // 2) Forward pass for non-input nodes (in creation order)
+  // Snapshot previous activations so that each step only moves one "hop":
+  // new activations depend on the previous step, not on values updated
+  // earlier in this same step.
+  const prevActivation = new Map();
+  for (const [id, node] of graph.nodes) {
+    prevActivation.set(id, node.activation || 0);
+  }
+
+  // 2) Forward pass for non-input nodes (in creation order),
+  // using prevActivation for all sources.
   const order = graph.getForwardOrder();
   for (const nodeId of order) {
     const node = graph.nodes.get(nodeId);
@@ -332,9 +341,7 @@ export function simulationStep(graph, t, params) {
         for (const eid of inEdges) {
           const edge = graph.edges.get(eid);
           if (!edge) continue;
-          const srcNode = graph.nodes.get(edge.src);
-          if (!srcNode) continue;
-          const x = srcNode.activation;
+          const x = prevActivation.get(edge.src) || 0;
           let contrib;
           if (weightTanh) {
             contrib = Math.tanh(edge.w * x);
@@ -354,9 +361,7 @@ export function simulationStep(graph, t, params) {
         for (const eid of inEdges) {
           const edge = graph.edges.get(eid);
           if (!edge) continue;
-          const srcNode = graph.nodes.get(edge.src);
-          if (!srcNode) continue;
-          const x = srcNode.activation;
+          const x = prevActivation.get(edge.src) || 0;
           if (weightTanh) {
             z += Math.tanh(edge.w * x);
           } else {

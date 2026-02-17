@@ -244,6 +244,13 @@ function impulseTestStep() {
     actFn = x => Math.tanh(x);
   }
   const order = graph.getForwardOrder();
+
+  // Use previous activations to advance one "hop" per test step.
+  const prevActivation = new Map();
+  for (const [id, node] of graph.nodes) {
+    prevActivation.set(id, node.activation || 0);
+  }
+
   for (const nodeId of order) {
     const node = graph.nodes.get(nodeId);
     if (!node || node.type === 'input') continue;
@@ -256,9 +263,7 @@ function impulseTestStep() {
         for (const eid of inEdges) {
           const edge = graph.edges.get(eid);
           if (!edge) continue;
-          const srcNode = graph.nodes.get(edge.src);
-          if (!srcNode) continue;
-          const x = srcNode.activation;
+          const x = prevActivation.get(edge.src) || 0;
           let contrib;
           if (useTanhConstraint) {
             contrib = Math.tanh(edge.w * x);
@@ -278,9 +283,7 @@ function impulseTestStep() {
         for (const eid of inEdges) {
           const edge = graph.edges.get(eid);
           if (!edge) continue;
-          const srcNode = graph.nodes.get(edge.src);
-          if (!srcNode) continue;
-          const x = srcNode.activation;
+          const x = prevActivation.get(edge.src) || 0;
           if (useTanhConstraint) {
             z += Math.tanh(edge.w * x);
           } else {
@@ -369,6 +372,13 @@ function runImpulseOnce() {
       }
     }
 
+    // Forward pass for non-input nodes using previous activations so that
+    // each test step advances the impulse by one hop.
+    const prevActivation = new Map();
+    for (const [id, node] of graph.nodes) {
+      prevActivation.set(id, node.activation || 0);
+    }
+
     // Forward pass for non-input nodes.
     const order = graph.getForwardOrder();
     for (const nodeId of order) {
@@ -383,9 +393,7 @@ function runImpulseOnce() {
           for (const eid of inEdges) {
             const edge = graph.edges.get(eid);
             if (!edge) continue;
-            const srcNode = graph.nodes.get(edge.src);
-            if (!srcNode) continue;
-            const x = srcNode.activation;
+            const x = prevActivation.get(edge.src) || 0;
             let contrib;
             if (useTanhConstraint) {
               contrib = Math.tanh(edge.w * x);
@@ -405,9 +413,7 @@ function runImpulseOnce() {
           for (const eid of inEdges) {
             const edge = graph.edges.get(eid);
             if (!edge) continue;
-            const srcNode = graph.nodes.get(edge.src);
-            if (!srcNode) continue;
-            const x = srcNode.activation;
+            const x = prevActivation.get(edge.src) || 0;
             if (useTanhConstraint) {
               z += Math.tanh(edge.w * x);
             } else {
