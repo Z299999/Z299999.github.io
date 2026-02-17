@@ -123,7 +123,10 @@ function reset() {
       ? activation
       : 'tanh';
   weightControlKind =
-    weightControl === 'tanh' || weightControl === 'ou' || weightControl === 'hebbian'
+    weightControl === 'tanh' ||
+    weightControl === 'ou' ||
+    weightControl === 'hebbian' ||
+    weightControl === 'hebbian-tanh'
       ? weightControl
       : 'vanilla';
   constructionMode = construction === 'random' ? 'random' : 'bridge';
@@ -162,9 +165,9 @@ function evolveStep() {
     m: genesisM,
     activation: activationKind,
     construction: constructionMode,
-    weightTanh: weightControlKind === 'tanh',
+    weightTanh: weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh',
     useOU: weightControlKind === 'ou',
-    useHebbian: weightControlKind === 'hebbian'
+    useHebbian: weightControlKind === 'hebbian' || weightControlKind === 'hebbian-tanh'
   };
 
   const events = simulationStep(graph, t, runParams);
@@ -224,7 +227,7 @@ function impulseTestStep() {
   const { theta } = controls.getRunParams();
   const thetaVal = Number.isFinite(theta) ? theta : 0;
   const weightFn =
-    weightControlKind === 'tanh'
+    weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh'
       ? w => Math.tanh(w)
       : w => w;
   let actFn;
@@ -326,7 +329,7 @@ function runImpulseOnce() {
       : 0;
 
   const weightFn =
-    weightControlKind === 'tanh'
+    weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh'
       ? w => Math.tanh(w)
       : w => w;
   const { theta: thetaRun } = controls.getRunParams();
@@ -620,7 +623,7 @@ function updateWeightDynamicsUI() {
     if (hebbThreshSlider && hebbThreshLabel) {
       setSliderState(hebbThreshSlider, hebbThreshLabel, false);
     }
-  } else if (modeVal === 'hebbian') {
+  } else if (modeVal === 'hebbian' || modeVal === 'hebbian-tanh') {
     setSliderState(muSlider, muLabel, false);
     setSliderState(ouSlider, ouLabel, false);
     if (etaHebbSlider && etaHebbLabel) {
