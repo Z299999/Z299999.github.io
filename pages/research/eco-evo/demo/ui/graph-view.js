@@ -17,8 +17,9 @@ const BRIDGE_BORDER_COLOR = '#ffd600';
 
 export class GraphView {
   constructor(containerId) {
+    this.container = document.getElementById(containerId);
     this.cy = cytoscape({
-      container: document.getElementById(containerId),
+      container: this.container,
       style: [
         {
           selector: 'node',
@@ -63,6 +64,9 @@ export class GraphView {
       maxZoom: 5,
       wheelSensitivity: 0.3
     });
+
+    this._initInfoPopup();
+    this._bindInteractionHandlers();
   }
 
   /**
@@ -177,6 +181,7 @@ export class GraphView {
         group: 'nodes',
         data: {
           id,
+          activation: node.activation || 0,
           color: NODE_COLORS[node.type] || NODE_COLORS.internal,
           size,
           fontSize,
@@ -195,6 +200,7 @@ export class GraphView {
           id: eid,
           source: edge.src,
           target: edge.dst,
+          weight: edge.w,
           color: edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR,
           thickness: Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2)
         }
@@ -239,6 +245,7 @@ export class GraphView {
           group: 'nodes',
           data: {
             id,
+            activation: node.activation || 0,
             color: NODE_COLORS[node.type] || NODE_COLORS.internal,
             size,
             fontSize,
@@ -258,6 +265,7 @@ export class GraphView {
             id: eid,
             source: edge.src,
             target: edge.dst,
+            weight: edge.w,
             color: edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR,
             thickness: Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2)
           }
@@ -270,7 +278,7 @@ export class GraphView {
     }
 
     // Update positions and sizes of all existing nodes to keep columns neat
-    for (const [id] of graph.nodes) {
+    for (const [id, node] of graph.nodes) {
       const pos = positions.get(id);
       if (!pos) continue;
       const cyNode = this.cy.getElementById(id);
@@ -282,6 +290,7 @@ export class GraphView {
         cyNode.data('size', size);
         cyNode.data('fontSize', fontSize);
         cyNode.data('textOutlineWidth', textOutlineWidth);
+        cyNode.data('activation', node.activation || 0);
       }
     }
 
@@ -291,6 +300,7 @@ export class GraphView {
       if (cyEdge.length) {
         cyEdge.data('color', edge.w >= 0 ? EDGE_POS_COLOR : EDGE_NEG_COLOR);
         cyEdge.data('thickness', Math.max(0.5, Math.min(Math.abs(edge.w), 3) * 2));
+        cyEdge.data('weight', edge.w);
       }
     }
 
@@ -312,5 +322,65 @@ export class GraphView {
   resize() {
     this.cy.resize();
     this.cy.fit();
+  }
+
+  _initInfoPopup() {
+    const popup = document.createElement('div');
+    popup.style.position = 'absolute';
+    popup.style.zIndex = '10';
+    popup.style.background = 'rgba(0, 0, 0, 0.8)';
+    popup.style.color = '#fff';
+    popup.style.padding = '4px 6px';
+    popup.style.borderRadius = '4px';
+    popup.style.fontSize = '11px';
+    popup.style.pointerEvents = 'none';
+    popup.style.display = 'none';
+    this.container.style.position = this.container.style.position || 'relative';
+    this.container.appendChild(popup);
+    this.infoPopup = popup;
+  }
+
+  _showInfoPopup(text, renderedPosition) {
+    if (!this.infoPopup) return;
+    this.infoPopup.textContent = text;
+    this.infoPopup.style.left = `${renderedPosition.x + 8}px`;
+    this.infoPopup.style.top = `${renderedPosition.y + 8}px`;
+    this.infoPopup.style.display = 'block';
+  }
+
+  _hideInfoPopup() {
+    if (!this.infoPopup) return;
+    this.infoPopup.style.display = 'none';
+  }
+
+  _bindInteractionHandlers() {
+    // Click on node: show activation
+    this.cy.on('tap', 'node', evt => {
+      const node = evt.target;
+      const id = node.id();
+      const a = node.data('activation');
+      const val =
+        a == null || Number.isNaN(a) ? 'n/a' : a.toFixed(4);
+      const pos = evt.renderedPosition || this.cy.renderer().projectToRenderedPosition(node.position());
+      this._showInfoPopup(`node ${id}\nactivation = ${val}`, pos);
+    });
+
+    // Click on edge: show weight
+    this.cy.on('tap', 'edge', evt => {
+      const edge = evt.target;
+      const id = edge.id();
+      const w = edge.data('weight');
+      const val =
+        w == null || Number.isNaN(w) ? 'n/a' : w.toFixed(4);
+      const pos = evt.renderedPosition || this.cy.renderer().projectToRenderedPosition(edge.midpoint());
+      this._showInfoPopup(`edge ${id}\nweight = ${val}`, pos);
+    });
+
+    // Click on background: hide popup
+    this.cy.on('tap', evt => {
+      if (evt.target === this.cy) {
+        this._hideInfoPopup();
+      }
+    });
   }
 }
