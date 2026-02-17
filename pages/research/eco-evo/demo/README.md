@@ -1,6 +1,6 @@
 # Eco-Evo Graph Simulation Demo
 
-Interactive browser demo of a directed weighted graph simulation with configurable activations (`tanh`, `ReLU`, `ReLU with threshold`, `Identity`, `max |w_i x_i|`), stochastic weight dynamics, and bridging growth.
+Interactive browser demo of a directed weighted graph simulation with configurable activations (`tanh`, `ReLU`, `ReLU with threshold`, `Identity`, `max |w_i x_i|`), stochastic weight dynamics, and two graph-construction modes: **bridging growth** and **random growth**.
 
 ## How to Open
 
@@ -25,6 +25,8 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 
 ## Parameters
 
+This section doubles as both a user manual (what each control does) and an experiment setup reference (how to reproduce a configuration).
+
 ### Genesis (applied on Reset)
 
 | Parameter | Range | Description |
@@ -35,6 +37,7 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | Input source | noise / constant / sine | Input signal generator |
 | Activation | tanh / ReLU / ReLU (with threshold) / Identity / max \|w_i x_i\| | Node activation nonlinearity (applied to all non-input nodes) |
 | Edge weight control | vanilla / tanh(w) / OU | - `vanilla`: Brownian weight dynamics + raw `w` in forward pass; `tanh(w)`: Brownian dynamics + `tanh(w)` as effective weight; `OU`: Ornstein–Uhlenbeck dynamics with mean `m` and raw `w` in forward pass |
+| Construction mode | bridge / random | - `bridge`: canonical bridging growth described below; `random`: suppresses bridging and instead applies random edge/node growth with parameters in “Random growth (runtime)” |
 
 ### Runtime (applied immediately)
 
@@ -50,6 +53,39 @@ Open `index.html` directly in a modern browser (Chrome, Firefox, Safari, Edge). 
 | `ε_zero` | 0–0.01 | 0.001 | Near-zero threshold for edge deletion / flip |
 | `K` (cooldown) | 0–50 | 10 | Minimum steps between two bridge events on the same node |
 | Speed | 1–200 | 10 | Simulation steps per second |
+
+### Random growth (runtime, only when construction = random)
+
+These parameters are visible in the UI but disabled unless you select `construction = random`.
+
+| Parameter | Range | Default | Description |
+|-----------|-------|---------|-------------|
+| `p_add_edge` | 0–1 | 0.01 | Per-step probability of adding a weak new edge from an internal node to another internal/output node at a sampled graph distance |
+| `p_add_node` | 0–1 | 0.005 | Per-step probability of inserting a new internal node along an existing internal→(internal/output) edge |
+| `α` (alpha) | 1–3 | 1.5 | Power-law exponent for the target graph distance: smaller `α` favors longer jumps, larger `α` favors local connections |
+| `d_max` | 1–6 | 4 | Maximum graph-distance considered for random edge targets |
+
+Under the hood, the “random” mode performs:
+
+- **Random edge growth** — with probability `p_add_edge`, pick an internal node, sample a distance `d` from the discrete power-law `P(d) ∝ 1/d^α` up to `d_max`, then add a small-weight edge to a reachable internal/output node at that distance (if any).
+- **Random node growth** — with probability `p_add_node`, choose an internal→(internal/output) edge and insert a fresh internal node along it, adding two small-weight edges `src → new` and `new → dst`.
+
+### Impulse test (frozen-graph experiments)
+
+The “Impulse test (frozen graph)” panel is collapsed by default. When enabled, it lets you probe the linear response of the current graph while freezing structural evolution.
+
+| Control | Range | Default | Description |
+|---------|-------|---------|-------------|
+| Input index `i` | 0–(m−1) | 0 | Which input node `x_i` receives the impulse |
+| Amplitude `A` | ≥ 0 | 1.0 | Magnitude of the injected impulse |
+| Test steps | ≥ 1 | 200 | Number of time steps to run the impulse response measurement |
+
+Workflow for an impulse experiment:
+
+1. Choose a configuration (genesis + runtime), run until the graph and weights reach a regime of interest.
+2. Freeze structural evolution by pausing bridging or random growth (e.g. set `T_bridge` very high and `p_add_edge = p_add_node = 0`, or simply hold the graph fixed).
+3. Open the **Impulse test** panel, set `i`, `A`, and `Test steps`.
+4. Click **Inject** to apply the impulse and record the output norm / distributions; click **Stop** to end the recording early.
 
 ## Simulation Step Order
 

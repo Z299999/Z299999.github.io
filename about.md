@@ -6,7 +6,7 @@ permalink: /about/
 
 ## About Me
 
-I'm a PhD student at UC San Diego. My work spans research, filmmaking, and writing.
+I'm a PhD student at UC San Diego, and my work spans research, filmmaking, and writing.
 
 ### Contact
 
@@ -15,4 +15,4 @@ I'm a PhD student at UC San Diego. My work spans research, filmmaking, and writi
 
 ### Background
 
-*Add your bio here.*
+Before joining UC San Diego, I received my BSc in the Chinese University of Hong Kong and an MSc with Distinction from University of Oxford, both in mathematics.
