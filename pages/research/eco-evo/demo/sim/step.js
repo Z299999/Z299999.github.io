@@ -249,7 +249,7 @@ function deleteInternalEdgeWithStructure(graph, edgeId, edge, epsZero, events) {
  * @param {object} params - {
  *   mu, pFlip, tBridge, sigma, omega, epsilon, K, theta,
  *   inputSource, m, activation, construction,
- *   weightTanh, useOU, ouMean
+ *   weightTanh, useOU, useHebbian, ouMean, etaHebb, hebbThresh
  * }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
@@ -273,7 +273,10 @@ export function simulationStep(graph, t, params) {
     randDMax,
     weightTanh,
     useOU,
-    ouMean
+    useHebbian,
+    ouMean,
+    etaHebb,
+    hebbThresh
   } = params;
 
   // Defaults if UI values are missing
@@ -285,6 +288,8 @@ export function simulationStep(graph, t, params) {
   const pAddNodeVal = Number.isFinite(pAddNode) ? Math.max(0, pAddNode) : 0.005;
   const alphaVal = Number.isFinite(randAlpha) ? Math.max(0.1, randAlpha) : 1.5;
   const dMaxVal = Number.isFinite(randDMax) ? Math.max(1, Math.min(10, Math.floor(randDMax))) : 4;
+  const etaHebbVal = Number.isFinite(etaHebb) ? etaHebb : 0;
+  const hebbThreshVal = Number.isFinite(hebbThresh) ? hebbThresh : 0;
   const events = { bridged: [], removedEdges: 0, removedNodes: 0 };
 
   // 1) Set input node activations
@@ -434,7 +439,22 @@ export function simulationStep(graph, t, params) {
   }
 
   // 5) Weight update for every edge
-  if (useOU) {
+  if (useHebbian) {
+    // Brownian motion with Hebbian drift:
+    // drift magnitude ∝ |a_pre * a_post|,
+    // but only if |a_pre * a_post| > θ_hebb;
+    // drift direction = sign(w).
+    for (const [, edge] of graph.edges) {
+      const srcNode = graph.nodes.get(edge.src);
+      const dstNode = graph.nodes.get(edge.dst);
+      const aPre = srcNode ? srcNode.activation || 0 : 0;
+      const aPost = dstNode ? dstNode.activation || 0 : 0;
+      const productMag = Math.abs(aPre * aPost);
+      const driftMag = productMag > hebbThreshVal ? etaHebbVal * productMag : 0;
+      const signW = Math.sign(edge.w) || 0;
+      edge.w += driftMag * signW + sigmaVal * randn();
+    }
+  } else if (useOU) {
     // Ornstein–Uhlenbeck update with mean reversion.
     // We interpret ouMean as a magnitude m >= 0 and use
     // a sign-dependent mean: +m for positive edges and

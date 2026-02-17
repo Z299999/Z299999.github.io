@@ -42,6 +42,10 @@ export class Controls {
     this.elSpeedVal = document.getElementById('param-speed-val');
     this.elOuMean = document.getElementById('param-ou-mean');
     this.elOuMeanVal = document.getElementById('param-ou-mean-val');
+    this.elEtaHebb = document.getElementById('param-eta-hebb');
+    this.elEtaHebbVal = document.getElementById('param-eta-hebb-val');
+    this.elHebbThresh = document.getElementById('param-hebb-thresh');
+    this.elHebbThreshVal = document.getElementById('param-hebb-thresh-val');
 
     // Impulse test params
     this.elTestInput = document.getElementById('param-test-input');
@@ -64,6 +68,12 @@ export class Controls {
     this._bindSliderDisplay(this.elSpeed, this.elSpeedVal);
     if (this.elOuMean && this.elOuMeanVal) {
       this._bindSliderDisplay(this.elOuMean, this.elOuMeanVal);
+    }
+    if (this.elEtaHebb && this.elEtaHebbVal) {
+      this._bindSliderDisplay(this.elEtaHebb, this.elEtaHebbVal);
+    }
+    if (this.elHebbThresh && this.elHebbThreshVal) {
+      this._bindSliderDisplay(this.elHebbThresh, this.elHebbThreshVal);
     }
   }
 
@@ -102,7 +112,9 @@ export class Controls {
       pAddNode: this.elPAddNode ? parseFloat(this.elPAddNode.value) : 0.005,
       randAlpha: this.elRandAlpha ? parseFloat(this.elRandAlpha.value) : 1.5,
       randDMax: this.elRandDMax ? parseInt(this.elRandDMax.value, 10) || 4 : 4,
-      ouMean: this.elOuMean ? parseFloat(this.elOuMean.value) || 0 : 0
+      ouMean: this.elOuMean ? parseFloat(this.elOuMean.value) || 0 : 0,
+      etaHebb: this.elEtaHebb ? parseFloat(this.elEtaHebb.value) || 0 : 0,
+      hebbThresh: this.elHebbThresh ? parseFloat(this.elHebbThresh.value) || 0 : 0
     };
   }
 

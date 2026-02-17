@@ -123,7 +123,7 @@ function reset() {
       ? activation
       : 'tanh';
   weightControlKind =
-    weightControl === 'tanh' || weightControl === 'ou'
+    weightControl === 'tanh' || weightControl === 'ou' || weightControl === 'hebbian'
       ? weightControl
       : 'vanilla';
   constructionMode = construction === 'random' ? 'random' : 'bridge';
@@ -163,7 +163,8 @@ function evolveStep() {
     activation: activationKind,
     construction: constructionMode,
     weightTanh: weightControlKind === 'tanh',
-    useOU: weightControlKind === 'ou'
+    useOU: weightControlKind === 'ou',
+    useHebbian: weightControlKind === 'hebbian'
   };
 
   const events = simulationStep(graph, t, runParams);
@@ -591,20 +592,52 @@ function updateWeightDynamicsUI() {
   const sel = document.getElementById('param-weight-control');
   const muSlider = document.getElementById('param-mu');
   const ouSlider = document.getElementById('param-ou-mean');
+  const etaHebbSlider = document.getElementById('param-eta-hebb');
+  const hebbThreshSlider = document.getElementById('param-hebb-thresh');
   if (!sel || !muSlider || !ouSlider) return;
-   const muLabel = muSlider.closest('label');
-   const ouLabel = ouSlider.closest('label');
+  const muLabel = muSlider.closest('label');
+  const ouLabel = ouSlider.closest('label');
+  const etaHebbLabel = etaHebbSlider ? etaHebbSlider.closest('label') : null;
+  const hebbThreshLabel = hebbThreshSlider ? hebbThreshSlider.closest('label') : null;
   const modeVal = sel.value;
+
+  const setSliderState = (slider, label, enabled) => {
+    if (!slider || !label) return;
+    slider.disabled = !enabled;
+    if (enabled) {
+      label.classList.remove('disabled-slider');
+    } else {
+      label.classList.add('disabled-slider');
+    }
+  };
+
   if (modeVal === 'ou') {
-    muSlider.disabled = true;
-    ouSlider.disabled = false;
-    if (muLabel) muLabel.classList.add('disabled-slider');
-    if (ouLabel) ouLabel.classList.remove('disabled-slider');
+    setSliderState(muSlider, muLabel, false);
+    setSliderState(ouSlider, ouLabel, true);
+    if (etaHebbSlider && etaHebbLabel) {
+      setSliderState(etaHebbSlider, etaHebbLabel, false);
+    }
+    if (hebbThreshSlider && hebbThreshLabel) {
+      setSliderState(hebbThreshSlider, hebbThreshLabel, false);
+    }
+  } else if (modeVal === 'hebbian') {
+    setSliderState(muSlider, muLabel, false);
+    setSliderState(ouSlider, ouLabel, false);
+    if (etaHebbSlider && etaHebbLabel) {
+      setSliderState(etaHebbSlider, etaHebbLabel, true);
+    }
+    if (hebbThreshSlider && hebbThreshLabel) {
+      setSliderState(hebbThreshSlider, hebbThreshLabel, true);
+    }
   } else {
-    muSlider.disabled = false;
-    ouSlider.disabled = true;
-    if (muLabel) muLabel.classList.remove('disabled-slider');
-    if (ouLabel) ouLabel.classList.add('disabled-slider');
+    setSliderState(muSlider, muLabel, true);
+    setSliderState(ouSlider, ouLabel, false);
+    if (etaHebbSlider && etaHebbLabel) {
+      setSliderState(etaHebbSlider, etaHebbLabel, false);
+    }
+    if (hebbThreshSlider && hebbThreshLabel) {
+      setSliderState(hebbThreshSlider, hebbThreshLabel, false);
+    }
   }
 }
 
