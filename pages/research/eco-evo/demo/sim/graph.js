@@ -6,7 +6,7 @@
 export class Graph {
   constructor() {
     this.nodes = new Map();   // id -> { id, type, activation, lastBridge }
-    this.edges = new Map();   // id -> { id, src, dst, w }
+    this.edges = new Map();   // id -> { id, src, dst, w, m }
     this.adjOut = new Map();  // src -> Set of edge ids
     this.adjIn = new Map();   // dst -> Set of edge ids
     // Counter for internal nodes z1, z2, z3, ...
@@ -104,7 +104,7 @@ export class Graph {
 
   addEdge(src, dst, w) {
     const id = this.newEdgeId();
-    this.edges.set(id, { id, src, dst, w });
+    this.edges.set(id, { id, src, dst, w, m: w });
     this.adjOut.get(src).add(id);
     this.adjIn.get(dst).add(id);
     return id;

@@ -249,7 +249,7 @@ function deleteInternalEdgeWithStructure(graph, edgeId, edge, epsZero, events) {
  * @param {object} params - {
  *   mu, pFlip, tBridge, sigma, omega, epsilon, K, theta,
  *   inputSource, m, activation, construction,
- *   weightTanh, useOU, useHebbian, ouMean, etaHebb, hebbThresh
+ *   weightTanh, useOU, useHebbian, useHebbOU, ouMean, etaHebb, hebbThresh
  * }
  * @returns {object} events - { bridged: [], removedEdges: number, removedNodes: number }
  */
@@ -274,6 +274,7 @@ export function simulationStep(graph, t, params) {
     weightTanh,
     useOU,
     useHebbian,
+    useHebbOU,
     ouMean,
     etaHebb,
     hebbThresh
@@ -453,7 +454,47 @@ export function simulationStep(graph, t, params) {
   }
 
   // 5) Weight update for every edge
-  if (useHebbian) {
+  if (useHebbOU) {
+    // Hebbian update of OU mean m_e, then OU update of w_e around m_e.
+    const gamma = 0.05;
+    const aOU = Math.exp(-gamma);
+    const bOU = sigmaVal * Math.sqrt((1 - aOU * aOU) / (2 * gamma));
+    const lambdaM = 0.01; // small decay on Hebbian mean to prevent divergence
+
+    for (const [, edge] of graph.edges) {
+      const srcNode = graph.nodes.get(edge.src);
+      const dstNode = graph.nodes.get(edge.dst);
+      const aPre = srcNode ? srcNode.activation || 0 : 0;
+      const aPost = dstNode ? dstNode.activation || 0 : 0;
+      const p = aPre * aPost;
+
+      // Determine role sign (excitatory/inhibitory) in a stable way.
+      let m = Number.isFinite(edge.m) ? edge.m : 0;
+      let roleSign = 0;
+      if (m !== 0) {
+        roleSign = Math.sign(m);
+      } else if (edge.w !== 0) {
+        roleSign = Math.sign(edge.w);
+      } else if (p !== 0) {
+        roleSign = Math.sign(p);
+      } else {
+        roleSign = Math.random() < 0.5 ? 1 : -1;
+      }
+
+      let hebbTerm = 0;
+      if (p > hebbThreshVal) {
+        hebbTerm = etaHebbVal * (p - hebbThreshVal) * roleSign;
+      }
+
+      // Hebbian mean update with decay
+      m = m + hebbTerm - lambdaM * m;
+      edge.m = m;
+
+      // OU update of the actual weight around m
+      const wOld = edge.w;
+      edge.w = m + aOU * (wOld - m) + bOU * randn();
+    }
+  } else if (useHebbian) {
     // Brownian motion with Hebbian drift:
     // drift magnitude ∝ |a_pre * a_post|,
     // but only if |a_pre * a_post| > θ_hebb;

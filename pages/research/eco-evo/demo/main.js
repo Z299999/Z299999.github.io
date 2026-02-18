@@ -126,7 +126,8 @@ function reset() {
     weightControl === 'tanh' ||
     weightControl === 'ou' ||
     weightControl === 'hebbian' ||
-    weightControl === 'hebbian-tanh'
+    weightControl === 'hebbian-tanh' ||
+    weightControl === 'hebb-ou'
       ? weightControl
       : 'vanilla';
   constructionMode = construction === 'random' ? 'random' : 'bridge';
@@ -167,7 +168,8 @@ function evolveStep() {
     construction: constructionMode,
     weightTanh: weightControlKind === 'tanh' || weightControlKind === 'hebbian-tanh',
     useOU: weightControlKind === 'ou',
-    useHebbian: weightControlKind === 'hebbian' || weightControlKind === 'hebbian-tanh'
+    useHebbian: weightControlKind === 'hebbian' || weightControlKind === 'hebbian-tanh',
+    useHebbOU: weightControlKind === 'hebb-ou'
   };
 
   const events = simulationStep(graph, t, runParams);
@@ -660,7 +662,7 @@ function updateWeightDynamicsUI() {
     if (hebbThreshSlider && hebbThreshLabel) {
       setSliderState(hebbThreshSlider, hebbThreshLabel, false);
     }
-  } else if (modeVal === 'hebbian' || modeVal === 'hebbian-tanh') {
+  } else if (modeVal === 'hebbian' || modeVal === 'hebbian-tanh' || modeVal === 'hebb-ou') {
     setSliderState(muSlider, muLabel, false);
     setSliderState(ouSlider, ouLabel, false);
     if (etaHebbSlider && etaHebbLabel) {
