@@ -42,31 +42,92 @@
         <h2>Eco-Evo Graph Simulation – Tutorial</h2>
         <p>
           This demo simulates a directed, weighted graph with evolving structure and weights.
-          Use the left panel to configure genesis (inputs/outputs/internal nodes, construction
-          mode, activation, and edge weight control), and the Runtime sliders to tune dynamics
-          such as weight noise σ, near-zero threshold ε, and bridging threshold T_bridge.
+          Use the left panel to configure the graph at reset (Genesis), the Runtime sliders to
+          tune evolution, and Test mode to probe the frozen graph with impulse/constant signals.
         </p>
+
         <h3>Top toolbar</h3>
         <ul>
           <li><strong>Play</strong>: run evolution continuously.</li>
           <li><strong>Step</strong>: advance a single simulation step.</li>
           <li><strong>Reset</strong>: rebuild the graph using the current Genesis parameters.</li>
-          <li><strong>Start test</strong>: enter test mode (frozen graph) to run impulse or constant signal tests.</li>
+          <li><strong>Start test</strong>: enter / exit test mode (frozen graph).</li>
         </ul>
-        <h3>Weights and activations</h3>
+
+        <h3>Genesis (applied on Reset)</h3>
         <ul>
-          <li>Click a node in the center graph to see its current activation.</li>
+          <li><strong>m (inputs), n (outputs)</strong>: number of input and output nodes.</li>
+          <li><strong>k (internal nodes)</strong>: number of internal nodes at genesis (z-nodes).</li>
+          <li><strong>Graph construction</strong>:
+            <ul>
+              <li><strong>Bridging growth</strong>: starts from a fully connected z-core and grows via bridge events.</li>
+              <li><strong>Random growth</strong>: disables bridging; edges/nodes are added stochastically.</li>
+            </ul>
+          </li>
+          <li><strong>Input source</strong>:
+            <ul>
+              <li><strong>Noise</strong>: i.i.d. Uniform(-1,1) noise on each input.</li>
+              <li><strong>Constant (1)</strong>: all inputs fixed to 1.</li>
+              <li><strong>Sine</strong>: sine waves with different phases/frequencies per input.</li>
+            </ul>
+          </li>
+          <li><strong>Activation</strong>:
+            <ul>
+              <li><strong>tanh</strong>: smooth saturating nonlinearity.</li>
+              <li><strong>ReLU</strong>: max(0, z).</li>
+              <li><strong>ReLU (with threshold)</strong>: max(0, z − θ) with global θ.</li>
+              <li><strong>Identity</strong>: linear units.</li>
+              <li><strong>max |w_i x_i|</strong>: node picks the single strongest incoming contribution.</li>
+            </ul>
+          </li>
+          <li><strong>Edge weight control</strong>:
+            <ul>
+              <li><strong>drifted Brownian motion</strong> (vanilla): random walk with drift μ on w.</li>
+              <li><strong>drifted BM with tanh constraint</strong>: same, but contributions use tanh(w·x).</li>
+              <li><strong>Ornstein–Uhlenbeck (OU)</strong>: w follows an OU process with mean m and noise σ.</li>
+              <li><strong>BM with Hebbian drift</strong>: Brownian motion plus Hebbian drift ∝ |a_pre a_post|.</li>
+              <li><strong>BM Hebbian + tanh constraint</strong>: Hebbian drift with tanh(w·x) contributions.</li>
+              <li><strong>Hebb OU (Hebb mean + OU)</strong>: OU on w whose mean is an instantaneous Hebbian
+                function of the previous-step activations.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>Runtime (evolution parameters)</h3>
+        <ul>
+          <li><strong>μ (drift)</strong>: constant drift in Brownian modes (vanilla / tanh).</li>
+          <li><strong>σ (mutation)</strong>: noise strength for all weight dynamics.</li>
+          <li><strong>p_flip</strong>: probability that near-zero edges flip sign instead of being removed.</li>
+          <li><strong>T_bridge</strong>: activation threshold for triggering bridge events.</li>
+          <li><strong>ω (bridge feedback)</strong>: strength of stabilizing feedback edges around bridges.</li>
+          <li><strong>ε (near-zero)</strong>: threshold below which edges are considered “near zero” and may flip or be deleted.</li>
+          <li><strong>K (bridge cooldown)</strong>: minimum steps between bridge events at the same node.</li>
+          <li><strong>θ_hebb</strong>: Hebbian co-activation threshold; only edges with |a_pre a_post| above this are updated by Hebb.</li>
+          <li><strong>η_hebb</strong>: Hebbian learning rate; larger values make Hebbian effects stronger.</li>
+        </ul>
+
+        <h3>Test mode (frozen graph)</h3>
+        <ul>
+          <li><strong>Signal type</strong>:
+            <ul>
+              <li><strong>Impulse</strong>: one-step spike on input i, then 0.</li>
+              <li><strong>Constant</strong>: constant amplitude A on input i for all test steps.</li>
+            </ul>
+          </li>
+          <li><strong>Input index i</strong>: which input node receives the test signal.</li>
+          <li><strong>Amplitude A</strong>: magnitude of the injected signal.</li>
+          <li><strong>Test steps</strong>: number of test iterations in frozen-graph mode.</li>
+        </ul>
+
+        <h3>Graph view and plots</h3>
+        <ul>
+          <li>Click a node to see its current activation (popup near the cursor).</li>
           <li>Click an edge to see its current weight.</li>
-          <li>Use the Edge weight control dropdown to switch between Brownian, OU, Hebbian, and Hebb-OU dynamics.</li>
+          <li>Right panel shows ‖y(t)‖₂ over time and histograms of activations, weights, and degree.</li>
         </ul>
-        <h3>Test mode</h3>
-        <ul>
-          <li>In the Test mode panel, choose <strong>Signal type</strong> = impulse or constant.</li>
-          <li>Set input index <code>i</code>, amplitude <code>A</code>, and test steps, then click <strong>Inject</strong>.</li>
-          <li>The right panel shows the output norm ‖y(t)‖₂ and distributions over time.</li>
-        </ul>
+
         <p>
-          For more details (including exact update equations), see the README in the
+          For exact update equations and more details, see the README in the
           <code>demo/</code> directory of this project.
         </p>
       </div>
