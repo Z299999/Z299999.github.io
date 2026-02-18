@@ -119,8 +119,9 @@ html, body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 60px;
+  padding: 60px 16px 16px;
   z-index: 1000;
+  overflow-y: auto;
 }
 
 .help-content {
@@ -132,6 +133,8 @@ html, body {
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   font-size: 13px;
+  max-height: calc(100% - 80px);
+  overflow-y: auto;
 }
 
 .help-content h2 {
