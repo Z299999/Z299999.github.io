@@ -7,6 +7,19 @@
 
 /* global Chart */
 
+function formatBinLabel(value) {
+  if (!Number.isFinite(value)) return '';
+  const rounded = Number(value.toFixed(1));
+  if (Math.abs(rounded) < 1e-6) {
+    return '0';
+  }
+  let s = rounded.toFixed(1);
+  if (Math.abs(rounded) < 1) {
+    s = s.replace(/^(-?)0\./, '$1.');
+  }
+  return s;
+}
+
 // Degree distribution: { k: count }
 export class ChartView {
   constructor(canvasId) {
@@ -110,7 +123,7 @@ export class ActivationView {
       this.chart.update('none');
       return;
     }
-    this.chart.data.labels = hist.centers.map(v => Math.trunc(v).toString());
+    this.chart.data.labels = hist.centers.map(formatBinLabel);
     this.chart.data.datasets[0].data = hist.counts;
     this.chart.update('none');
   }
@@ -167,7 +180,7 @@ export class WeightView {
       this.chart.update('none');
       return;
     }
-    this.chart.data.labels = hist.centers.map(v => Math.trunc(v).toString());
+    this.chart.data.labels = hist.centers.map(formatBinLabel);
     this.chart.data.datasets[0].data = hist.counts;
     this.chart.update('none');
   }
