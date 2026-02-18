@@ -805,6 +805,24 @@ function init() {
     reset();
   });
 
+  // Help button: show tutorial overlay
+  const helpBtn = document.getElementById('btn-help');
+  const helpOverlay = document.getElementById('help-overlay');
+  const helpClose = document.getElementById('btn-help-close');
+  if (helpBtn && helpOverlay && helpClose) {
+    helpBtn.addEventListener('click', () => {
+      helpOverlay.style.display = 'flex';
+    });
+    helpClose.addEventListener('click', () => {
+      helpOverlay.style.display = 'none';
+    });
+    helpOverlay.addEventListener('click', evt => {
+      if (evt.target === helpOverlay) {
+        helpOverlay.style.display = 'none';
+      }
+    });
+  }
+
   // Impulse test toggle button
   document.getElementById('btn-test-toggle').addEventListener('click', () => {
     if (mode === 'test') {

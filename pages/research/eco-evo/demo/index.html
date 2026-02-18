@@ -18,6 +18,7 @@
       <button id="btn-step" title="Single step">Step</button>
       <button id="btn-reset" title="Reset simulation">Reset</button>
       <button id="btn-test-toggle" title="Impulse response test">Start test</button>
+      <button id="btn-help" class="toolbar-help" title="Show tutorial">?</button>
     </div>
     <div class="toolbar-group toolbar-stats">
       <span>t = <strong id="stat-step">0</strong></span>
@@ -34,6 +35,42 @@
 
   <!-- Main layout: left panel | center graph | right chart -->
   <main id="layout">
+    <!-- Help overlay -->
+    <div id="help-overlay" class="help-overlay" style="display: none;">
+      <div class="help-content">
+        <button id="btn-help-close" class="help-close" title="Close help">×</button>
+        <h2>Eco-Evo Graph Simulation – Tutorial</h2>
+        <p>
+          This demo simulates a directed, weighted graph with evolving structure and weights.
+          Use the left panel to configure genesis (inputs/outputs/internal nodes, construction
+          mode, activation, and edge weight control), and the Runtime sliders to tune dynamics
+          such as weight noise σ, near-zero threshold ε, and bridging threshold T_bridge.
+        </p>
+        <h3>Top toolbar</h3>
+        <ul>
+          <li><strong>Play</strong>: run evolution continuously.</li>
+          <li><strong>Step</strong>: advance a single simulation step.</li>
+          <li><strong>Reset</strong>: rebuild the graph using the current Genesis parameters.</li>
+          <li><strong>Start test</strong>: enter test mode (frozen graph) to run impulse or constant signal tests.</li>
+        </ul>
+        <h3>Weights and activations</h3>
+        <ul>
+          <li>Click a node in the center graph to see its current activation.</li>
+          <li>Click an edge to see its current weight.</li>
+          <li>Use the Edge weight control dropdown to switch between Brownian, OU, Hebbian, and Hebb-OU dynamics.</li>
+        </ul>
+        <h3>Test mode</h3>
+        <ul>
+          <li>In the Test mode panel, choose <strong>Signal type</strong> = impulse or constant.</li>
+          <li>Set input index <code>i</code>, amplitude <code>A</code>, and test steps, then click <strong>Inject</strong>.</li>
+          <li>The right panel shows the output norm ‖y(t)‖₂ and distributions over time.</li>
+        </ul>
+        <p>
+          For more details (including exact update equations), see the README in the
+          <code>demo/</code> directory of this project.
+        </p>
+      </div>
+    </div>
 
     <!-- Left: control panel -->
     <aside id="panel-left">
