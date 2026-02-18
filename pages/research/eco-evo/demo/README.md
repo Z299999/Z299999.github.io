@@ -99,7 +99,7 @@ Each call to `step()` executes in this exact order:
    - For standard activations:
      - `z_i = Σ(w_ji × a_j(t))` over all incoming edges  
      - `a_i = φ(z_i)` where `φ` is:
-       - `tanh` (default), or  
+       - `tanh`, or  
        - `ReLU(x) = max(0, x)`, or  
        - **ReLU with threshold:** `ReLU(z_i - θ) = max(0, z_i - θ)` using the global runtime threshold `θ`, or  
        - `Identity(x) = x` (fully linear graph)
