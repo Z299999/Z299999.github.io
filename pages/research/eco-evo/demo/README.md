@@ -36,14 +36,14 @@ This section doubles as both a user manual (what each control does) and an exper
 | `k` | 1–50 | Number of internal nodes at genesis (z0, ..., z_{k-1} fully connected; each x_i connects to every z_j, and each z_j connects to every y_l) |
 | Input source | noise / constant / sine | Input signal generator |
 | Activation | tanh / ReLU / ReLU (with threshold) / Identity / max \|w_i x_i\| | Node activation nonlinearity (applied to all non-input nodes) |
-| Edge weight control | vanilla / tanh-constraint / OU / Hebbian / Hebbian+tanh | - `vanilla`: drifted Brownian motion on `w` + raw `w` in forward pass; `tanh-constraint`: same drift but contributions use `tanh(w·x)` to keep inputs bounded; `OU`: Ornstein–Uhlenbeck dynamics with user mean `m`; `Hebbian`: Brownian motion with Hebbian drift; `Hebbian+tanh`: Hebbian drift + `tanh(w·x)` constraint on contributions |
+| Edge weight control | vanilla / tanh-constraint / OU / Hebbian / Hebbian+tanh / Hebb-OU | - `vanilla`: drifted Brownian motion on `w` + raw `w` in forward pass; `tanh-constraint`: same drift but contributions use `tanh(w·x)` to keep inputs bounded; `OU`: Ornstein–Uhlenbeck dynamics with user mean `m`; `Hebbian`: Brownian motion with Hebbian drift; `Hebbian+tanh`: Hebbian drift + `tanh(w·x)` constraint on contributions; `Hebb-OU`: OU dynamics whose mean is an instantaneous Hebbian function of the previous-step activations |
 | Construction mode | bridge / random | - `bridge`: canonical bridging growth described below; `random`: suppresses bridging and instead applies random edge/node growth with parameters in “Random growth (runtime)” |
 
 ### Runtime (applied immediately)
 
 | Parameter | Range | Default | Description |
 |-----------|-------|---------|-------------|
-| `μ` (mu) | -0.1–0.1 | 0.0 | Drift term in `w += σ ξ + μ sign(w)` (used for `vanilla` / `tanh-constraint`, disabled in OU / Hebbian modes) |
+| `μ` (mu) | -0.1–0.1 | 0.0 | Drift term in `w += σ ξ + μ sign(w)` (used for `vanilla` / `tanh-constraint`, disabled in OU / Hebbian / Hebb-OU modes) |
 | `σ` (sigma) | 0–0.05 | 0.02 | Weight noise standard deviation (used in both Brownian and OU dynamics) |
 | `θ` (activation threshold) | 0–1 | 0.0 | Global threshold used only when activation is set to “ReLU (with threshold)”; nodes apply `ReLU(z - θ)` to their aggregated input |
 | OU mean `m` | free | 0.0 | Target mean for OU weight dynamics (only used when edge weight control is `OU`) |
@@ -52,8 +52,8 @@ This section doubles as both a user manual (what each control does) and an exper
 | `ω` (omega) | 0–0.2 | 0.05 | Bridge feedback strength for edges `z1 → z0 = -ω`, `z0 → z2 = ω` |
 | `ε_zero` | 0–0.01 | 0.001 | Near-zero threshold for edge deletion / flip / structural rewiring |
 | `K` (cooldown) | 0–50 | 10 | Minimum steps between two bridge events on the same node |
-| Hebbian rate `η_hebb` | 0–2 | 0.1 | Hebbian drift strength in `Δw ∝ η_hebb · \|a_pre a_post\|`, only used for Hebbian edge weight controls |
-| Hebbian threshold `θ_hebb` | 0–1 | 0.1 | Only edges with `\|a_pre a_post\| > θ_hebb` receive Hebbian drift; below threshold only noise acts |
+| Hebbian rate `η_hebb` | 0–2 | 0.1 | Hebbian strength parameter used in Hebbian and Hebb-OU edge weight controls |
+| Hebbian threshold `θ_hebb` | 0–1 | 0.1 | Only edges with sufficiently strong co-activation (see Hebbian / Hebb-OU rules) receive Hebbian contributions; below threshold only noise/OU act |
 | Speed | 1–200 | 10 | Simulation steps per second |
 
 ### Random growth (runtime, only when construction = random)
@@ -135,6 +135,33 @@ Each call to `step()` executes in this exact order:
        w \leftarrow w + d\,\operatorname{sign}(w) + \sigma\,\xi;
        \]
        otherwise, apply only the noise term `σ ξ` (no Hebbian drift).
+   - If edge weight control is Hebb-OU: OU with instantaneous Hebbian mean  
+     - Let `a_pre(t), a_post(t)` be the previous-step activations and set  
+       \[
+       p = a_{\text{pre}}(t)\,a_{\text{post}}(t).
+       \]
+       Define a role sign
+       \[
+       s_{\text{role}}(t) =
+       \begin{cases}
+       \operatorname{sign}(w(t)), & w(t)\neq 0,\\
+       \operatorname{sign}(p), & w(t)=0,\ p\neq 0,\\
+       \pm 1 \text{ (random)}, & \text{otherwise.}
+       \end{cases}
+       \]
+     - Define an instantaneous OU mean
+       \[
+       m(t) =
+       \begin{cases}
+       \tanh\bigl(\eta_{\text{hebb}}(p - \theta_{\text{hebb}})s_{\text{role}}(t)\bigr), & p > \theta_{\text{hebb}},\\
+       0, & p \le \theta_{\text{hebb}},
+       \end{cases}
+       \]
+       and update
+       \[
+       w \leftarrow m(t) + a\bigl(w - m(t)\bigr) + b\,\xi,
+       \]
+       with the same `a = e^{-γ}`, `b = σ sqrt((1-a^2)/(2γ))` as in the OU rule.
 6. **Near-zero event and structural changes** — For edges with `|w| < ε_zero`:
    - With probability `p_flip`: draw a small magnitude `u ~ Uniform(0, ε_zero)` and set  
      `w ← -sign(w) · u` (flip sign but keep `|w|` small).
