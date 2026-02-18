@@ -41,22 +41,28 @@ function sampleDistance(dMax, alpha) {
 }
 
 /**
- * Randomly add a new weak edge from an internal node to another node that is
- * "nearby" in graph distance (power-law over distances). Edges are only added
- * from internal nodes to internal or output nodes, and we avoid duplicate
- * edges.
+ * Randomly add a new weak edge from an internal or input node to another node
+ * that is "nearby" in graph distance (power-law over distances).
+ * - Sources: internal or input nodes.
+ * - Targets: if source is input, only internal nodes;
+ *            if source is internal, internal or output nodes.
+ * We avoid duplicate edges.
  */
 function randomEdgeGrowth(graph, pAddEdge, alpha, dMax) {
-  if (pAddEdge <= 0) return;
-  if (Math.random() >= pAddEdge) return;
+  if (pAddEdge <= 0) return null;
+  if (Math.random() >= pAddEdge) return null;
 
-  const internalIds = [];
+  const candidateSrcIds = [];
   for (const [id, node] of graph.nodes) {
-    if (node.type === 'internal') internalIds.push(id);
+    if (node.type === 'internal' || node.type === 'input') {
+      candidateSrcIds.push(id);
+    }
   }
-  if (internalIds.length === 0) return;
+  if (candidateSrcIds.length === 0) return null;
 
-  const srcId = internalIds[Math.floor(Math.random() * internalIds.length)];
+  const srcId = candidateSrcIds[Math.floor(Math.random() * candidateSrcIds.length)];
+  const srcNode = graph.nodes.get(srcId);
+  const srcType = srcNode ? srcNode.type : 'internal';
 
   const targetDistance = sampleDistance(dMax, alpha);
 
@@ -96,14 +102,19 @@ function randomEdgeGrowth(graph, pAddEdge, alpha, dMax) {
         const node = graph.nodes.get(nb);
         if (!node) continue;
         if (nb === srcId) continue;
-        if (node.type === 'internal' || node.type === 'output') {
+        // If the source is an input node, only connect to internal nodes.
+        if (srcType === 'input') {
+          if (node.type === 'internal') {
+            candidates.push(nb);
+          }
+        } else if (node.type === 'internal' || node.type === 'output') {
           candidates.push(nb);
         }
       }
     }
   }
 
-  if (candidates.length === 0) return;
+  if (candidates.length === 0) return null;
 
   const dstId = candidates[Math.floor(Math.random() * candidates.length)];
 
@@ -113,13 +124,14 @@ function randomEdgeGrowth(graph, pAddEdge, alpha, dMax) {
     for (const eid of outEdgesFromSrc) {
       const e = graph.edges.get(eid);
       if (e && e.dst === dstId) {
-        return;
+        return null;
       }
     }
   }
 
   const wNew = 0.02 * randn(); // small initial weight
   graph.addEdge(srcId, dstId, wNew);
+  return srcId;
 }
 
 /**
@@ -128,20 +140,25 @@ function randomEdgeGrowth(graph, pAddEdge, alpha, dMax) {
  * two weak incident edges so that the structural perturbation is small.
  */
 function randomNodeGrowth(graph, pAddNode) {
-  if (pAddNode <= 0) return;
-  if (Math.random() >= pAddNode) return;
+  if (pAddNode <= 0) return null;
+  if (Math.random() >= pAddNode) return null;
 
   const candidateEdges = [];
   for (const [eid, edge] of graph.edges) {
     const src = graph.nodes.get(edge.src);
     const dst = graph.nodes.get(edge.dst);
     if (!src || !dst) continue;
-    if (src.type === 'internal' &&
-        (dst.type === 'internal' || dst.type === 'output')) {
+    const isInternalInternal =
+      src.type === 'internal' && dst.type === 'internal';
+    const isInternalOutput =
+      src.type === 'internal' && dst.type === 'output';
+    const isInputInternal =
+      src.type === 'input' && dst.type === 'internal';
+    if (isInternalInternal || isInternalOutput || isInputInternal) {
       candidateEdges.push(edge);
     }
   }
-  if (candidateEdges.length === 0) return;
+  if (candidateEdges.length === 0) return null;
 
   const edge = candidateEdges[Math.floor(Math.random() * candidateEdges.length)];
   const srcId = edge.src;
@@ -155,6 +172,7 @@ function randomNodeGrowth(graph, pAddNode) {
   const wOut = base * randn();
   graph.addEdge(srcId, newId, wIn);
   graph.addEdge(newId, dstId, wOut);
+  return newId;
 }
 
 /**
@@ -449,8 +467,14 @@ export function simulationStep(graph, t, params) {
     }
   } else {
     // Random construction mode: skip bridging and instead apply random growth.
-    randomEdgeGrowth(graph, pAddEdgeVal, alphaVal, dMaxVal);
-    randomNodeGrowth(graph, pAddNodeVal);
+    const growthNodes = [];
+    const edgeSrc = randomEdgeGrowth(graph, pAddEdgeVal, alphaVal, dMaxVal);
+    if (edgeSrc) growthNodes.push(edgeSrc);
+    const newNode = randomNodeGrowth(graph, pAddNodeVal);
+    if (newNode) growthNodes.push(newNode);
+    for (const id of growthNodes) {
+      events.bridged.push(id);
+    }
   }
 
   // 5) Weight update for every edge
