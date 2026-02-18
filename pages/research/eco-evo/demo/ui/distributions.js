@@ -30,7 +30,11 @@ export class ChartView {
         scales: {
           x: {
             title: { display: true, text: 'Total Degree (k)', color: '#ccc' },
-            ticks: { color: '#aaa' },
+            ticks: {
+              color: '#aaa',
+              maxRotation: 0,
+              minRotation: 0
+            },
             grid: { color: 'rgba(255,255,255,0.1)' }
           },
           y: {
@@ -78,7 +82,11 @@ export class ActivationView {
         scales: {
           x: {
             title: { display: true, text: 'Activation value', color: '#ccc' },
-            ticks: { color: '#aaa' },
+            ticks: {
+              color: '#aaa',
+              maxRotation: 0,
+              minRotation: 0
+            },
             grid: { color: 'rgba(255,255,255,0.08)' }
           },
           y: {
@@ -102,7 +110,7 @@ export class ActivationView {
       this.chart.update('none');
       return;
     }
-    this.chart.data.labels = hist.centers.map(v => v.toFixed(2));
+    this.chart.data.labels = hist.centers.map(v => Math.trunc(v).toString());
     this.chart.data.datasets[0].data = hist.counts;
     this.chart.update('none');
   }
@@ -131,7 +139,11 @@ export class WeightView {
         scales: {
           x: {
             title: { display: true, text: 'Edge weight', color: '#ccc' },
-            ticks: { color: '#aaa' },
+            ticks: {
+              color: '#aaa',
+              maxRotation: 0,
+              minRotation: 0
+            },
             grid: { color: 'rgba(255,255,255,0.08)' }
           },
           y: {
@@ -155,9 +167,8 @@ export class WeightView {
       this.chart.update('none');
       return;
     }
-    this.chart.data.labels = hist.centers.map(v => v.toFixed(2));
+    this.chart.data.labels = hist.centers.map(v => Math.trunc(v).toString());
     this.chart.data.datasets[0].data = hist.counts;
     this.chart.update('none');
   }
 }
-
