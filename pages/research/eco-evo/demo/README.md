@@ -149,15 +149,14 @@ Each call to `step()` executes in this exact order:
        \pm 1 \text{ (random)}, & \text{otherwise.}
        \end{cases}
        \]
-     - Define an instantaneous OU mean
+     - Require both nodes to be strongly active, i.e.  
+       \(|a_{\text{pre}}(t)| > \theta_{\text{hebb}}\) and \(|a_{\text{post}}(t)| > \theta_{\text{hebb}}\).  
+       If this condition holds, define an instantaneous OU mean
        \[
-       m(t) =
-       \begin{cases}
-       \tanh\bigl(\eta_{\text{hebb}}(p - \theta_{\text{hebb}})s_{\text{role}}(t)\bigr), & p > \theta_{\text{hebb}},\\
-       0, & p \le \theta_{\text{hebb}},
-       \end{cases}
+       m(t) = \tanh\bigl(\eta_{\text{hebb}}\,p\,s_{\text{role}}(t)\bigr);
        \]
-       and update
+       otherwise set \(m(t) = 0\).
+     - Update
        \[
        w \leftarrow m(t) + a\bigl(w - m(t)\bigr) + b\,\xi,
        \]

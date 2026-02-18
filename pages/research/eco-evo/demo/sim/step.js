@@ -468,6 +468,10 @@ export function simulationStep(graph, t, params) {
       const aPost = dstNode ? dstNode.activation || 0 : 0;
       const p = aPre * aPost;
 
+      // Require both nodes to be strongly active before Hebb-OU has any effect.
+      const absPre = Math.abs(aPre);
+      const absPost = Math.abs(aPost);
+
       // Determine role sign (excitatory/inhibitory) in a stable way.
       let roleSign = 0;
       if (edge.w !== 0) {
@@ -479,10 +483,10 @@ export function simulationStep(graph, t, params) {
       }
 
       // Instantaneous Hebbian mean in [-1, 1]:
-      // m_e(t) = tanh( etaHebb * max(p - theta, 0) * roleSign )
+      // only when both |a_pre| and |a_post| exceed θ_hebb.
       let mInst = 0;
-      if (p > hebbThreshVal) {
-        const hebbInput = etaHebbVal * (p - hebbThreshVal) * roleSign;
+      if (absPre > hebbThreshVal && absPost > hebbThreshVal) {
+        const hebbInput = etaHebbVal * p * roleSign;
         mInst = Math.tanh(hebbInput);
       } else {
         mInst = 0;
