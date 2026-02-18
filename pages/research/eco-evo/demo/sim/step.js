@@ -455,11 +455,11 @@ export function simulationStep(graph, t, params) {
 
   // 5) Weight update for every edge
   if (useHebbOU) {
-    // Hebbian update of OU mean m_e, then OU update of w_e around m_e.
+    // Hebbian-defined OU mean m_e(a_pre, a_post) (no separate ODE state),
+    // then OU update of w_e around this instantaneous mean.
     const gamma = 0.05;
     const aOU = Math.exp(-gamma);
     const bOU = sigmaVal * Math.sqrt((1 - aOU * aOU) / (2 * gamma));
-    const lambdaM = 0.01; // small decay on Hebbian mean to prevent divergence
 
     for (const [, edge] of graph.edges) {
       const srcNode = graph.nodes.get(edge.src);
@@ -469,11 +469,8 @@ export function simulationStep(graph, t, params) {
       const p = aPre * aPost;
 
       // Determine role sign (excitatory/inhibitory) in a stable way.
-      let m = Number.isFinite(edge.m) ? edge.m : 0;
       let roleSign = 0;
-      if (m !== 0) {
-        roleSign = Math.sign(m);
-      } else if (edge.w !== 0) {
+      if (edge.w !== 0) {
         roleSign = Math.sign(edge.w);
       } else if (p !== 0) {
         roleSign = Math.sign(p);
@@ -481,18 +478,19 @@ export function simulationStep(graph, t, params) {
         roleSign = Math.random() < 0.5 ? 1 : -1;
       }
 
-      let hebbTerm = 0;
+      // Instantaneous Hebbian mean in [-1, 1]:
+      // m_e(t) = tanh( etaHebb * max(p - theta, 0) * roleSign )
+      let mInst = 0;
       if (p > hebbThreshVal) {
-        hebbTerm = etaHebbVal * (p - hebbThreshVal) * roleSign;
+        const hebbInput = etaHebbVal * (p - hebbThreshVal) * roleSign;
+        mInst = Math.tanh(hebbInput);
+      } else {
+        mInst = 0;
       }
 
-      // Hebbian mean update with decay
-      m = m + hebbTerm - lambdaM * m;
-      edge.m = m;
-
-      // OU update of the actual weight around m
+      // OU update of the actual weight around instantaneous mean mInst
       const wOld = edge.w;
-      edge.w = m + aOU * (wOld - m) + bOU * randn();
+      edge.w = mInst + aOU * (wOld - mInst) + bOU * randn();
     }
   } else if (useHebbian) {
     // Brownian motion with Hebbian drift:
