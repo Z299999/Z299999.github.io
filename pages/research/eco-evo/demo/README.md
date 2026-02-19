@@ -62,15 +62,23 @@ These parameters are visible in the UI but disabled unless you select `construct
 
 | Parameter | Range | Default | Description |
 |-----------|-------|---------|-------------|
-| `p_add_edge` | 0–1 | 0.01 | Per-step probability of adding a weak new edge from an internal node to another internal/output node at a sampled graph distance |
-| `p_add_node` | 0–1 | 0.005 | Per-step probability of inserting a new internal node along an existing internal→(internal/output) edge |
+| `p_add_edge` | 0–1 | 0.01 | Per-step probability of adding a weak new edge from an internal **or input** node to another node at a sampled graph distance (see below) |
+| `p_add_node` | 0–1 | 0.005 | Per-step probability of inserting a new internal node along an existing edge of type internal→internal, internal→output, or input→internal |
 | `α` (alpha) | 1–3 | 1.5 | Power-law exponent for the target graph distance: smaller `α` favors longer jumps, larger `α` favors local connections |
 | `d_max` | 1–6 | 4 | Maximum graph-distance considered for random edge targets |
 
 Under the hood, the “random” mode performs:
 
-- **Random edge growth** — with probability `p_add_edge`, pick an internal node, sample a distance `d` from the discrete power-law `P(d) ∝ 1/d^α` up to `d_max`, then add a small-weight edge to a reachable internal/output node at that distance (if any).
-- **Random node growth** — with probability `p_add_node`, choose an internal→(internal/output) edge and insert a fresh internal node along it, adding two small-weight edges `src → new` and `new → dst`.
+- **Random edge growth** — with probability `p_add_edge`:
+  - choose a source node `src` among internal and input nodes;
+  - sample a distance `d` from the discrete power-law `P(d) ∝ 1/d^α` up to `d_max`;
+  - perform a BFS in the underlying undirected graph to find candidates at distance `d`;  
+    - if `src` is an **input** node, only internal nodes are valid targets;  
+    - if `src` is an **internal** node, internal and output nodes are valid targets;  
+  - if a candidate exists and there is no existing `src → dst` edge, add a small-weight edge `src → dst`.
+- **Random node growth** — with probability `p_add_node`, choose a structural edge with one of the types
+  internal→internal, internal→output, or input→internal, and insert a fresh internal node along it, adding
+  two small-weight edges `src → new` and `new → dst` while keeping the original edge.
 
 ### Test mode (frozen-graph experiments)
 
