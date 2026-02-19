@@ -115,7 +115,7 @@ let constructionMode = 'bridge'; // 'bridge' | 'random'
 
 /** Initialize or re-initialize the simulation. */
 function reset() {
-  const { m, n, kInternal, activation, weightControl, construction } = controls.getStartParams();
+  const { m, n, kInternal, arch, activation, weightControl, construction } = controls.getStartParams();
   genesisM = Math.max(1, m); // guard against m=0
   const safeN = Math.max(1, n);
   activationKind =
@@ -132,7 +132,11 @@ function reset() {
       : 'vanilla';
   constructionMode = construction === 'random' ? 'random' : 'bridge';
   const safeK = Math.max(1, kInternal | 0);
-  graph = Graph.genesis(genesisM, safeN, safeK);
+  if (arch === 'mlp2') {
+    graph = Graph.genesisMLP2(genesisM, safeN);
+  } else {
+    graph = Graph.genesis(genesisM, safeN, safeK);
+  }
   recordOutput = true;
   t = 0;
   lastBridged = new Set();

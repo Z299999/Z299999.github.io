@@ -33,7 +33,7 @@ This section doubles as both a user manual (what each control does) and an exper
 |-----------|-------|-------------|
 | `m` | 1–50 | Number of input nodes |
 | `n` | 1–50 | Number of output nodes |
-| `k` | 1–50 | Number of internal nodes at genesis (z0, ..., z_{k-1} fully connected; each x_i connects to every z_j, and each z_j connects to every y_l) |
+| Initial architecture | core9 / mlp2 | - `core9`: 9 internal nodes (z0, ..., z8) forming a fully connected directed core; each x_i connects to every z_j, and each z_j connects to every y_l.  - `mlp2`: two hidden layers, each of size `m`; inputs fully connect to hidden layer 1, which fully connects to hidden layer 2, which fully connects to outputs (feed-forward only). |
 | Input source | noise / constant / sine | Input signal generator |
 | Activation | tanh / ReLU / ReLU (with threshold) / Identity / max \|w_i x_i\| | Node activation nonlinearity (applied to all non-input nodes) |
 | Edge weight control | vanilla / tanh-constraint / OU / Hebbian / Hebbian+tanh / Hebb-OU | - `vanilla`: drifted Brownian motion on `w` + raw `w` in forward pass; `tanh-constraint`: same drift but contributions use `tanh(w·x)` to keep inputs bounded; `OU`: Ornstein–Uhlenbeck dynamics with user mean `m`; `Hebbian`: Brownian motion with Hebbian drift; `Hebbian+tanh`: Hebbian drift + `tanh(w·x)` constraint on contributions; `Hebb-OU`: OU dynamics whose mean is an instantaneous Hebbian function of the previous-step activations |

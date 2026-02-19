@@ -7,7 +7,8 @@ export class Controls {
     // Start-time params (apply on Reset)
     this.elM = document.getElementById('param-m');
     this.elN = document.getElementById('param-n');
-    this.elKInternal = document.getElementById('param-k');
+    this.elKInternal = document.getElementById('param-k'); // legacy (unused)
+    this.elArchitecture = document.getElementById('param-arch');
     this.elInputSource = document.getElementById('param-input-source');
     this.elConstruction = document.getElementById('param-construction');
     this.elActivation = document.getElementById('param-activation');
@@ -86,10 +87,22 @@ export class Controls {
 
   /** Get start-time parameters (used on Reset). */
   getStartParams() {
+    const mVal = parseInt(this.elM.value, 10);
+    const arch = this.elArchitecture?.value || 'core9';
+    let kInternal;
+    if (arch === 'mlp2') {
+      // Two hidden layers, each of size m
+      const mSafe = Number.isFinite(mVal) && mVal > 0 ? mVal : 1;
+      kInternal = 2 * mSafe;
+    } else {
+      // 9-node fully connected core (default)
+      kInternal = 9;
+    }
     return {
-      m: parseInt(this.elM.value, 10),
+      m: mVal,
       n: parseInt(this.elN.value, 10),
-       kInternal: this.elKInternal ? parseInt(this.elKInternal.value, 10) || 1 : 1,
+      kInternal,
+      arch,
       inputSource: this.elInputSource.value,
       activation: this.elActivation?.value || 'tanh',
       weightControl: this.elWeightControl?.value || 'vanilla',

@@ -79,6 +79,77 @@ export class Graph {
     return g;
   }
 
+  /**
+   * Create a 2-hidden-layer feed-forward MLP-style graph:
+   *  - layer 1: m internal nodes
+   *  - layer 2: m internal nodes
+   *  - fully connected x -> layer1 -> layer2 -> y
+   */
+  static genesisMLP2(m, n) {
+    const g = new Graph();
+
+    const mSafe = Math.max(1, m | 0);
+    const nSafe = Math.max(1, n | 0);
+
+    // Inputs x0, ..., x{m-1}
+    const inputs = [];
+    for (let i = 0; i < mSafe; i++) {
+      const id = `x${i}`;
+      g.addNode(id, 'input');
+      inputs.push(id);
+    }
+
+    // Hidden layer 1: z0, z1, ..., z{m-1}
+    const h1 = [];
+    for (let j = 0; j < mSafe; j++) {
+      const id = j === 0 ? 'z0' : g.newInternalId();
+      g.addNode(id, 'internal');
+      h1.push(id);
+    }
+
+    // Hidden layer 2: z{m}, ..., z{2m-1}
+    const h2 = [];
+    for (let j = 0; j < mSafe; j++) {
+      const id = g.newInternalId();
+      g.addNode(id, 'internal');
+      h2.push(id);
+    }
+
+    // Outputs y0, ..., y{n-1}
+    const outputs = [];
+    for (let j = 0; j < nSafe; j++) {
+      const id = `y${j}`;
+      g.addNode(id, 'output');
+      outputs.push(id);
+    }
+
+    // x -> hidden1
+    const wIn = 1 / mSafe;
+    for (const xId of inputs) {
+      for (const zId of h1) {
+        g.addEdge(xId, zId, wIn);
+      }
+    }
+
+    // hidden1 -> hidden2
+    const wH = 1 / mSafe;
+    for (const z1 of h1) {
+      for (const z2 of h2) {
+        g.addEdge(z1, z2, wH);
+      }
+    }
+
+    // hidden2 -> outputs
+    const wOut = 1 / mSafe;
+    for (const z2 of h2) {
+      for (const yId of outputs) {
+        g.addEdge(z2, yId, wOut);
+      }
+    }
+
+    return g;
+  }
+
   addNode(id, type) {
     if (this.nodes.has(id)) return;
     this.nodes.set(id, {
