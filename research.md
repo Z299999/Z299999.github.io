@@ -26,3 +26,15 @@ A dissertation project on probabilistic numerical methods for fluid dynamics, us
 #### *Hierarchical Feature-Based Synthesis of a Brain Module*
 
 A project on generating synthetic brain networks based on the Drosophila connectome. The work combines flow-based community detection, Hodge decomposition, centrality measures, and probabilistic modelling to reconstruct modular, hierarchical, and spatial structure in neural circuits.
+
+#### *Predictor Feedback for an Age-Structured Population Model with Input Delay*
+
+An ongoing paper project on stabilization of nonlinear age-structured population dynamics with delayed actuation. The work combines PDE reduction, delay compensation, and predictor feedback design to establish exponential closed-loop stability.
+
+#### *Nonlinear Opinion Dynamics, Information Diffusion, and Ensemble Control*
+
+A current research direction focused on continuum and network-based models of collective behaviour. This line studies control and analysis questions in opinion dynamics, information diffusion, and their connections to ensemble systems.
+
+#### *Neural Architectures with Built-In Short- and Long-Term Memory*
+
+An ongoing project on designing neural systems whose structure itself supports memory across multiple timescales. Current work explores how architectural organization can improve sequential learning, function approximation, and control without relying solely on external memory mechanisms.
