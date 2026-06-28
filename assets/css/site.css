@@ -235,10 +235,11 @@ img {
   font-style: italic;
 }
 
-/* Masonry gallery: fixed-width columns (browser fits as many as possible) */
+/* Masonry gallery: 3 columns, thin black gutters */
 .photo-grid {
-  column-width: 320px;
+  column-count: 3;
   column-gap: 6px;
+  max-width: 1200px;
 }
 
 .photo {
@@ -249,6 +250,7 @@ img {
 .photo img {
   display: block;
   width: 100%;
+  height: auto; /* preserve aspect ratio (height attr would otherwise stretch it) */
   cursor: zoom-in;
 }
 
