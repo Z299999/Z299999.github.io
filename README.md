@@ -1,8 +1,12 @@
 # Personal website for Shuheng Zhang
 
-Personal website for Shuheng Zhang — PhD Student @ UC San Diego
+Personal website for Shuheng Zhang — PhD Student @ UC San Diego.
 
 **Live site:** [https://z299999.github.io](https://z299999.github.io)
+
+A plain, static, single-page site (no Jekyll, no build step). The homepage
+is a hand-written `index.html` with a left sidebar and click-to-switch
+content panels (Home / Research / Films / Writing / Life / Contact).
 
 ---
 
@@ -10,107 +14,52 @@ Personal website for Shuheng Zhang — PhD Student @ UC San Diego
 
 ```
 Z299999.github.io/
-├── _config.yml                 # Jekyll configuration
-├── _data/
-│   ├── films.yml               # (optional) film project data
-│   └── publications.yml        # (optional) publication data
-├── _includes/
-│   └── custom-head.html        # Links custom CSS (minima hook)
-├── _posts/                     # Blog posts (date-prefixed .md files)
-│   ├── 2024-01-15-first-writing-post.md
-│   └── 2024-02-01-vanlife-beginnings.md
+├── index.html                  # The whole site: sidebar + switchable panels
+├── .nojekyll                   # Tells GitHub Pages to skip Jekyll, serve as-is
 ├── assets/
-│   ├── css/custom.css          # Custom styles (override minima)
-│   ├── img/
-│   │   ├── films/              # Film project images
-│   │   ├── profile/            # Profile photos
-│   │   └── van/                # Van life photos
-│   └── js/main.js              # JavaScript (optional)
-├── pages/                      # Subpages (permalinks hide /pages/ in URL)
-│   └── research/
-│       └── eco-evo/            # Eco-evolutionary Neural Ecosystem project
-│           ├── index.md        # → /research/eco-evo/
-│           ├── demo.html       # → /research/eco-evo/demo.html
-│           ├── style.css       # Demo styles
-│           └── viewer.js       # Demo logic
-├── index.md                    # Home page
-├── about.md                    # → /about/
-├── research.md                 # → /research/
-├── films.md                    # → /films/
-├── writing.md                  # → /writing/
-├── life.md                     # → /life/
+│   ├── css/site.css            # All styles
+│   ├── js/site.js              # Panel switching (click sidebar → show panel)
+│   └── img/
+│       ├── profile/profile.jpg # Profile photo (Home panel)
+│       ├── films/              # Film posters
+│       └── van/                # Van life photos
+├── pages/
+│   └── research/eco-evo/demo/  # Standalone interactive simulation demo
+│       ├── index.html          # Entry point (linked from Research panel)
+│       ├── styles.css
+│       ├── main.js             # Orchestrator
+│       ├── sim/                # Simulation core (graph, step, input)
+│       ├── ui/                 # Visual components (graph view, charts, controls)
+│       └── README.md           # Demo documentation
 └── README.md                   # This file
 ```
 
 ---
 
-## Site Categories
+## How to Edit
 
-| Category | Description | Posts Category |
-|----------|-------------|----------------|
-| Research | Academic work, notes, publications | `research` |
-| Films | Documentary and creative projects | `films` |
-| Writing | Essays, reflections, blog posts | `writing` |
-| Life | Van life, travel, personal stories | `life` |
-
----
-
-## How to Add Content
-
-### New Blog Post (optional)
-Create a file in `_posts/` with format `YYYY-MM-DD-title.md`:
-```yaml
----
-layout: post
-title: "Your Title"
-date: 2024-03-15
-categories: [writing]  # or [life], [research], [films]
-tags: [optional, tags]
----
-Your content here...
-```
-
-### Eco-evo Demo Page
-The interactive eco-evolutionary neural ecosystem lives under `pages/research/eco-evo/`:
-
-- Edit project text in `pages/research/eco-evo/index.md`
-- Edit the interactive demo in `pages/research/eco-evo/demo/`:
-  - Structure and UI: `index.html`
-  - Styles: `styles.css`
-  - Orchestrator / logic: `main.js`
-  - Simulation core: `sim/graph.js`, `sim/step.js`, `sim/input.js`
-  - Visual components: files under `ui/` (graph view, charts, controls, stats)
-
-All top-level sections (`research.md`, `films.md`, `writing.md`, `life.md`) are kept as simple, mostly static HTML pages; new subpages are only needed if you want additional project-specific sections like the eco-evo demo.
+- **Homepage content** — edit the panels directly in `index.html`. Each section
+  is a `<section class="panel" id="…">`; the matching sidebar link uses
+  `data-panel="…"`.
+- **Styles** — `assets/css/site.css`.
+- **Eco-evo demo** — see `pages/research/eco-evo/demo/README.md`.
 
 ---
 
-## Edit Log
+## Local Preview
 
-| Date | Changes |
-|------|---------|
-| 2024-02-02 | Initial Jekyll structure created with 4 categories, sample posts, data files, and custom CSS |
-
----
-
-## Local Development (Optional)
+No tooling required — just open `index.html` in a browser. To preview exactly
+as served (and to run the eco-evo demo, whose ES modules need a server):
 
 ```bash
-# Install dependencies
-gem install bundler
-bundle install
-
-# Run local server
-bundle exec jekyll serve
-
-# View at http://localhost:4000
+python3 -m http.server 8000
+# Site:  http://localhost:8000/
+# Demo:  http://localhost:8000/pages/research/eco-evo/demo/
 ```
 
 ---
 
-## Tech Stack
+## Hosting
 
-- **Framework:** Jekyll (GitHub Pages default)
-- **Theme:** minima
-- **Hosting:** GitHub Pages
-- **No build tools required** — just push to main branch
+GitHub Pages, served straight from the `main` branch as static files
+(`.nojekyll` disables the Jekyll build). Just push to deploy.
