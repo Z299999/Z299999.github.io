@@ -18,12 +18,16 @@
         <p class="sidebar__role">PhD Student, UC San Diego</p>
 
         <nav class="sidebar__nav" aria-label="Section navigation">
+          <p class="sidebar__group-title">About</p>
           <a href="#home" data-panel="home">Home</a>
+          <a href="#biography" data-panel="biography">Biography</a>
+          <a href="#contact" data-panel="contact">Contact</a>
+
+          <p class="sidebar__group-title">Work &amp; Life</p>
           <a href="#research" data-panel="research">Research</a>
-          <a href="#films" data-panel="films">Films</a>
+          <a href="#films" data-panel="films">Film</a>
           <a href="#writing" data-panel="writing">Writing</a>
           <a href="#life" data-panel="life">Life</a>
-          <a href="#contact" data-panel="contact">Contact</a>
         </nav>
 
         <div class="sidebar__links" aria-label="External links">
@@ -39,12 +43,29 @@
           <h2>Shuheng Zhang</h2>
           <div class="profile">
             <img class="profile__photo" src="assets/img/profile/profile.jpg" alt="Shuheng Zhang">
-            <p>
-              I am a PhD student at UC San Diego. My work moves between mathematical
-              biology, control and systems theory, deep learning, network theory,
-              documentary filmmaking, and essay writing.
-            </p>
+            <div>
+              <p>
+                PhD student at UC San Diego, working across mathematics and
+                complex systems, documentary film, and essay writing.
+              </p>
+              <p>
+                See <a href="#research" data-panel="research">Research</a>,
+                <a href="#films" data-panel="films">Film</a>, and
+                <a href="#writing" data-panel="writing">Writing</a>, or read more
+                in the <a href="#biography" data-panel="biography">Biography</a>.
+              </p>
+            </div>
           </div>
+        </section>
+
+        <!-- Biography -->
+        <section class="panel" id="biography" aria-label="Biography">
+          <h2>Biography</h2>
+          <p>
+            I am a PhD student at UC San Diego. My work moves between mathematical
+            biology, control and systems theory, deep learning, network theory,
+            documentary filmmaking, and essay writing.
+          </p>
           <p>
             Before joining UC San Diego, I received my BSc in mathematics from
             the Chinese University of Hong Kong and an MSc with Distinction in
@@ -135,8 +156,8 @@
         </section>
 
         <!-- Films -->
-        <section class="panel" id="films" aria-label="Films">
-          <h2>Films</h2>
+        <section class="panel" id="films" aria-label="Film">
+          <h2>Film</h2>
           <p>
             I create documentary and creative films exploring themes of nature,
             identity, and human experience.

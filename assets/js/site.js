@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const navLinks = Array.from(document.querySelectorAll(".sidebar__nav a[data-panel]"));
+  const panelLinks = Array.from(document.querySelectorAll("a[data-panel]"));
   const panels = Array.from(document.querySelectorAll(".panel"));
 
   const show = (id) => {
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.scrollTo(0, 0);
   };
 
-  navLinks.forEach((link) => {
+  panelLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const id = link.getAttribute("data-panel");

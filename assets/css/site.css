@@ -76,6 +76,19 @@ img {
   flex-direction: column;
 }
 
+.sidebar__group-title {
+  margin: 1.2rem 0 0.3rem;
+  color: #999;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sidebar__group-title:first-child {
+  margin-top: 0;
+}
+
 .sidebar__nav a {
   padding: 0.28rem 0;
   color: var(--link);
