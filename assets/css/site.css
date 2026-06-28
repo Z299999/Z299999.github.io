@@ -235,7 +235,8 @@ img {
   font-style: italic;
 }
 
-/* Masonry gallery: responsive columns (~340px each), thin black gutters */
+/* Masonry gallery. CSS-columns is the fallback; JS upgrades to ordered
+   (row-wise, shortest-column) masonry via .js-masonry. */
 .photo-grid {
   column-width: 340px;
   column-gap: 6px;
@@ -251,6 +252,24 @@ img {
   width: 100%;
   height: auto; /* preserve aspect ratio (height attr would otherwise stretch it) */
   cursor: zoom-in;
+}
+
+.photo-grid.js-masonry {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.photo-col {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.js-masonry .photo {
+  margin: 0;
 }
 
 /* Cinema mode: let the gallery break out to full width */
