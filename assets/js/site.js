@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navLinks.forEach((a) =>
       a.classList.toggle("is-active", a.getAttribute("data-panel") === target.id)
     );
+    document.body.classList.toggle("theme-dark", target.id === "photography");
     window.scrollTo(0, 0);
   };
 
