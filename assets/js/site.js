@@ -1,44 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.querySelector(".sidebar__toggle");
-  const nav = document.getElementById("site-nav");
-  const navLinks = nav ? Array.from(nav.querySelectorAll('a[href^="#"]')) : [];
-  const sections = navLinks
-    .map((link) => document.querySelector(link.getAttribute("href")))
-    .filter(Boolean);
+  const navLinks = Array.from(document.querySelectorAll(".sidebar__nav a[data-panel]"));
+  const panels = Array.from(document.querySelectorAll(".panel"));
 
-  if (toggle && nav) {
-    toggle.addEventListener("click", () => {
-      const nextExpanded = toggle.getAttribute("aria-expanded") !== "true";
-      toggle.setAttribute("aria-expanded", String(nextExpanded));
-      nav.classList.toggle("is-open", nextExpanded);
-    });
-  }
-
-  const setActiveLink = () => {
-    const currentSection = sections.find((section, index) => {
-      const nextSection = sections[index + 1];
-      const top = section.offsetTop - 120;
-      const bottom = nextSection ? nextSection.offsetTop - 120 : Number.POSITIVE_INFINITY;
-      return window.scrollY >= top && window.scrollY < bottom;
-    });
-
-    navLinks.forEach((link) => {
-      const isActive =
-        currentSection && link.getAttribute("href") === `#${currentSection.id}`;
-      link.classList.toggle("is-active", Boolean(isActive));
-    });
+  const show = (id) => {
+    const target = panels.find((p) => p.id === id) || panels[0];
+    panels.forEach((p) => p.classList.toggle("is-active", p === target));
+    navLinks.forEach((a) =>
+      a.classList.toggle("is-active", a.getAttribute("data-panel") === target.id)
+    );
+    window.scrollTo(0, 0);
   };
 
   navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      if (window.innerWidth <= 960 && nav && toggle) {
-        nav.classList.remove("is-open");
-        toggle.setAttribute("aria-expanded", "false");
-      }
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = link.getAttribute("data-panel");
+      show(id);
+      history.replaceState(null, "", `#${id}`);
     });
   });
 
-  setActiveLink();
-  window.addEventListener("scroll", setActiveLink, { passive: true });
-  window.addEventListener("resize", setActiveLink);
+  const initial = window.location.hash.replace("#", "");
+  show(panels.some((p) => p.id === initial) ? initial : panels[0].id);
 });
