@@ -235,9 +235,9 @@ img {
   font-style: italic;
 }
 
-/* Masonry gallery: 3 columns, thin black gutters */
+/* Masonry gallery: fixed-width columns (browser fits as many as possible) */
 .photo-grid {
-  column-count: 3;
+  column-width: 320px;
   column-gap: 6px;
 }
 
