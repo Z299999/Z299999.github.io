@@ -235,11 +235,10 @@ img {
   font-style: italic;
 }
 
-/* Masonry gallery: 3 columns, thin black gutters */
+/* Masonry gallery: responsive columns (~340px each), thin black gutters */
 .photo-grid {
-  column-count: 3;
+  column-width: 340px;
   column-gap: 6px;
-  max-width: 1200px;
 }
 
 .photo {
@@ -314,18 +313,6 @@ body.theme-dark .content {
   top: 50%;
   right: 0.4rem;
   transform: translateY(-50%);
-}
-
-@media (max-width: 800px) {
-  .photo-grid {
-    column-count: 2;
-  }
-}
-
-@media (max-width: 480px) {
-  .photo-grid {
-    column-count: 1;
-  }
 }
 
 .contact-table td {
