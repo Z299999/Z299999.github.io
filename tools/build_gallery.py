@@ -81,6 +81,18 @@ def capture_dt(path):
     return datetime.fromtimestamp(os.path.getmtime(path))
 
 
+def camera_info(path):
+    """(make, model) from EXIF, e.g. ('SONY','ILCE-7RM3') / ('Apple','iPhone 13 Pro').
+    Stored in the manifest so photos can be classified (phone/camera/drone)
+    even though the device info is stripped from the published image file."""
+    try:
+        exif = Image.open(path)._getexif() or {}
+        t = {TAGS.get(k, k): v for k, v in exif.items()}
+        return str(t.get("Make", "")).strip(), str(t.get("Model", "")).strip()
+    except Exception:
+        return "", ""
+
+
 def strip_jpeg_metadata(path):
     """Losslessly remove APP1 (EXIF + XMP) segments from a JPEG in place."""
     data = open(path, "rb").read()
@@ -137,10 +149,15 @@ def finalize(name):
     entries = load_manifest(name)
     entries.sort(key=lambda e: e["date"], reverse=True)
 
-    json.dump(
-        [{"file": e["file"], "date": e["date"], "w": e["w"], "h": e["h"]} for e in entries],
-        open(manifest_path(name), "w"), ensure_ascii=False, indent=2,
-    )
+    def keep(e):
+        o = {"file": e["file"], "date": e["date"], "w": e["w"], "h": e["h"]}
+        if e.get("make"):
+            o["make"] = e["make"]
+        if e.get("model"):
+            o["model"] = e["model"]
+        return o
+
+    json.dump([keep(e) for e in entries], open(manifest_path(name), "w"), ensure_ascii=False, indent=2)
 
     figs = [
         f'            <figure class="photo"><img src="{g["dir"]}/{e["file"]}" '
@@ -195,8 +212,14 @@ def add(name, paths):
             continue
         name_jpg = f'{g["prefix"]}{n:04d}.jpg'
         n += 1
+        make, model = camera_info(p)  # capture device BEFORE process() strips it
         w, ht = process(p, os.path.join(out, name_jpg))
-        entries.append({"file": name_jpg, "date": capture_dt(p).isoformat(), "w": w, "h": ht})
+        entry = {"file": name_jpg, "date": capture_dt(p).isoformat(), "w": w, "h": ht}
+        if make:
+            entry["make"] = make
+        if model:
+            entry["model"] = model
+        entries.append(entry)
         existing_hashes.append(h)
         new_hashes.append(h)
         added += 1

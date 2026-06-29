@@ -272,8 +272,8 @@ img {
   margin: 0;
 }
 
-/* Cinema mode: let the gallery break out to full width */
-body.theme-dark .content {
+/* Any gallery panel breaks out to full width */
+body.gallery-wide .content {
   width: 100%;
   max-width: none;
 }
