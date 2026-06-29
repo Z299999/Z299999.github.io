@@ -24,7 +24,7 @@ Z299999.github.io/
 │   └── img/
 │       ├── profile/profile.jpg # Profile photo (Home panel)
 │       ├── films/              # Film posters
-│       └── photography/        # Gallery images p01.jpg (newest) … pNN.jpg (oldest)
+│       └── photography/        # Gallery images pNNNN.jpg (stable ids; order is by date)
 ├── tools/
 │   ├── build_gallery.py        # Add/rebuild the Photography gallery
 │   └── gallery.json            # Manifest: per-photo date + dimensions (source of truth)
@@ -63,9 +63,14 @@ The processed images in `assets/img/photography/` plus `tools/gallery.json`
 full-resolution files are **only needed at import time** — once a photo is added
 you can delete the original; the script never touches it again.
 
+Each image gets a stable id filename (`p0001.jpg`, `p0002.jpg`, …): a new photo
+takes `max(existing) + 1` and existing files are never renamed, so browser
+caches never go stale. Display order is by capture date (the `<figure>` list in
+`index.html`), independent of the filename.
+
 Add photos (resizes to long-edge 1800px / JPEG q82, strips EXIF/GPS,
-de-duplicates by perceptual hash, merges by capture date, renumbers, and
-regenerates the figures in `index.html`):
+de-duplicates by perceptual hash, assigns the next id, sorts by capture date,
+and regenerates the figures in `index.html`):
 
 ```bash
 python3 tools/build_gallery.py add /path/to/photo1.jpg /path/to/photo2.jpg

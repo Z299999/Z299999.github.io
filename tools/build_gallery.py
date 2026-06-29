@@ -6,11 +6,12 @@ source of truth. tools/gallery.json is a sidecar manifest recording, for each
 image, its capture date and dimensions (so the original full-res files can be
 deleted after they're added — they are never needed again).
 
-Images are named by a hash of their content (e.g. 3f9a1c8b2d44.jpg), NOT by
-position. A file's URL therefore only changes when its content changes, so
-browser caches never serve a stale image, and re-sorting the gallery never
-renames files. Display order is the order of the <figure> list in index.html
-(newest capture date first); filenames are unrelated to order.
+Images are named by a stable, ever-increasing id assigned when they are added
+(p0001.jpg, p0002.jpg, ...): a new photo takes max(existing) + 1 and existing
+files are NEVER renamed. A filename's content therefore never changes, so
+browser caches never serve a stale image. Display order is the order of the
+<figure> list in index.html (newest capture date first); filenames are
+unrelated to display order.
 
 Usage:
   python3 tools/build_gallery.py add PATH [PATH ...]
@@ -33,9 +34,6 @@ import re
 import sys
 import glob
 import json
-import hashlib
-import shutil
-import tempfile
 from datetime import datetime
 
 from PIL import Image, ImageOps
@@ -94,8 +92,13 @@ def process(src, dst):
     return w, h
 
 
-def content_name(path):
-    return hashlib.sha1(open(path, "rb").read()).hexdigest()[:12] + ".jpg"
+def parse_id(filename):
+    m = re.match(r"p(\d+)\.jpg$", filename)
+    return int(m.group(1)) if m else 0
+
+
+def next_id(entries):
+    return max((parse_id(e["file"]) for e in entries), default=0) + 1
 
 
 def load_manifest():
@@ -146,7 +149,7 @@ def add(paths):
     entries = load_manifest()
     existing_hashes = [dhash(os.path.join(OUT, e["file"])) for e in entries]
     new_hashes = []
-    proc_dir = tempfile.mkdtemp()
+    n = next_id(entries)
     added = 0
     for p in paths:
         if not os.path.exists(p):
@@ -159,16 +162,14 @@ def add(paths):
             where = "gallery" if dg <= DHASH_THRESHOLD else "this batch"
             print("SKIP dup ", os.path.basename(p), f"(already in {where})")
             continue
-        tmp = os.path.join(proc_dir, "tmp.jpg")
-        w, ht = process(p, tmp)
-        name = content_name(tmp)
-        shutil.move(tmp, os.path.join(OUT, name))
+        name = f"p{n:04d}.jpg"
+        n += 1
+        w, ht = process(p, os.path.join(OUT, name))
         entries.append({"file": name, "date": capture_dt(p).isoformat(), "w": w, "h": ht})
         existing_hashes.append(h)
         new_hashes.append(h)
         added += 1
         print("ADD      ", os.path.basename(p), capture_dt(p).strftime("%Y-%m-%d"), "->", name)
-    shutil.rmtree(proc_dir, ignore_errors=True)
     if not added:
         print("nothing new to add.")
         return
