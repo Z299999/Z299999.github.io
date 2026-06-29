@@ -3,19 +3,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const panelLinks = Array.from(document.querySelectorAll("a[data-panel]"));
   const panels = Array.from(document.querySelectorAll(".panel"));
 
-  // ---- Ordered masonry: fill the shortest column so newest stay at the top ----
-  const grid = document.querySelector("#photography .photo-grid");
-  const figuresInOrder = grid ? Array.from(grid.querySelectorAll(".photo")) : [];
+  // ---- Ordered masonry for each .photo-grid (shortest-column packing) ----
   const GAP = 6;
   const TARGET = 340; // approximate column width in px
+  const grids = Array.from(document.querySelectorAll(".photo-grid")).map((grid) => ({
+    grid,
+    figures: Array.from(grid.querySelectorAll(".photo")),
+  }));
 
-  const layoutGallery = () => {
-    if (!grid || !figuresInOrder.length) return;
-    const width = grid.clientWidth;
-    if (!width) return; // panel is hidden — lay out when it becomes visible
+  const layoutGrid = (g) => {
+    if (!g.figures.length) return;
+    const width = g.grid.clientWidth;
+    if (!width) return; // hidden — lay out when its panel becomes visible
     const n = Math.max(1, Math.round(width / TARGET));
     const colW = (width - GAP * (n - 1)) / n;
-
     const cols = [];
     const heights = [];
     for (let i = 0; i < n; i++) {
@@ -24,8 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cols.push(c);
       heights.push(0);
     }
-
-    figuresInOrder.forEach((fig) => {
+    g.figures.forEach((fig) => {
       const img = fig.querySelector("img");
       const w = parseInt(img.getAttribute("width"), 10) || 1;
       const h = parseInt(img.getAttribute("height"), 10) || 1;
@@ -34,9 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
       cols[mi].appendChild(fig);
       heights[mi] += colW * (h / w) + GAP;
     });
+    g.grid.classList.add("js-masonry");
+    g.grid.replaceChildren(...cols);
+  };
 
-    grid.classList.add("js-masonry");
-    grid.replaceChildren(...cols);
+  const layoutVisible = () => {
+    grids.forEach((g) => {
+      if (g.grid.closest(".panel.is-active")) layoutGrid(g);
+    });
   };
 
   const show = (id) => {
@@ -46,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       a.classList.toggle("is-active", a.getAttribute("data-panel") === target.id)
     );
     document.body.classList.toggle("theme-dark", target.id === "photography");
-    if (target.id === "photography") requestAnimationFrame(layoutGallery);
+    requestAnimationFrame(layoutVisible);
     window.scrollTo(0, 0);
   };
 
@@ -65,17 +70,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let resizeTimer;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(layoutGallery, 150);
+    resizeTimer = setTimeout(layoutVisible, 150);
   });
 
-  // ---- Lightbox (navigates in the original newest -> oldest order) ----
+  // ---- Lightbox (scoped to the clicked grid, in capture-date order) ----
   const box = document.getElementById("lightbox");
   if (box) {
     const lbImg = box.querySelector(".lightbox__img");
-    const photos = figuresInOrder.map((f) => f.querySelector("img"));
+    let photos = [];
     let i = 0;
 
-    const open = (n) => {
+    const open = (list, n) => {
+      photos = list;
       i = (n + photos.length) % photos.length;
       lbImg.src = photos[i].src;
       box.hidden = false;
@@ -85,14 +91,17 @@ document.addEventListener("DOMContentLoaded", () => {
       lbImg.removeAttribute("src");
     };
 
-    photos.forEach((p, n) => p.addEventListener("click", () => open(n)));
+    grids.forEach((g) => {
+      const imgs = g.figures.map((f) => f.querySelector("img"));
+      imgs.forEach((p, n) => p.addEventListener("click", () => open(imgs, n)));
+    });
     box.querySelector(".lightbox__next").addEventListener("click", (e) => {
       e.stopPropagation();
-      open(i + 1);
+      open(photos, i + 1);
     });
     box.querySelector(".lightbox__prev").addEventListener("click", (e) => {
       e.stopPropagation();
-      open(i - 1);
+      open(photos, i - 1);
     });
     box.querySelector(".lightbox__close").addEventListener("click", close);
     box.addEventListener("click", (e) => {
@@ -101,8 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", (e) => {
       if (box.hidden) return;
       if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") open(i + 1);
-      else if (e.key === "ArrowLeft") open(i - 1);
+      else if (e.key === "ArrowRight") open(photos, i + 1);
+      else if (e.key === "ArrowLeft") open(photos, i - 1);
     });
   }
 });

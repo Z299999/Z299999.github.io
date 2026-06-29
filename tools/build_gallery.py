@@ -1,32 +1,34 @@
 #!/usr/bin/env python3
-"""Build the Photography gallery for the website.
+"""Build the photo galleries for the website.
 
-The processed images in assets/img/photography/ ARE the gallery; they are the
-source of truth. tools/gallery.json is a sidecar manifest recording, for each
-image, its capture date and dimensions (so the original full-res files can be
-deleted after they're added — they are never needed again).
+There are two galleries, each a panel in index.html with its own image folder
+and manifest:
 
-Images are named by a stable, ever-increasing id assigned when they are added
-(p0001.jpg, p0002.jpg, ...): a new photo takes max(existing) + 1 and existing
-files are NEVER renamed. A filename's content therefore never changes, so
-browser caches never serve a stale image. Display order is the order of the
-<figure> list in index.html (newest capture date first); filenames are
-unrelated to display order.
+  photography  -> assets/img/photography/ , tools/gallery.json , prefix "p"
+  life         -> assets/img/life/        , tools/life.json    , prefix "l"
+
+For each gallery the processed images plus its manifest (per-photo capture date
++ dimensions) are the source of truth; the original full-res files are only
+needed at import time and can be deleted afterwards.
+
+Images are named by a stable, ever-increasing id (p0001.jpg / l0001.jpg, ...):
+a new photo takes max(existing) + 1 and existing files are NEVER renamed, so
+browser caches never go stale. Display order is the order of the <figure> list
+in index.html (newest capture date first); filenames are unrelated to order.
 
 Usage:
-  python3 tools/build_gallery.py add PATH [PATH ...]
-      Process the given originals, de-duplicate them (perceptual hash) against
-      the current gallery and each other, add them, and regenerate everything.
-  python3 tools/build_gallery.py rebuild
-      Regenerate the manifest order + figures from the existing images
-      (use after manually editing/reordering gallery.json).
+  python3 tools/build_gallery.py add [--gallery NAME] PATH [PATH ...]
+      Process originals, de-duplicate (perceptual hash) against that gallery and
+      each other, add them, and regenerate. NAME defaults to "photography".
+  python3 tools/build_gallery.py rebuild [--gallery NAME|all]
+      Regenerate manifest order + figures from existing images.
 
 Pipeline per photo: apply EXIF orientation, convert to RGB, downscale so the
-long edge is 1800px, save JPEG q82 (EXIF/XMP/GPS metadata stripped). Sorted newest->oldest
-by capture date (EXIF DateTimeOriginal, falling back to file mtime). The
-<figure> list is injected into the .photo-grid in index.html.
+long edge is 1800px, save JPEG q82, and strip all EXIF/XMP metadata. The
+<figure> list is injected into the matching <div class="photo-grid"
+data-gallery="NAME"> in index.html.
 
-After running: git add assets/img/photography index.html tools && push.
+After running: git add assets/img index.html tools && push.
 If a push fails with HTTP 400, run: git config http.postBuffer 524288000
 """
 import os
@@ -40,9 +42,12 @@ from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MANIFEST = os.path.join(REPO, "tools", "gallery.json")
-OUT = os.path.join(REPO, "assets", "img", "photography")
 INDEX = os.path.join(REPO, "index.html")
+
+GALLERIES = {
+    "photography": {"dir": "assets/img/photography", "manifest": "tools/gallery.json", "prefix": "p"},
+    "life": {"dir": "assets/img/life", "manifest": "tools/life.json", "prefix": "l"},
+}
 
 LONG_EDGE = 1800
 QUALITY = 82
@@ -50,7 +55,6 @@ DHASH_THRESHOLD = 8  # Hamming distance <= this => treated as the same photo
 
 
 def dhash(path, size=8):
-    """64-bit difference hash; robust to resizing and re-compression."""
     img = Image.open(path).convert("L").resize((size + 1, size), Image.LANCZOS)
     px = list(img.getdata())
     bits = 0
@@ -66,7 +70,6 @@ def hamming(a, b):
 
 
 def capture_dt(path):
-    """EXIF capture time, falling back to the file's modified time."""
     try:
         exif = Image.open(path)._getexif() or {}
         m = {TAGS.get(k, k): v for k, v in exif.items()}
@@ -79,25 +82,23 @@ def capture_dt(path):
 
 
 def strip_jpeg_metadata(path):
-    """Losslessly remove APP1 (EXIF + XMP) segments from a JPEG in place.
-    Only metadata segments are dropped; pixel data is not re-encoded."""
+    """Losslessly remove APP1 (EXIF + XMP) segments from a JPEG in place."""
     data = open(path, "rb").read()
-    out = bytearray(data[:2])  # SOI (FFD8)
+    out = bytearray(data[:2])  # SOI
     i = 2
     while i < len(data) - 1 and data[i] == 0xFF:
         marker = data[i + 1]
-        if marker in (0xD9, 0xDA):  # EOI / start of scan -> copy the rest verbatim
+        if marker in (0xD9, 0xDA):  # EOI / start of scan -> copy rest verbatim
             out += data[i:]
             break
         seglen = (data[i + 2] << 8) | data[i + 3]
-        if marker != 0xE1:  # keep everything except APP1 (EXIF/XMP)
+        if marker != 0xE1:  # keep everything except APP1
             out += data[i:i + 2 + seglen]
         i += 2 + seglen
     open(path, "wb").write(out)
 
 
 def process(src, dst):
-    """Resize + compress one original into dst. Returns (w, h)."""
     im = ImageOps.exif_transpose(Image.open(src))
     if im.mode != "RGB":
         im = im.convert("RGB")
@@ -108,68 +109,78 @@ def process(src, dst):
         im = im.resize((w, h), Image.LANCZOS)
     im.info.pop("xmp", None)
     im.save(dst, "JPEG", quality=QUALITY, optimize=True, progressive=True)
-    strip_jpeg_metadata(dst)  # belt-and-suspenders: ensure no EXIF/XMP remains
+    strip_jpeg_metadata(dst)
     return w, h
 
 
 def parse_id(filename):
-    m = re.match(r"p(\d+)\.jpg$", filename)
+    m = re.search(r"(\d+)", filename)
     return int(m.group(1)) if m else 0
 
 
-def next_id(entries):
-    return max((parse_id(e["file"]) for e in entries), default=0) + 1
+def out_dir(name):
+    return os.path.join(REPO, GALLERIES[name]["dir"])
 
 
-def load_manifest():
-    if os.path.exists(MANIFEST):
-        return json.load(open(MANIFEST))
-    return []
+def manifest_path(name):
+    return os.path.join(REPO, GALLERIES[name]["manifest"])
 
 
-def finalize(entries):
-    """entries: list of {file, date, w, h}; files already live in OUT.
-    Sorts newest first, writes the manifest + figures, removes orphan files."""
+def load_manifest(name):
+    p = manifest_path(name)
+    return json.load(open(p)) if os.path.exists(p) else []
+
+
+def finalize(name):
+    g = GALLERIES[name]
+    out = out_dir(name)
+    entries = load_manifest(name)
     entries.sort(key=lambda e: e["date"], reverse=True)
 
     json.dump(
         [{"file": e["file"], "date": e["date"], "w": e["w"], "h": e["h"]} for e in entries],
-        open(MANIFEST, "w"), ensure_ascii=False, indent=2,
+        open(manifest_path(name), "w"), ensure_ascii=False, indent=2,
     )
 
     figs = [
-        f'            <figure class="photo"><img src="assets/img/photography/{e["file"]}" '
+        f'            <figure class="photo"><img src="{g["dir"]}/{e["file"]}" '
         f'width="{e["w"]}" height="{e["h"]}" loading="lazy" alt=""></figure>'
         for e in entries
     ]
     html = open(INDEX).read()
-    grid = '<div class="photo-grid">\n' + "\n".join(figs) + "\n          </div>"
-    html2, n = re.subn(r'<div class="photo-grid">.*?</div>', grid, html, count=1, flags=re.DOTALL)
+    block = f'<div class="photo-grid" data-gallery="{name}">\n' + "\n".join(figs) + "\n          </div>"
+    pat = r'<div class="photo-grid" data-gallery="%s">.*?</div>' % name
+    html2, n = re.subn(pat, block, html, count=1, flags=re.DOTALL)
     if n != 1:
-        raise SystemExit('Could not find <div class="photo-grid"> ... </div> in index.html')
+        raise SystemExit(f'Could not find <div class="photo-grid" data-gallery="{name}"> in index.html')
     open(INDEX, "w").write(html2)
 
     keep = {e["file"] for e in entries}
     removed = 0
-    for f in glob.glob(os.path.join(OUT, "*.jpg")):
+    for f in glob.glob(os.path.join(out, "*.jpg")):
         if os.path.basename(f) not in keep:
             os.remove(f)
             removed += 1
 
-    total = sum(os.path.getsize(os.path.join(OUT, e["file"])) for e in entries)
+    total = sum(os.path.getsize(os.path.join(out, e["file"])) for e in entries)
     if entries:
         print(
-            f"gallery: {len(entries)} photos, {total / 1e6:.1f} MB"
-            + (f" ({removed} orphan file(s) removed)" if removed else "")
+            f"{name}: {len(entries)} photos, {total / 1e6:.1f} MB"
+            + (f" ({removed} orphan removed)" if removed else "")
             + f", {entries[0]['date'][:10]} (newest) .. {entries[-1]['date'][:10]} (oldest)"
         )
+    else:
+        print(f"{name}: 0 photos")
 
 
-def add(paths):
-    entries = load_manifest()
-    existing_hashes = [dhash(os.path.join(OUT, e["file"])) for e in entries]
+def add(name, paths):
+    g = GALLERIES[name]
+    out = out_dir(name)
+    os.makedirs(out, exist_ok=True)
+    entries = load_manifest(name)
+    existing_hashes = [dhash(os.path.join(out, e["file"])) for e in entries]
     new_hashes = []
-    n = next_id(entries)
+    n = max((parse_id(e["file"]) for e in entries), default=0) + 1
     added = 0
     for p in paths:
         if not os.path.exists(p):
@@ -179,35 +190,49 @@ def add(paths):
         dg = min((hamming(h, eh) for eh in existing_hashes), default=99)
         dn = min((hamming(h, nh) for nh in new_hashes), default=99)
         if dg <= DHASH_THRESHOLD or dn <= DHASH_THRESHOLD:
-            where = "gallery" if dg <= DHASH_THRESHOLD else "this batch"
+            where = name if dg <= DHASH_THRESHOLD else "this batch"
             print("SKIP dup ", os.path.basename(p), f"(already in {where})")
             continue
-        name = f"p{n:04d}.jpg"
+        name_jpg = f'{g["prefix"]}{n:04d}.jpg'
         n += 1
-        w, ht = process(p, os.path.join(OUT, name))
-        entries.append({"file": name, "date": capture_dt(p).isoformat(), "w": w, "h": ht})
+        w, ht = process(p, os.path.join(out, name_jpg))
+        entries.append({"file": name_jpg, "date": capture_dt(p).isoformat(), "w": w, "h": ht})
         existing_hashes.append(h)
         new_hashes.append(h)
         added += 1
-        print("ADD      ", os.path.basename(p), capture_dt(p).strftime("%Y-%m-%d"), "->", name)
+        print("ADD      ", os.path.basename(p), capture_dt(p).strftime("%Y-%m-%d"), "->", name, name_jpg)
     if not added:
         print("nothing new to add.")
         return
-    finalize(entries)
+    json.dump(entries, open(manifest_path(name), "w"), ensure_ascii=False, indent=2)
+    finalize(name)
 
 
-def rebuild():
-    finalize(load_manifest())
+def parse_gallery_arg(args):
+    name = "photography"
+    rest = []
+    i = 0
+    while i < len(args):
+        if args[i] == "--gallery":
+            name = args[i + 1]
+            i += 2
+        else:
+            rest.append(args[i])
+            i += 1
+    return name, rest
 
 
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else "rebuild"
+    name, rest = parse_gallery_arg(sys.argv[2:])
     if cmd == "add":
-        if len(sys.argv) < 3:
-            raise SystemExit("usage: build_gallery.py add PATH [PATH ...]")
-        add(sys.argv[2:])
+        if not rest:
+            raise SystemExit("usage: build_gallery.py add [--gallery NAME] PATH [PATH ...]")
+        add(name, rest)
     elif cmd == "rebuild":
-        rebuild()
+        targets = list(GALLERIES) if (rest and rest[0] == "all") or name == "all" else [name]
+        for t in targets:
+            finalize(t)
     else:
         print(__doc__)
         raise SystemExit(1)
