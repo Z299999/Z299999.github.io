@@ -68,7 +68,7 @@ takes `max(existing) + 1` and existing files are never renamed, so browser
 caches never go stale. Display order is by capture date (the `<figure>` list in
 `index.html`), independent of the filename.
 
-Add photos (resizes to long-edge 1800px / JPEG q82, strips EXIF/GPS,
+Add photos (resizes to long-edge 1800px / JPEG q82, strips all EXIF/XMP metadata (incl. camera model, serial, GPS),
 de-duplicates by perceptual hash, assigns the next id, sorts by capture date,
 and regenerates the figures in `index.html`):
 

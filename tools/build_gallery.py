@@ -22,7 +22,7 @@ Usage:
       (use after manually editing/reordering gallery.json).
 
 Pipeline per photo: apply EXIF orientation, convert to RGB, downscale so the
-long edge is 1800px, save JPEG q82 (EXIF/GPS stripped). Sorted newest->oldest
+long edge is 1800px, save JPEG q82 (EXIF/XMP/GPS metadata stripped). Sorted newest->oldest
 by capture date (EXIF DateTimeOriginal, falling back to file mtime). The
 <figure> list is injected into the .photo-grid in index.html.
 
@@ -78,6 +78,24 @@ def capture_dt(path):
     return datetime.fromtimestamp(os.path.getmtime(path))
 
 
+def strip_jpeg_metadata(path):
+    """Losslessly remove APP1 (EXIF + XMP) segments from a JPEG in place.
+    Only metadata segments are dropped; pixel data is not re-encoded."""
+    data = open(path, "rb").read()
+    out = bytearray(data[:2])  # SOI (FFD8)
+    i = 2
+    while i < len(data) - 1 and data[i] == 0xFF:
+        marker = data[i + 1]
+        if marker in (0xD9, 0xDA):  # EOI / start of scan -> copy the rest verbatim
+            out += data[i:]
+            break
+        seglen = (data[i + 2] << 8) | data[i + 3]
+        if marker != 0xE1:  # keep everything except APP1 (EXIF/XMP)
+            out += data[i:i + 2 + seglen]
+        i += 2 + seglen
+    open(path, "wb").write(out)
+
+
 def process(src, dst):
     """Resize + compress one original into dst. Returns (w, h)."""
     im = ImageOps.exif_transpose(Image.open(src))
@@ -88,7 +106,9 @@ def process(src, dst):
     if scale < 1.0:
         w, h = round(w * scale), round(h * scale)
         im = im.resize((w, h), Image.LANCZOS)
+    im.info.pop("xmp", None)
     im.save(dst, "JPEG", quality=QUALITY, optimize=True, progressive=True)
+    strip_jpeg_metadata(dst)  # belt-and-suspenders: ensure no EXIF/XMP remains
     return w, h
 
 
