@@ -225,6 +225,10 @@ img {
   border: 1px solid var(--line);
 }
 
+img.film__poster {
+  cursor: zoom-in;
+}
+
 .film__poster--empty {
   display: flex;
   align-items: flex-end;

@@ -96,6 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const imgs = g.figures.map((f) => f.querySelector("img"));
       imgs.forEach((p, n) => p.addEventListener("click", () => open(imgs, n)));
     });
+
+    const posters = Array.from(document.querySelectorAll("img.film__poster"));
+    posters.forEach((p, n) => p.addEventListener("click", () => open(posters, n)));
     box.querySelector(".lightbox__next").addEventListener("click", (e) => {
       e.stopPropagation();
       open(photos, i + 1);
