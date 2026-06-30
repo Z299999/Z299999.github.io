@@ -358,6 +358,48 @@ body.gallery-wide .content {
   color: var(--muted);
 }
 
+/* Callout link (e.g. the Van build entry in the Life panel) */
+.callout {
+  margin: 1.2rem 0;
+  font-weight: bold;
+}
+
+/* Standalone Van build page */
+.vanpage {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.8rem 1.5rem 4rem;
+}
+
+.vanpage__top {
+  margin: 0 0 1.6rem;
+}
+
+.vanpage__back {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.vanpage__back:hover {
+  color: var(--text);
+}
+
+.vanpage h1 {
+  margin: 0 0 0.3rem;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+.vanpage__status {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.vanpage p {
+  max-width: 46rem;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 800px) {
   .site-shell {

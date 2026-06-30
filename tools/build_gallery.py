@@ -45,8 +45,16 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX = os.path.join(REPO, "index.html")
 
 GALLERIES = {
-    "photography": {"dir": "assets/img/photography", "manifest": "tools/gallery.json", "prefix": "p"},
-    "life": {"dir": "assets/img/life", "manifest": "tools/life.json", "prefix": "l"},
+    "photography": {"dir": "assets/img/photography", "src": "assets/img/photography",
+                    "manifest": "tools/gallery.json", "prefix": "p",
+                    "page": "index.html", "order": "desc"},
+    "life": {"dir": "assets/img/life", "src": "assets/img/life",
+             "manifest": "tools/life.json", "prefix": "l",
+             "page": "index.html", "order": "desc"},
+    # Van build — its grid lives on the standalone /van/ page (not the homepage)
+    "vanlife": {"dir": "assets/img/vanlife", "src": "../assets/img/vanlife",
+                "manifest": "tools/vanlife.json", "prefix": "v",
+                "page": "van/index.html", "order": "asc"},
 }
 
 LONG_EDGE = 1800
@@ -147,7 +155,7 @@ def finalize(name):
     g = GALLERIES[name]
     out = out_dir(name)
     entries = load_manifest(name)
-    entries.sort(key=lambda e: e["date"], reverse=True)
+    entries.sort(key=lambda e: e["date"], reverse=(g.get("order", "desc") == "desc"))
 
     def keep(e):
         o = {"file": e["file"], "date": e["date"], "w": e["w"], "h": e["h"]}
@@ -160,17 +168,18 @@ def finalize(name):
     json.dump([keep(e) for e in entries], open(manifest_path(name), "w"), ensure_ascii=False, indent=2)
 
     figs = [
-        f'            <figure class="photo"><img src="{g["dir"]}/{e["file"]}" '
+        f'            <figure class="photo"><img src="{g["src"]}/{e["file"]}" '
         f'width="{e["w"]}" height="{e["h"]}" loading="lazy" alt=""></figure>'
         for e in entries
     ]
-    html = open(INDEX).read()
+    page = os.path.join(REPO, g["page"])
+    html = open(page).read()
     block = f'<div class="photo-grid" data-gallery="{name}">\n' + "\n".join(figs) + "\n          </div>"
     pat = r'<div class="photo-grid" data-gallery="%s">.*?</div>' % name
     html2, n = re.subn(pat, block, html, count=1, flags=re.DOTALL)
     if n != 1:
-        raise SystemExit(f'Could not find <div class="photo-grid" data-gallery="{name}"> in index.html')
-    open(INDEX, "w").write(html2)
+        raise SystemExit(f'Could not find <div class="photo-grid" data-gallery="{name}"> in {g["page"]}')
+    open(page, "w").write(html2)
 
     keep = {e["file"] for e in entries}
     removed = 0
@@ -184,7 +193,7 @@ def finalize(name):
         print(
             f"{name}: {len(entries)} photos, {total / 1e6:.1f} MB"
             + (f" ({removed} orphan removed)" if removed else "")
-            + f", {entries[0]['date'][:10]} (newest) .. {entries[-1]['date'][:10]} (oldest)"
+            + f", {min(e['date'] for e in entries)[:10]} .. {max(e['date'] for e in entries)[:10]}"
         )
     else:
         print(f"{name}: 0 photos")
