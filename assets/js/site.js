@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const box = document.getElementById("lightbox");
   if (box) {
     const lbImg = box.querySelector(".lightbox__img");
+    const caption = box.querySelector(".lightbox__caption");
     let photos = [];
     let i = 0;
 
@@ -85,6 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
       photos = list;
       i = (n + photos.length) % photos.length;
       lbImg.src = photos[i].src;
+      const m = photos[i].getAttribute("src").match(/([a-z]\d+)\.jpg/i);
+      caption.textContent = m ? m[1] : "";
       box.hidden = false;
     };
     const close = () => {

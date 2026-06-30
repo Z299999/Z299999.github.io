@@ -338,6 +338,17 @@ body.gallery-wide .content {
   transform: translateY(-50%);
 }
 
+.lightbox__caption {
+  position: absolute;
+  bottom: 0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #bbb;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
 .contact-table td {
   padding: 0.2rem 1.2rem 0.2rem 0;
   vertical-align: top;
