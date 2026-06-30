@@ -75,12 +75,6 @@ img {
   border-right: 1px solid var(--line);
 }
 
-.sidebar__name {
-  margin: 0 0 1.2rem;
-  font-size: 1.15rem;
-  font-weight: bold;
-}
-
 .sidebar__toggle {
   display: none;
 }
