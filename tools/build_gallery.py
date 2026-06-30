@@ -54,7 +54,7 @@ GALLERIES = {
     # Van build — its grid lives on the standalone /van/ page (not the homepage)
     "vanlife": {"dir": "assets/img/vanlife", "src": "../assets/img/vanlife",
                 "manifest": "tools/vanlife.json", "prefix": "v",
-                "page": "van/index.html", "order": "asc"},
+                "page": "van/index.html", "order": "asc", "dedup": False},
 }
 
 LONG_EDGE = 1800
@@ -203,8 +203,9 @@ def add(name, paths):
     g = GALLERIES[name]
     out = out_dir(name)
     os.makedirs(out, exist_ok=True)
+    dedup = g.get("dedup", True)
     entries = load_manifest(name)
-    existing_hashes = [dhash(os.path.join(out, e["file"])) for e in entries]
+    existing_hashes = [dhash(os.path.join(out, e["file"])) for e in entries] if dedup else []
     new_hashes = []
     n = max((parse_id(e["file"]) for e in entries), default=0) + 1
     added = 0
@@ -212,13 +213,16 @@ def add(name, paths):
         if not os.path.exists(p):
             print("MISSING  ", p)
             continue
-        h = dhash(p)
-        dg = min((hamming(h, eh) for eh in existing_hashes), default=99)
-        dn = min((hamming(h, nh) for nh in new_hashes), default=99)
-        if dg <= DHASH_THRESHOLD or dn <= DHASH_THRESHOLD:
-            where = name if dg <= DHASH_THRESHOLD else "this batch"
-            print("SKIP dup ", os.path.basename(p), f"(already in {where})")
-            continue
+        if dedup:
+            h = dhash(p)
+            dg = min((hamming(h, eh) for eh in existing_hashes), default=99)
+            dn = min((hamming(h, nh) for nh in new_hashes), default=99)
+            if dg <= DHASH_THRESHOLD or dn <= DHASH_THRESHOLD:
+                where = name if dg <= DHASH_THRESHOLD else "this batch"
+                print("SKIP dup ", os.path.basename(p), f"(already in {where})")
+                continue
+            existing_hashes.append(h)
+            new_hashes.append(h)
         name_jpg = f'{g["prefix"]}{n:04d}.jpg'
         n += 1
         make, model = camera_info(p)  # capture device BEFORE process() strips it
@@ -229,8 +233,6 @@ def add(name, paths):
         if model:
             entry["model"] = model
         entries.append(entry)
-        existing_hashes.append(h)
-        new_hashes.append(h)
         added += 1
         print("ADD      ", os.path.basename(p), capture_dt(p).strftime("%Y-%m-%d"), "->", name, name_jpg)
     if not added:
