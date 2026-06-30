@@ -54,7 +54,7 @@ GALLERIES = {
     # Van build — its grid lives on the standalone /van/ page (not the homepage)
     "vanlife": {"dir": "assets/img/vanlife", "src": "../assets/img/vanlife",
                 "manifest": "tools/vanlife.json", "prefix": "v",
-                "page": "van/index.html", "order": "asc", "dedup": False},
+                "page": "van/index.html", "order": "desc", "dedup": False},
 }
 
 LONG_EDGE = 1800
