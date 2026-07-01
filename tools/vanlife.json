@@ -24,24 +24,8 @@
     "model": "iPhone 13 Pro"
   },
   {
-    "file": "v0028.jpg",
-    "date": "2026-05-18T19:24:08",
-    "w": 1800,
-    "h": 1350,
-    "make": "Apple",
-    "model": "iPhone 13 Pro"
-  },
-  {
     "file": "v0023.jpg",
     "date": "2026-05-18T19:23:39",
-    "w": 1800,
-    "h": 1350,
-    "make": "Apple",
-    "model": "iPhone 13 Pro"
-  },
-  {
-    "file": "v0027.jpg",
-    "date": "2026-05-18T18:46:33",
     "w": 1800,
     "h": 1350,
     "make": "Apple",
@@ -194,14 +178,6 @@
   {
     "file": "v0005.jpg",
     "date": "2025-12-31T15:25:46",
-    "w": 1350,
-    "h": 1800,
-    "make": "Apple",
-    "model": "iPhone 13 Pro"
-  },
-  {
-    "file": "v0004.jpg",
-    "date": "2025-12-31T15:25:31",
     "w": 1350,
     "h": 1800,
     "make": "Apple",
