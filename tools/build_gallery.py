@@ -118,7 +118,21 @@ def strip_jpeg_metadata(path):
     open(path, "wb").write(out)
 
 
+def exif_date_str(path):
+    """'YYYY:MM:DD HH:MM:SS' capture time from EXIF, or None if absent."""
+    try:
+        exif = Image.open(path)._getexif() or {}
+        m = {TAGS.get(k, k): v for k, v in exif.items()}
+        s = m.get("DateTimeOriginal") or m.get("DateTimeDigitized") or m.get("DateTime")
+        if s:
+            return str(s)[:19]
+    except Exception:
+        pass
+    return None
+
+
 def process(src, dst):
+    dts = exif_date_str(src)  # capture time to preserve (None if the source has none)
     im = ImageOps.exif_transpose(Image.open(src))
     if im.mode != "RGB":
         im = im.convert("RGB")
@@ -128,8 +142,13 @@ def process(src, dst):
         w, h = round(w * scale), round(h * scale)
         im = im.resize((w, h), Image.LANCZOS)
     im.info.pop("xmp", None)
-    im.save(dst, "JPEG", quality=QUALITY, optimize=True, progressive=True)
-    strip_jpeg_metadata(dst)
+    # Write back ONLY the capture time (no GPS / device / serial); a fresh Exif
+    # block means nothing else from the original is carried over.
+    exif = Image.Exif()
+    if dts:
+        exif[0x0132] = dts  # DateTime
+        exif[0x8769] = {0x9003: dts, 0x9004: dts}  # DateTimeOriginal, DateTimeDigitized
+    im.save(dst, "JPEG", quality=QUALITY, optimize=True, progressive=True, exif=exif)
     return w, h
 
 
