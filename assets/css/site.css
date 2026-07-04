@@ -270,6 +270,31 @@ img.film__poster {
   margin: 0;
 }
 
+/* Hover badge showing the photo id (for curation) */
+.photo[data-id] {
+  position: relative;
+}
+
+.photo[data-id]::after {
+  content: attr(data-id);
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  padding: 1px 6px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+}
+
+.photo[data-id]:hover::after {
+  opacity: 1;
+}
+
 /* Any gallery panel breaks out to full width */
 body.gallery-wide .content {
   width: 100%;

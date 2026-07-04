@@ -186,8 +186,10 @@ def finalize(name):
     json.dump([entry(e) for e in entries], open(manifest_path(name), "w"), ensure_ascii=False, indent=2)
 
     def fig(e):
-        return (f'            <figure class="photo"><img src="{g["src"]}/{e["file"]}" '
-                f'width="{e["w"]}" height="{e["h"]}" loading="lazy" alt=""></figure>')
+        vid = e["file"][:-4]
+        return (f'            <figure class="photo" data-id="{vid}"><img src="{g["src"]}/{e["file"]}" '
+                f'width="{e["w"]}" height="{e["h"]}" loading="lazy" '
+                f'alt="{vid}" title="{vid}"></figure>')
 
     page = os.path.join(REPO, g["page"])
     html = open(page).read()
@@ -199,7 +201,7 @@ def finalize(name):
         for e in entries:
             by_sec.setdefault(e.get("section", "road"), []).append(e)
         blocks = []
-        for s in sections:
+        for s in reversed(sections):  # newest section first (On the road at top)
             items = by_sec.get(s["id"], [])
             if not items:
                 continue
