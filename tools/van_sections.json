@@ -2,27 +2,37 @@
   {
     "id": "empty",
     "title": "The empty van",
-    "caption": "I bought a Chevy Express, sold off the shelving and dividers, and vacuumed the whole cargo bay at a car wash until it was back to bare metal. Then washed it at sunset out of a single Home Depot bucket. An empty box — and the start of everything."
+    "caption": "I bought a Chevy Express and sold off the shelving and dividers that came in the back. An empty box — and the start of everything."
+  },
+  {
+    "id": "cleaning",
+    "title": "Cleaning it out",
+    "caption": "A big vacuum at the car wash to get the cargo bay back to bare metal, then a wash at sunset out of a single Home Depot bucket. Clean slate."
   },
   {
     "id": "deaden",
     "title": "Sound deadening",
-    "caption": "Kilmat on the panels first: the quiet layer you never see once the walls go up, but you hear it on every drive."
+    "caption": "Kilmat on the panels — the quiet layer you never see once the walls go up, but you hear it on every drive."
   },
   {
     "id": "floor",
     "title": "The floor",
-    "caption": "Templated the floor with Amazon boxes and paper bags, cut XPS foam and then a full sheet of plywood with a jigsaw, and test-fit until the edges were right. The moment the floor went down, the box suddenly felt like a room."
+    "caption": "Templated the floor with Amazon boxes and paper bags, cut XPS foam and then a full sheet of plywood with a jigsaw, test-fit until the edges were right, then tidied the van back up. The moment the floor went down, the box suddenly felt like a room."
   },
   {
     "id": "roof",
     "title": "A hole in the roof",
-    "caption": "First time cutting into a roof — a little nervous. A frame from leftover wood, pilot holes, a jigsaw, butyl tape to seal. Not just ventilation: the line where a work truck starts becoming a home."
+    "caption": "First time cutting into a roof — a little nervous. A frame from leftover wood, pilot holes, a jigsaw, butyl tape to seal, and the fan going in. Not just ventilation: the line where a work truck starts becoming a home."
   },
   {
-    "id": "build",
-    "title": "Insulation & walls",
-    "caption": "Havelock wool over the ceiling and walls, held with nylon rope and 3M spray — threading the rope felt a lot like motion planning, where planning the route ahead saves a lot of rework. Then the plywood walls, sealed and stained. Electrical, solar, and the interior fit-out are still ahead."
+    "id": "wall_insul",
+    "title": "Wall insulation",
+    "caption": "Threaded nylon rope through the ribs — which felt a lot like motion planning — then packed Havelock wool over the ceiling and walls, held with the rope and 3M spray. Every redo was just the search for a better way."
+  },
+  {
+    "id": "wall_panels",
+    "title": "The walls",
+    "caption": "Cutting and fitting the plywood walls — the last big layer, and still in progress."
   },
   {
     "id": "road",
