@@ -27,10 +27,46 @@
     "section": "road"
   },
   {
+    "file": "v0084.jpg",
+    "date": "2026-05-18T20:18:06",
+    "w": 1350,
+    "h": 1800,
+    "make": "Apple",
+    "model": "iPhone 13 Pro",
+    "section": "road"
+  },
+  {
     "file": "v0078.jpg",
     "date": "2026-05-18T19:24:14",
     "w": 1800,
     "h": 1350,
+    "make": "Apple",
+    "model": "iPhone 13 Pro",
+    "section": "road"
+  },
+  {
+    "file": "v0085.jpg",
+    "date": "2026-05-18T19:24:08",
+    "w": 1800,
+    "h": 1350,
+    "make": "Apple",
+    "model": "iPhone 13 Pro",
+    "section": "road"
+  },
+  {
+    "file": "v0087.jpg",
+    "date": "2026-05-18T18:46:33",
+    "w": 1800,
+    "h": 1350,
+    "make": "Apple",
+    "model": "iPhone 13 Pro",
+    "section": "road"
+  },
+  {
+    "file": "v0086.jpg",
+    "date": "2026-05-18T17:36:14",
+    "w": 1350,
+    "h": 1800,
     "make": "Apple",
     "model": "iPhone 13 Pro",
     "section": "road"
@@ -79,6 +115,24 @@
     "make": "Apple",
     "model": "iPhone 13 Pro",
     "section": "wall_insul"
+  },
+  {
+    "file": "v0083.jpg",
+    "date": "2026-04-25T12:37:41",
+    "w": 1350,
+    "h": 1800,
+    "make": "Apple",
+    "model": "iPhone 13 Pro",
+    "section": "roof"
+  },
+  {
+    "file": "v0082.jpg",
+    "date": "2026-04-25T11:57:16",
+    "w": 1350,
+    "h": 1800,
+    "make": "Apple",
+    "model": "iPhone 13 Pro",
+    "section": "roof"
   },
   {
     "file": "v0069.jpg",
