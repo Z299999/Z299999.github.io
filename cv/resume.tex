@@ -24,7 +24,7 @@
 \newcommand{\tableEnv}[2]{%
   \begin{rSection}{#1}
     \begin{adjustwidth}{0.0in}{0.1in}
-      \begin{tabularx}{\linewidth}{@{} >{\bfseries\raggedright\arraybackslash}X @{\hspace{3ex}} >{\raggedleft\arraybackslash}p{2.3in} @{}}
+      \begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}X @{\hspace{3ex}} >{\raggedleft\arraybackslash}p{2.3in} @{}}
         #2
       \end{tabularx}
     \end{adjustwidth}
@@ -65,8 +65,9 @@
 \end{rSection}
 
 %----------------------------------------------------------------------------------------
-%   Relevant Projects
+%   Relevant Projects  (hidden for now — flip \iffalse to \iftrue to show)
 %----------------------------------------------------------------------------------------
+\iffalse
 \begin{rSection}{Relevant Projects}
 
     \begin{rSubsection}{Complex-Valued Framework for Nonlinear Opinion Dynamics}{2026 - Now}{In consultation with Professor Mamadou Diagne}{La Jolla, CA, USA}
@@ -89,14 +90,15 @@
     \end{rSubsection}
 
 \end{rSection}
+\fi
 
 %----------------------------------------------------------------------------------------
 %   Film Festival Participation
 %----------------------------------------------------------------------------------------
 \tableEnv{Film Festival Participation}{
-    \entry{\textit{Plant Pears for Your Heirs} --- Luminar Film Festival}{2022, CUHK-Shenzhen}
-    \entry{\textit{Current} --- Fisheye Film Festival}{2024, UK}
-    \entry{\textit{Guitar} --- London International Film Festival (two London festivals)}{2024, UK}
+    \entry{\textit{Plant Pears for Your Heirs} --- Luminar Film Festival}{2022, Shenzhen, China}
+    \entry{\textit{Current} --- Fisheye International Film Festival}{2025, High Wycombe, UK}
+    \entry{\textit{Guitar} --- London International \& British International Film Festivals}{2024, UK}
 }
 
 %----------------------------------------------------------------------------------------
