@@ -1,3 +1,7 @@
 .DS_Store
 __pycache__/
 *.pyc
+cv/*.aux
+cv/*.log
+cv/*.out
+cv/*.synctex.gz
