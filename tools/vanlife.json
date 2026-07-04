@@ -5,7 +5,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0029.jpg",
@@ -13,7 +14,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0032.jpg",
@@ -21,7 +23,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0024.jpg",
@@ -29,7 +32,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0023.jpg",
@@ -37,7 +41,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0022.jpg",
@@ -45,7 +50,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0031.jpg",
@@ -53,7 +59,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0021.jpg",
@@ -61,7 +68,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "road"
   },
   {
     "file": "v0020.jpg",
@@ -69,7 +77,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "solar"
   },
   {
     "file": "v0019.jpg",
@@ -77,7 +86,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "solar"
   },
   {
     "file": "v0018.jpg",
@@ -85,7 +95,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "insul"
   },
   {
     "file": "v0017.jpg",
@@ -93,7 +104,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "insul"
   },
   {
     "file": "v0016.jpg",
@@ -101,13 +113,15 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "insul"
   },
   {
     "file": "v0030.jpg",
     "date": "2026-03-22T15:30:00",
     "w": 1350,
-    "h": 1800
+    "h": 1800,
+    "section": "roof"
   },
   {
     "file": "v0015.jpg",
@@ -115,7 +129,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "roof"
   },
   {
     "file": "v0014.jpg",
@@ -123,7 +138,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "roof"
   },
   {
     "file": "v0013.jpg",
@@ -131,7 +147,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "roof"
   },
   {
     "file": "v0012.jpg",
@@ -139,7 +156,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "floor"
   },
   {
     "file": "v0011.jpg",
@@ -147,7 +165,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "floor"
   },
   {
     "file": "v0010.jpg",
@@ -155,7 +174,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "floor"
   },
   {
     "file": "v0026.jpg",
@@ -163,7 +183,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "floor"
   },
   {
     "file": "v0009.jpg",
@@ -171,7 +192,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "floor"
   },
   {
     "file": "v0008.jpg",
@@ -179,7 +201,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "deaden"
   },
   {
     "file": "v0007.jpg",
@@ -187,7 +210,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "deaden"
   },
   {
     "file": "v0006.jpg",
@@ -195,7 +219,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "deaden"
   },
   {
     "file": "v0005.jpg",
@@ -203,7 +228,8 @@
     "w": 1350,
     "h": 1800,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "empty"
   },
   {
     "file": "v0003.jpg",
@@ -211,7 +237,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "empty"
   },
   {
     "file": "v0002.jpg",
@@ -219,7 +246,8 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "empty"
   },
   {
     "file": "v0001.jpg",
@@ -227,6 +255,7 @@
     "w": 1800,
     "h": 1350,
     "make": "Apple",
-    "model": "iPhone 13 Pro"
+    "model": "iPhone 13 Pro",
+    "section": "empty"
   }
 ]

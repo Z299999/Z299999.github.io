@@ -1,0 +1,37 @@
+[
+  {
+    "id": "empty",
+    "title": "The empty van",
+    "caption": "I bought a Chevy Express cargo van, sold the shelving and dividers, and vacuumed the whole bay at a car wash until it was back to bare metal. An empty box — and the start of everything."
+  },
+  {
+    "id": "deaden",
+    "title": "Sound deadening",
+    "caption": "Kilmat on the panels first: the quiet layer you never see once the walls go up, but you hear it on every drive."
+  },
+  {
+    "id": "floor",
+    "title": "The floor",
+    "caption": "Templated the floor with Amazon boxes and paper bags, cut XPS foam and then a full plywood sheet with a jigsaw, and test-fit until the edges were right. The moment the floor went down, the box suddenly felt like a room."
+  },
+  {
+    "id": "roof",
+    "title": "A hole in the roof",
+    "caption": "First time cutting into a roof — a little nervous. A frame from leftover wood, pilot holes, a jigsaw, butyl tape to seal. Not just ventilation: the line where a work truck starts becoming a home."
+  },
+  {
+    "id": "insul",
+    "title": "Wiring & insulation",
+    "caption": "I sketched the 12V wiring on kraft paper first — planning the runs felt a lot like motion planning. Then Havelock wool over the ceiling and walls, held with nylon rope and 3M spray. Every redo was just the search for a better way."
+  },
+  {
+    "id": "solar",
+    "title": "Solar & finish",
+    "caption": "A solar panel for power, and the plywood sealed and stained. Slow, but every layer is taking shape."
+  },
+  {
+    "id": "road",
+    "title": "On the road",
+    "caption": "Then out to Joshua Tree — the reason for all of it. Open desert, a warm glow through the windows at dusk, a chair set up inside. Still a build in progress, already a life on the road."
+  }
+]

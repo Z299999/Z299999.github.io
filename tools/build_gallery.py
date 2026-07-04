@@ -176,28 +176,54 @@ def finalize(name):
     entries = load_manifest(name)
     entries.sort(key=lambda e: e["date"], reverse=(g.get("order", "desc") == "desc"))
 
-    def keep(e):
+    def entry(e):
         o = {"file": e["file"], "date": e["date"], "w": e["w"], "h": e["h"]}
-        if e.get("make"):
-            o["make"] = e["make"]
-        if e.get("model"):
-            o["model"] = e["model"]
+        for k in ("make", "model", "section"):
+            if e.get(k):
+                o[k] = e[k]
         return o
 
-    json.dump([keep(e) for e in entries], open(manifest_path(name), "w"), ensure_ascii=False, indent=2)
+    json.dump([entry(e) for e in entries], open(manifest_path(name), "w"), ensure_ascii=False, indent=2)
 
-    figs = [
-        f'            <figure class="photo"><img src="{g["src"]}/{e["file"]}" '
-        f'width="{e["w"]}" height="{e["h"]}" loading="lazy" alt=""></figure>'
-        for e in entries
-    ]
+    def fig(e):
+        return (f'            <figure class="photo"><img src="{g["src"]}/{e["file"]}" '
+                f'width="{e["w"]}" height="{e["h"]}" loading="lazy" alt=""></figure>')
+
     page = os.path.join(REPO, g["page"])
     html = open(page).read()
-    block = f'<div class="photo-grid" data-gallery="{name}">\n' + "\n".join(figs) + "\n          </div>"
-    pat = r'<div class="photo-grid" data-gallery="%s">.*?</div>' % name
-    html2, n = re.subn(pat, block, html, count=1, flags=re.DOTALL)
-    if n != 1:
-        raise SystemExit(f'Could not find <div class="photo-grid" data-gallery="{name}"> in {g["page"]}')
+
+    if name == "vanlife":
+        # Sectioned build journal: heading + caption + grid, in section order.
+        sections = json.load(open(os.path.join(REPO, "tools", "van_sections.json")))
+        by_sec = {}
+        for e in entries:
+            by_sec.setdefault(e.get("section", "road"), []).append(e)
+        blocks = []
+        for s in sections:
+            items = by_sec.get(s["id"], [])
+            if not items:
+                continue
+            grid = "\n".join(fig(e) for e in items)
+            blocks.append(
+                '        <section class="journal">\n'
+                f'          <h2>{s["title"]}</h2>\n'
+                f'          <p>{s["caption"]}</p>\n'
+                f'          <div class="photo-grid">\n{grid}\n          </div>\n'
+                '        </section>'
+            )
+        new = "<!-- VAN JOURNAL START -->\n" + "\n".join(blocks) + "\n        <!-- VAN JOURNAL END -->"
+        html2, n = re.subn(r"<!-- VAN JOURNAL START -->.*?<!-- VAN JOURNAL END -->",
+                           new, html, count=1, flags=re.DOTALL)
+        if n != 1:
+            raise SystemExit("Could not find VAN JOURNAL markers in van/index.html")
+    else:
+        block = (f'<div class="photo-grid" data-gallery="{name}">\n'
+                 + "\n".join(fig(e) for e in entries) + "\n          </div>")
+        pat = r'<div class="photo-grid" data-gallery="%s">.*?</div>' % name
+        html2, n = re.subn(pat, block, html, count=1, flags=re.DOTALL)
+        if n != 1:
+            raise SystemExit(f'Could not find <div class="photo-grid" data-gallery="{name}"> in {g["page"]}')
+
     open(page, "w").write(html2)
 
     keep = {e["file"] for e in entries}
