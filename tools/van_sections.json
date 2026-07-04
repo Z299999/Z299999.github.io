@@ -2,7 +2,7 @@
   {
     "id": "empty",
     "title": "The empty van",
-    "caption": "I bought a Chevy Express cargo van, sold the shelving and dividers, and vacuumed the whole bay at a car wash until it was back to bare metal. An empty box — and the start of everything."
+    "caption": "I bought a Chevy Express, sold off the shelving and dividers, and vacuumed the whole cargo bay at a car wash until it was back to bare metal. Then washed it at sunset out of a single Home Depot bucket. An empty box — and the start of everything."
   },
   {
     "id": "deaden",
@@ -12,7 +12,7 @@
   {
     "id": "floor",
     "title": "The floor",
-    "caption": "Templated the floor with Amazon boxes and paper bags, cut XPS foam and then a full plywood sheet with a jigsaw, and test-fit until the edges were right. The moment the floor went down, the box suddenly felt like a room."
+    "caption": "Templated the floor with Amazon boxes and paper bags, cut XPS foam and then a full sheet of plywood with a jigsaw, and test-fit until the edges were right. The moment the floor went down, the box suddenly felt like a room."
   },
   {
     "id": "roof",
@@ -20,14 +20,9 @@
     "caption": "First time cutting into a roof — a little nervous. A frame from leftover wood, pilot holes, a jigsaw, butyl tape to seal. Not just ventilation: the line where a work truck starts becoming a home."
   },
   {
-    "id": "insul",
-    "title": "Wiring & insulation",
-    "caption": "I sketched the 12V wiring on kraft paper first — planning the runs felt a lot like motion planning. Then Havelock wool over the ceiling and walls, held with nylon rope and 3M spray. Every redo was just the search for a better way."
-  },
-  {
-    "id": "solar",
-    "title": "Solar & finish",
-    "caption": "A solar panel for power, and the plywood sealed and stained. Slow, but every layer is taking shape."
+    "id": "build",
+    "title": "Wiring, insulation & finish",
+    "caption": "Sketched the 12V wiring on kraft paper first — planning the runs felt a lot like motion planning. Then Havelock wool over the ceiling and walls, held with nylon rope and 3M spray, a solar panel for power, and the plywood sealed and stained. Every redo was just the search for a better way."
   },
   {
     "id": "road",
