@@ -437,6 +437,14 @@ body.gallery-wide .content {
   margin: 0 0 1rem;
 }
 
+.journal p.journal-date {
+  margin: 0 0 0.7rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 800px) {
   .site-shell {

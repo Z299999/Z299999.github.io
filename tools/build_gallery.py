@@ -195,13 +195,28 @@ def finalize(name):
     html = open(page).read()
 
     if name == "vanlife":
-        # Sectioned build journal: heading + caption + grid, in section order.
+        # Sectioned build journal: heading + date + caption + grid, in section order.
         sections = json.load(open(os.path.join(REPO, "tools", "van_sections.json")))
         by_sec = {}
         for e in entries:
             by_sec.setdefault(e.get("section", "road"), []).append(e)
+
+        def month_label(items):
+            months = sorted(e["date"][:7] for e in items)  # YYYY-MM
+            lo, hi = months[0], months[-1]
+            def fmt(ym):
+                y, m = ym.split("-")
+                return datetime(int(y), int(m), 1).strftime("%B %Y")
+            if lo == hi:
+                return fmt(hi)
+            loy, him = lo[:4], hi[:4]
+            if loy == him:  # same year: "January – February 2026"
+                m_lo = datetime(int(loy), int(lo[5:7]), 1).strftime("%B")
+                return f"{m_lo} – {fmt(hi)}"
+            return f"{fmt(lo)} – {fmt(hi)}"
+
         blocks = []
-        for s in reversed(sections):  # newest section first (On the road at top)
+        for s in reversed(sections):  # newest section first
             items = by_sec.get(s["id"], [])
             if not items:
                 continue
@@ -209,6 +224,7 @@ def finalize(name):
             blocks.append(
                 '        <section class="journal">\n'
                 f'          <h2>{s["title"]}</h2>\n'
+                f'          <p class="journal-date">{month_label(items)}</p>\n'
                 f'          <p>{s["caption"]}</p>\n'
                 f'          <div class="photo-grid">\n{grid}\n          </div>\n'
                 '        </section>'
