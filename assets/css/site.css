@@ -202,6 +202,15 @@ img {
   margin: 0 0 0.15rem;
 }
 
+/* Paper link riding at the end of an entry's title: set apart by colour
+   and weight rather than size, so it does not compete with the heading. */
+.entry__paper {
+  margin-left: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
 .entry p {
   margin: 0.2rem 0;
 }
