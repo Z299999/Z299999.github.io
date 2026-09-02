@@ -491,4 +491,21 @@ body.gallery-wide .content {
   .film {
     flex-direction: column;
   }
+
+  /* A wide multi-panel figure fitted to a portrait phone's width is
+     unreadable, so fit it to height instead and let it scroll sideways. */
+  .lightbox--wide {
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lightbox__img.is-wide {
+    max-width: none;
+    max-height: none;
+    width: auto;
+    height: 78vh;
+    flex: none;
+  }
 }

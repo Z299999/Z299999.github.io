@@ -56,14 +56,30 @@
     let photos = [];
     let i = 0;
 
+    // A wide figure (a multi-panel strip) fitted to the width of a portrait
+    // phone is no bigger than it was inline, so the lightbox buys nothing.
+    // Flag it and let the narrow-screen CSS fit it to height and scroll.
+    const markWide = () => {
+      const src = photos[i];
+      const wide = !!src && src.classList.contains("entry__img") &&
+                   lbImg.naturalWidth / lbImg.naturalHeight > 1.8;
+      lbImg.classList.toggle("is-wide", wide);
+      box.classList.toggle("lightbox--wide", wide);
+    };
+
     const open = (list, n) => {
       photos = list;
       i = (n + photos.length) % photos.length;
+      lbImg.classList.remove("is-wide");
+      box.classList.remove("lightbox--wide");
       lbImg.src = photos[i].src;
+      if (lbImg.complete && lbImg.naturalWidth) markWide();
       const m = photos[i].getAttribute("src").match(/([a-z]\d+)\.jpg/i);
       if (caption) caption.textContent = m ? m[1] : "";
+      box.scrollLeft = 0;
       box.hidden = false;
     };
+    lbImg.addEventListener("load", markWide);
     const close = () => {
       box.hidden = true;
       lbImg.removeAttribute("src");
