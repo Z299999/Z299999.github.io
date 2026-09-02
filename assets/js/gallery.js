@@ -75,6 +75,8 @@
     });
     const posters = Array.from(document.querySelectorAll("img.film__poster"));
     posters.forEach((p, n) => p.addEventListener("click", () => open(posters, n)));
+    const figures = Array.from(document.querySelectorAll("img.entry__img"));
+    figures.forEach((p, n) => p.addEventListener("click", () => open(figures, n)));
 
     box.querySelector(".lightbox__next").addEventListener("click", (e) => {
       e.stopPropagation();

@@ -8,8 +8,8 @@
       name="description"
       content="Shuheng Zhang is a PhD student at UC San Diego working across mathematics, complex systems, filmmaking, and writing."
     >
-    <link rel="stylesheet" href="assets/css/site.css?v=17">
-    <script src="assets/js/gallery.js?v=13" defer></script>
+    <link rel="stylesheet" href="assets/css/site.css?v=18">
+    <script src="assets/js/gallery.js?v=14" defer></script>
     <script src="assets/js/site.js?v=14" defer></script>
   </head>
   <body>
@@ -94,69 +94,91 @@
 
           <div class="entries">
             <div class="entry">
-              <h3>Nonlinear Opinion Dynamics, Information Diffusion, and Ensemble Control</h3>
-              <p class="meta">Active direction</p>
-              <p>
-                A current research direction focused on continuum and
-                network-based models of collective behaviour. This line studies
-                control and analysis questions in opinion dynamics, information
-                diffusion, and their connections to ensemble systems.
-              </p>
-            </div>
-
-            <div class="entry">
-              <h3>Neural Architectures with Built-In Short- and Long-Term Memory</h3>
-              <p class="meta">Ongoing project</p>
-              <p>
-                An ongoing project on designing neural systems whose structure
-                itself supports memory across multiple timescales. Current work
-                explores how architectural organization can improve sequential
-                learning, function approximation, and control without relying
-                solely on external memory mechanisms.
-              </p>
-            </div>
-
-            <div class="entry">
               <h3>Predictor Feedback for an Age-Structured Population Model with Input Delay</h3>
-              <p class="meta">Paper project</p>
-              <p>
-                A completed paper project on stabilization of nonlinear
-                age-structured population dynamics with delayed actuation. The
-                work combines PDE reduction, delay compensation, and predictor
-                feedback design to establish exponential closed-loop stability.
+              <p class="meta">
+                With M. Diagne and M. Krstic &middot; UC San Diego &middot;
+                Accepted, 2026 IEEE Conference on Decision and Control
               </p>
-            </div>
-
-            <div class="entry">
-              <h3>Evolutionary Neural Networks Ecosystem</h3>
-              <p class="meta">Project</p>
               <p>
-                A computational framework for studying the emergence of complex
-                behaviours through the co-evolution of neural agents and their
-                environment.
-                <a href="pages/research/eco-evo/demo/">Interactive demo &rarr;</a>
+                Stabilization of a nonlinear age-structured population model
+                whose control input &mdash; the dilution rate &mdash; reaches
+                the plant only after a pure delay. A normalized spectral
+                functional splits the PDE into a scalar amplitude ODE, the only
+                place the delay enters, and an autonomous integral delay
+                equation for the shape, which decays on its own. That cascade
+                admits a predictor state feedback; PDE backstepping and Lyapunov
+                analysis then give exponential stability of the closed loop,
+                with a decay rate explicit in the actuator delay.
               </p>
+              <figure class="entry__figure">
+                <img class="entry__img" src="assets/img/research/age-structured-delay.png"
+                     width="1600" height="310" loading="lazy"
+                     alt="Closed-loop response: predictor feedback converges to the target equilibrium while naive feedback oscillates.">
+                <figcaption>
+                  Closed loop under delayed actuation. Predictor feedback (blue)
+                  drives the log-amplitude, dilution rate and log-density error
+                  to zero; ignoring the delay (red) leaves a sustained
+                  oscillation.
+                </figcaption>
+              </figure>
+              <!-- TODO: add arXiv / IEEE Xplore link once the paper is posted:
+                   <p><a href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank" rel="noreferrer">Read paper &rarr;</a></p> -->
             </div>
 
             <div class="entry">
               <h3>Random Vortex Method for 2D Incompressible Flows</h3>
-              <p class="meta">Dissertation project</p>
+              <p class="meta">
+                M.Sc. dissertation &middot; University of Oxford &middot; 2025
+              </p>
               <p>
-                A dissertation project on probabilistic numerical methods for
-                fluid dynamics, using random vortex particles to approximate
-                vorticity and study incompressible flows.
+                A probabilistic numerical scheme for the two-dimensional
+                Navier&ndash;Stokes equations: vorticity is carried by random
+                vortex particles whose stochastic trajectories reproduce the
+                viscous flow, and velocity is recovered through the Biot&ndash;Savart
+                law. The dissertation develops the method on the unbounded plane
+                and then on domains with no-slip boundaries &mdash; a half-plane,
+                a corner, and an infinite belt.
+              </p>
+              <figure class="entry__figure">
+                <img class="entry__img" src="assets/img/research/random-vortex.png"
+                     width="1600" height="873" loading="lazy"
+                     alt="Streamlines of a simulated viscous flow in a belt domain at t = 8.">
+                <figcaption>
+                  Streamlines and vorticity in the belt domain
+                  <span class="nowrap">D = &#8477; &times; [0, 6]</span> at
+                  <span class="nowrap">t = 8</span>, viscosity &nu; = 0.05,
+                  reconstructed from the random vortex particles.
+                </figcaption>
+              </figure>
+              <p>
+                <a href="assets/papers/random-vortex-method-2d-incompressible-flows.pdf" target="_blank" rel="noreferrer">Read paper &rarr;</a>
               </p>
             </div>
 
             <div class="entry">
               <h3>Hierarchical Feature-Based Synthesis of a Brain Module</h3>
-              <p class="meta">Mini project</p>
-              <p>
-                A project on generating synthetic brain networks based on the
-                Drosophila connectome, combining flow-based community detection,
-                Hodge decomposition, centrality measures, and probabilistic
-                modelling.
+              <p class="meta">
+                Network science research project &middot; University of Oxford &middot; 2025
               </p>
+              <p>
+                A generative pipeline for synthetic brain networks built on the
+                <i>Drosophila</i> connectome. Flow-based community detection,
+                Hodge decomposition, PageRank centrality and Gaussian mixture
+                models are combined to reconstruct modules that preserve the
+                structural, spatial and hierarchical properties of the original
+                system &mdash; giving an interpretable null model against which
+                real connectomes can be tested.
+              </p>
+              <figure class="entry__figure">
+                <img class="entry__img" src="assets/img/research/brain-module.png"
+                     width="1600" height="743" loading="lazy"
+                     alt="Three-view projections of two Infomap modules within the Drosophila connectome.">
+                <figcaption>
+                  Three-view projections of two second-level Infomap modules
+                  inside the fly brain. Module 1 (left) is asymmetric on its
+                  own; Module 5 (right) is strongly bilaterally symmetric.
+                </figcaption>
+              </figure>
             </div>
           </div>
         </section>

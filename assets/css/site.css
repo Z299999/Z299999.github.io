@@ -195,7 +195,7 @@ img {
 }
 
 .entry {
-  margin: 0 0 1.3rem;
+  margin: 0 0 2.4rem;
 }
 
 .entry h3 {
@@ -204,6 +204,31 @@ img {
 
 .entry p {
   margin: 0.2rem 0;
+}
+
+/* Research entry figures */
+.entry__figure {
+  margin: 0.9rem 0 0.6rem;
+}
+
+.entry__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: zoom-in;
+}
+
+.entry__figure figcaption {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 .film {
