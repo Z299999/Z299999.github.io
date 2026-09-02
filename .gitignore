@@ -1,7 +1,9 @@
 .DS_Store
 __pycache__/
 *.pyc
-cv/*.aux
-cv/*.log
-cv/*.out
-cv/*.synctex.gz
+# CV: only the compiled PDF is published. The LaTeX source, the document
+# class, the build script and NOTES.md stay local -- NOTES.md and the
+# hidden \iffalse block in resume.tex carry work not yet made public.
+# The files are still on disk and edited as usual; git just ignores them.
+cv/*
+!cv/resume.pdf
