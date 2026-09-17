@@ -401,12 +401,14 @@ body.gallery-wide .content {
   font-variant-numeric: tabular-nums;
 }
 
-.contact-table td {
+.contact-table td,
+.news-table td {
   padding: 0.2rem 1.2rem 0.2rem 0;
   vertical-align: top;
 }
 
-.contact-table td:first-child {
+.contact-table td:first-child,
+.news-table td:first-child {
   color: var(--muted);
 }
 
