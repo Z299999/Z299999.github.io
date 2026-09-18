@@ -2,7 +2,7 @@
 
 Personal website for Shuheng Zhang — PhD Student @ UC San Diego.
 
-**Live site:** [https://z299999.github.io](https://z299999.github.io)
+**Live site:** [https://shzhang.com](https://shzhang.com) (z299999.github.io redirects there)
 
 A plain, static, single-page site (no Jekyll, no build step), styled after
 classic academic homepages. A left sidebar lists the sections in two groups —
