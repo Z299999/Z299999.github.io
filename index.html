@@ -123,14 +123,10 @@
                      width="1600" height="460" loading="lazy"
                      alt="The simulated hexapod mid-stride on rough undulating ground, its two stalked eyes turned toward the camera, coloured fruit spheres scattered across the floor.">
                 <figcaption>
-                  Walking the rough floor at
-                  <span class="nowrap">t &asymp; 329 s</span>, third lineage,
-                  life 22 &mdash; the roughest ground any life was given. A real
-                  MuJoCo render replayed from the episode's ground truth, so the
-                  body's pose is the logged one and only the camera is chosen.
-                  The two stalks are its eyes, its only distance sense; the
-                  coloured spheres are fruit, and what it does with its legs
-                  here nobody designed.
+                  Run 3, life 22, mid-stride on the roughest ground any life
+                  was given. A MuJoCo render replayed from the episode's ground
+                  truth: the pose is logged, only the camera chosen. The two
+                  stalks are its eyes.
                 </figcaption>
               </figure>
             </div>
@@ -165,21 +161,12 @@
                      width="1600" height="460" loading="lazy"
                      alt="A close view of the world graph with three unrelated nodes lit across the frame — Qualcomm, US drug pricing policy and OpenAI — each with its labelled edges to neighbours such as Apple, Merck and AMD, over a pale field of the rest of the graph.">
                 <figcaption>
-                  Three unrelated corners of the graph lit at once &mdash;
-                  Qualcomm, <i>US drug pricing policy</i> and OpenAI &mdash;
-                  with the edges each one actually carries: Apple is a
-                  <i>customer_of</i> Qualcomm, which is <i>exposed_to</i> China
-                  as an end market; the drug-pricing policy <i>affects</i>
-                  Merck and Novo Nordisk and is <i>concerned</i> by an open
-                  question about the 2027 Medicare maximum fair price; OpenAI
-                  is a <i>customer_of</i> AMD. Solid edges are evidence-backed,
-                  dashed ones seeded and still unverified &mdash; a distinction
-                  the graph refuses to blur. The pale field behind is the rest
-                  of it:
+                  Three unrelated corners lit together &mdash; Qualcomm,
+                  <i>US drug pricing policy</i>, OpenAI &mdash; each with the
+                  edges it carries. Solid edges are evidence-backed, dashed ones
+                  seeded and unverified. Behind them, the rest:
                   <span class="nowrap">277 nodes</span>,
-                  <span class="nowrap">467 edges</span>,
-                  <span class="nowrap">1,938 recorded changes</span> on
-                  <span class="nowrap">2026-09-24</span>.
+                  <span class="nowrap">467 edges</span>.
                 </figcaption>
               </figure>
             </div>
@@ -207,13 +194,12 @@
                      alt="Population density over time and age under three control strategies: nominal, naive feedback, and predictor feedback.">
                 <figcaption>
                   The population density
-                  <span class="nowrap">f(t, a)</span> &mdash; the infinite-dimensional
-                  state &mdash; under actuator delay
-                  <span class="nowrap">&tau; = 1.5</span>: (a) the nominal control
-                  misses the target equilibrium, (b) feedback that ignores the
-                  delay sustains an oscillation, (c) the predictor settles onto
-                  <span class="nowrap">f*</span>. Dashed red marks the initial
-                  profile, dashed green the equilibrium.
+                  <span class="nowrap">f(t, a)</span> under actuator delay
+                  <span class="nowrap">&tau; = 1.5</span>: (a) the nominal
+                  control misses the equilibrium, (b) delay-blind feedback
+                  oscillates, (c) the predictor settles onto
+                  <span class="nowrap">f*</span>. Dashed red is the initial
+                  profile, green the equilibrium.
                 </figcaption>
               </figure>
               <!-- TODO: once the preprint is posted, append to the <h3> above:
