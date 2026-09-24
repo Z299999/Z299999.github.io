@@ -89,38 +89,98 @@
             and complex adaptive behaviour. Areas of interest: mathematical
             biology, control and systems theory, deep learning, and network theory.
             Two projects carry this into practice and run live on this site: a
-            hexapod robot learning to walk under closed-loop control, and an
-            investment research society.
+            language agent that has to work out how to walk a body it was told
+            nothing about, and an autonomous investment research society.
           </p>
 
           <div class="entries">
             <div class="entry">
-              <h3>Hexapod Control</h3>
-              <p class="meta">Placeholder &middot; live at hexapod.shzhang.com (login required)</p>
-              <p>Placeholder.<a
+              <h3>Hexapod Control<a
                   class="entry__paper"
                   href="https://hexapod.shzhang.com/"
-                  target="_blank" rel="noreferrer">Open &rarr;</a></p>
+                  target="_blank" rel="noreferrer">Open console &rarr;</a></h3>
+              <p class="meta">
+                Embodied-agent experiment &middot; 2026 &middot;
+                console at hexapod.shzhang.com (login required)
+              </p>
+              <p>
+                A language agent is sealed in a container and handed a body it
+                knows nothing about &mdash; a simulated hexapod reachable only
+                over HTTP &mdash; with a one-page datasheet and a single
+                instruction: stay alive. It may write twenty numbers and read
+                four things back; that the twenty are joint targets, that it has
+                six legs, how to stand, how to walk, and that fruit is what
+                stops the battery draining are all things it has to find out by
+                experiment. There is no training and no reward shaping. Its
+                workspace persists after it dies, so each new instance inherits
+                whatever the last one wrote down, and the question the
+                experiment asks is whether experience compiles into files:
+                whether the notes and the code alone, with the mind removed,
+                could keep the body alive.
+              </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="assets/img/research/placeholder.svg"
-                     width="1600" height="395" loading="lazy"
-                     alt="Placeholder figure.">
-                <figcaption>Placeholder.</figcaption>
+                <img class="entry__img" src="assets/img/research/hexapod-terrain.png"
+                     width="1600" height="460" loading="lazy"
+                     alt="The simulated hexapod mid-stride on rough undulating ground, its two stalked eyes turned toward the camera, coloured fruit spheres scattered across the floor.">
+                <figcaption>
+                  Walking the rough floor at
+                  <span class="nowrap">t &asymp; 329 s</span>, third lineage,
+                  life 22 &mdash; the roughest ground any life was given. A real
+                  MuJoCo render replayed from the episode's ground truth, so the
+                  body's pose is the logged one and only the camera is chosen.
+                  The two stalks are its eyes, its only distance sense; the
+                  coloured spheres are fruit, and what it does with its legs
+                  here nobody designed.
+                </figcaption>
               </figure>
             </div>
 
             <div class="entry">
-              <h3>Investment Research</h3>
-              <p class="meta">Placeholder &middot; live at longview.shzhang.com (login required)</p>
-              <p>Placeholder.<a
+              <h3>Longview &mdash; An Autonomous Investment Research Society<a
                   class="entry__paper"
                   href="https://longview.shzhang.com/"
-                  target="_blank" rel="noreferrer">Open &rarr;</a></p>
+                  target="_blank" rel="noreferrer">Open site &rarr;</a></h3>
+              <p class="meta">
+                Multi-agent research system &middot; 2026 &ndash; present &middot;
+                live at longview.shzhang.com (login required)
+              </p>
+              <p>
+                Four persistent identities &mdash; an actor, a critic, a steward
+                and a doctor &mdash; share one world graph and are built to
+                disagree, preserving the disagreement rather than resolving it.
+                They read primary filings rather than prices, and every claim
+                enters the graph as an edge with the document behind it; a
+                thesis is only admitted if it names the fact that supports it,
+                the filing that would falsify it, and the date that filing
+                arrives. The stance is deliberately slow: the short horizon is
+                an arms race over speed and data that a project like this cannot
+                enter, so it trades the one advantage it does have &mdash; time
+                &mdash; against the months it takes a changed sentence in a 10-K
+                to reach a price. A fifth identity keeps a paper book that
+                scores the research and that the other four never read. Nothing
+                here is advice, and the system never trades.
+              </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="assets/img/research/placeholder.svg"
-                     width="1600" height="395" loading="lazy"
-                     alt="Placeholder figure.">
-                <figcaption>Placeholder.</figcaption>
+                <img class="entry__img" src="assets/img/research/longview-graph.png"
+                     width="1600" height="460" loading="lazy"
+                     alt="A close view of the world graph with three unrelated nodes lit across the frame — Qualcomm, US drug pricing policy and OpenAI — each with its labelled edges to neighbours such as Apple, Merck and AMD, over a pale field of the rest of the graph.">
+                <figcaption>
+                  Three unrelated corners of the graph lit at once &mdash;
+                  Qualcomm, <i>US drug pricing policy</i> and OpenAI &mdash;
+                  with the edges each one actually carries: Apple is a
+                  <i>customer_of</i> Qualcomm, which is <i>exposed_to</i> China
+                  as an end market; the drug-pricing policy <i>affects</i>
+                  Merck and Novo Nordisk and is <i>concerned</i> by an open
+                  question about the 2027 Medicare maximum fair price; OpenAI
+                  is a <i>customer_of</i> AMD. Solid edges are evidence-backed,
+                  dashed ones seeded and still unverified &mdash; a distinction
+                  the graph refuses to blur. The pale field behind is the rest
+                  of it:
+                  <span class="nowrap">277 nodes</span>,
+                  <span class="nowrap">467 edges</span>,
+                  <span class="nowrap">1,938 recorded changes</span> on
+                  <span class="nowrap">2026-09-24</span>.
+                </figcaption>
               </figure>
             </div>
 
