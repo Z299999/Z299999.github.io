@@ -51,6 +51,9 @@ query in `index.html` — bump `N` when you change either, to bust browser cache
   `data-panel="…"`.
 - **Styles** — `assets/css/site.css`. The cinema theme is the `body.theme-dark`
   block; `site.js` toggles that class while the Photography panel is open.
+- **Research figures** — one banner per project, 1600 px wide, no responsive
+  variants; every `<figcaption>` under 40 words. The full rules are an HTML
+  comment above the Research `<div class="entries">` in `index.html`.
 - **Photography gallery** — use the script below; don't hand-edit the figures.
 - **Eco-evo demo** — see `pages/research/eco-evo/demo/README.md`.
 
