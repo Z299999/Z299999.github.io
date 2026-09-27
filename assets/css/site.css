@@ -410,6 +410,8 @@ body.gallery-wide .content {
 .contact-table td:first-child,
 .news-table td:first-child {
   color: var(--muted);
+  /* A date is one token: never let 2026-12 break at the hyphen. */
+  white-space: nowrap;
 }
 
 /* Callout link (e.g. the Van build entry in the Life panel) */
