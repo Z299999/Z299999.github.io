@@ -29,7 +29,10 @@ body {
   margin: 0;
   color: var(--text);
   background: var(--bg);
-  font-family: Helvetica, Arial, "Helvetica Neue", sans-serif;
+  /* CJK faces are listed after the Latin ones so they only ever pick up
+     the characters Helvetica has no glyph for -- the Chinese name. */
+  font-family: Helvetica, Arial, "Helvetica Neue", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   font-size: 15px;
   line-height: 1.55;
 }
