@@ -46,7 +46,6 @@ done without reconstructing the conversation it came from.
   profile photo. Each could carry something of its own (a poster, a photograph,
   a van shot) — one line each in the `PAGES` dict at the top of that script.
 
-
 - **Home News, 2026-08 is empty by design.** The old placeholder row was
   removed rather than filled; News does not need a row per month. Nothing to
   do unless something from that month turns out to be worth a row.
