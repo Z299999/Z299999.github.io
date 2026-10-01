@@ -243,6 +243,10 @@ def finalize(name):
             raise SystemExit(f'Could not find <div class="photo-grid" data-gallery="{name}"> in {g["page"]}')
 
     open(page, "w").write(html2)
+    if g["page"] == "index.html":
+        # every panel is also served at its own path, copied from index.html
+        from build_pages import build
+        build(quiet=True)
 
     keep = {e["file"] for e in entries}
     removed = 0

@@ -4,8 +4,10 @@ Personal website for Shuheng Zhang — PhD Student @ UC San Diego.
 
 **Live site:** [https://shzhang.com](https://shzhang.com) (z299999.github.io redirects there)
 
-A plain, static, single-page site (no Jekyll, no build step), styled after
-classic academic homepages. A left sidebar lists the sections in two groups —
+A plain, static site (no Jekyll), styled after classic academic homepages.
+It is written as one page, `index.html`, and served as six: each panel also
+lives at its own path (`/research/`, `/writing/`, …) so a shared link previews
+and indexes as that page — see **Pages and URLs** below. A left sidebar lists the sections in two groups —
 **About** (Home / Biography / Contact) and **Work & Life** (Research / Film /
 Photography / Writing / Life) — and clicking one swaps the content panel on the
 right. Opening **Photography** switches the whole page to a dark "cinema" theme.
@@ -16,7 +18,10 @@ right. Opening **Photography** switches the whole page to a dark "cinema" theme.
 
 ```
 Z299999.github.io/
-├── index.html                  # The whole site: sidebar + switchable panels + lightbox
+├── index.html                  # The whole site: sidebar + switchable panels + lightbox (the SOURCE)
+├── research/index.html         # … generated per panel by tools/build_pages.py — do not edit
+├── films/ photography/ writing/ life/   (same)
+├── sitemap.xml                 # generated with them
 ├── .nojekyll                   # Tells GitHub Pages to skip Jekyll, serve as-is
 ├── assets/
 │   ├── css/site.css            # All styles (light theme + body.theme-dark cinema theme)
@@ -26,7 +31,8 @@ Z299999.github.io/
 │       ├── films/              # Film posters
 │       └── photography/        # Gallery images pNNNN.jpg (stable ids; order is by date)
 ├── tools/
-│   ├── build_gallery.py        # Add/rebuild the Photography gallery
+│   ├── build_pages.py          # Copy index.html to /<panel>/ with that panel active + its own <head>
+│   ├── build_gallery.py        # Add/rebuild the Photography gallery (re-runs build_pages for you)
 │   └── gallery.json            # Manifest: per-photo date + dimensions (source of truth)
 ├── pages/
 │   └── research/eco-evo/demo/  # Standalone interactive simulation demo
@@ -48,7 +54,8 @@ query in `index.html` — bump `N` when you change either, to bust browser cache
 
 - **Homepage content** — edit the panels directly in `index.html`. Each section
   is a `<section class="panel" id="…">`; the matching sidebar link uses
-  `data-panel="…"`.
+  `href="/…/" data-panel="…"`. **Then run `python3 tools/build_pages.py`** so
+  the per-panel copies catch up (see below).
 - **Styles** — `assets/css/site.css`. The cinema theme is the `body.theme-dark`
   block; `site.js` toggles that class while the Photography panel is open.
 - **Research entries** — each description under 90 words, each `<figcaption>`
@@ -57,6 +64,29 @@ query in `index.html` — bump `N` when you change either, to bust browser cache
   in `index.html`.
 - **Photography gallery** — use the script below; don't hand-edit the figures.
 - **Eco-evo demo** — see `pages/research/eco-evo/demo/README.md`.
+
+---
+
+## Pages and URLs
+
+`index.html` holds all six panels and `site.js` shows one at a time. A `#research`
+fragment never reaches a server, so a link like `shzhang.com/#research` pasted into
+WeChat or iMessage previews as the Home page and Google sees one page, not six.
+
+So every panel is also a real path. `tools/build_pages.py` copies `index.html` to
+`research/index.html`, `films/`, `photography/`, `writing/` and `life/`, with that
+panel already `is-active` in the HTML and the `<!-- PAGE META -->` block in the
+`<head>` replaced by that page's own title, description, canonical URL and Open
+Graph tags (what chat previews read). It also writes `sitemap.xml`.
+
+- **`index.html` is the only source.** Never edit the copies.
+- **After editing `index.html`, run `python3 tools/build_pages.py`** and commit the
+  copies with it. `build_gallery.py` runs it for you after a gallery rebuild.
+- Titles, descriptions and preview images per page live in the `PAGES` dict at
+  the top of `build_pages.py`.
+- Once a page is loaded, `site.js` still switches panels in place: a click pushes
+  the path (`/writing/`), Back/Forward pop it, and old `/#writing` links still open
+  the right panel and are rewritten to the path.
 
 ---
 
