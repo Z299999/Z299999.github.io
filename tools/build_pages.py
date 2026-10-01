@@ -109,7 +109,10 @@ def build(quiet=False):
                       html, count=1, flags=re.DOTALL)
 
         # the panel is active in the HTML itself, so it shows before JS runs
-        # (and with JS off), and the sidebar marks it
+        # (and with JS off), and the sidebar marks it. Home is the one
+        # index.html marks, so un-mark it first.
+        html = html.replace('<section class="panel is-active" id="home"', '<section class="panel" id="home"', 1)
+        html = html.replace('<a href="/" data-panel="home" class="is-active">', '<a href="/" data-panel="home">', 1)
         html, n = re.subn(rf'<section class="panel" id="{pid}"',
                           f'<section class="panel is-active" id="{pid}"', html, count=1)
         assert n == 1, f"panel {pid} not found"
