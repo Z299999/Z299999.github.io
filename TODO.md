@@ -40,6 +40,13 @@ done without reconstructing the conversation it came from.
 
 ## Open, no trigger
 
+- **Preview images per page.** `tools/build_pages.py` sets the Open Graph image
+  that WeChat / iMessage / LinkedIn show next to a shared link. Research uses
+  the hexapod banner; Film, Photography, Writing and Life all fall back to the
+  profile photo. Each could carry something of its own (a poster, a photograph,
+  a van shot) — one line each in the `PAGES` dict at the top of that script.
+
+
 - **Home News, 2026-08 is empty by design.** The old placeholder row was
   removed rather than filled; News does not need a row per month. Nothing to
   do unless something from that month turns out to be worth a row.
