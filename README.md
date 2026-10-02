@@ -59,7 +59,7 @@ query in `index.html` — bump `N` when you change either, to bust browser cache
 - **Styles** — `assets/css/site.css`. The cinema theme is the `body.theme-dark`
   block; `site.js` toggles that class while the Photography panel is open.
 - **Research entries** — each description under 90 words, each `<figcaption>`
-  under 40; one banner figure per project, 1600 px wide, no responsive variants,
+  under 40; one banner figure per project, 2400 px wide, no responsive variants,
   saved as WebP at quality 90 (a fifth the bytes of PNG, no visible loss).
   The full rules are an HTML comment above the Research `<div class="entries">`
   in `index.html`.

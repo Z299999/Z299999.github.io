@@ -158,10 +158,12 @@
           </p>
 
           <!-- House rules for the entries below (keep them when adding one):
-               * One banner figure per project, 1600 px wide, no responsive
-                 variants -- the same image serves phone and desktop. Saved as
-                 WebP at quality 90: a fifth the bytes of PNG, and at 2x zoom
-                 thin lines and tick labels are indistinguishable. Pillow:
+               * One banner figure per project, 2400 px wide, no responsive
+                 variants -- the same image serves phone and desktop. 2400
+                 because the lightbox is 92vw on a Retina laptop (~2800 device
+                 px) and the inline figure ~1660: one file that is sharp in
+                 both. Saved as WebP at quality 90, from a master at least
+                 that wide (never upscaled). Pillow:
                  im.save(f, "WEBP", quality=90, method=6).
                * Every entry paragraph stays UNDER 90 WORDS -- the length of
                  the three older entries below. Say what the project is and
@@ -196,7 +198,7 @@
               </p>
               <figure class="entry__figure">
                 <img class="entry__img" src="/assets/img/research/hexapod-terrain.webp"
-                     width="1600" height="460" loading="lazy"
+                     width="2400" height="690" loading="lazy"
                      alt="The simulated hexapod mid-stride on rough undulating ground, its two stalked eyes turned toward the camera, coloured fruit spheres scattered across the floor.">
                 <figcaption>
                   Run 3, life 22, mid-stride on the roughest ground any life
@@ -229,7 +231,7 @@
               </p>
               <figure class="entry__figure">
                 <img class="entry__img" src="/assets/img/research/longview-graph.webp"
-                     width="1600" height="460" loading="lazy"
+                     width="2400" height="690" loading="lazy"
                      alt="A close view of the world graph with three unrelated nodes lit across the frame — Qualcomm, US drug pricing policy and OpenAI — each with its labelled edges to neighbours such as Apple, Merck and AMD, over a pale field of the rest of the graph.">
                 <figcaption>
                   Three unrelated corners lit together &mdash; Qualcomm,
@@ -261,7 +263,7 @@
               </p>
               <figure class="entry__figure">
                 <img class="entry__img" src="/assets/img/research/age-structured-delay.webp"
-                     width="1600" height="395" loading="lazy"
+                     width="2400" height="593" loading="lazy"
                      alt="Population density over time and age under three control strategies: nominal, naive feedback, and predictor feedback.">
                 <figcaption>
                   The population density
@@ -297,7 +299,7 @@
               </p>
               <figure class="entry__figure">
                 <img class="entry__img" src="/assets/img/research/random-vortex.webp"
-                     width="1600" height="355" loading="lazy"
+                     width="2400" height="532" loading="lazy"
                      alt="Simulated streamlines at t = 12 in three wall-bounded domains: the upper half-plane, a corner, and a belt.">
                 <figcaption>
                   Streamlines and vorticity at <span class="nowrap">t = 12</span>
@@ -326,7 +328,7 @@
               </p>
               <figure class="entry__figure">
                 <img class="entry__img" src="/assets/img/research/brain-module.webp"
-                     width="1600" height="743" loading="lazy"
+                     width="2400" height="1114" loading="lazy"
                      alt="Three-view projections of two Infomap modules within the Drosophila connectome.">
                 <figcaption>
                   Three-view projections of two second-level Infomap modules
