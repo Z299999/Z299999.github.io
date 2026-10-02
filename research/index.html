@@ -337,6 +337,35 @@
                 </figcaption>
               </figure>
             </div>
+
+            <div class="entry">
+              <h3>Obtaining High-quality Panorama from Videos</h3>
+              <p class="meta">
+                With Songlin Zhao &middot; Course project, EIE4512 Digital Image
+                Processing &middot; CUHK-Shenzhen &middot; 2022
+              </p>
+              <p>
+                A pipeline that turns a hand-held video sweep into one panorama.
+                Frames are chosen by a binary search on how much neighbours
+                overlap, so the stitch gets the frames it needs and no more; each
+                is projected onto a cylinder before SIFT, RANSAC and a projective
+                warp stitch it, so a wide field of view does not splay; and
+                because panning in low light smears the frames, the camera's
+                angular velocity is estimated from frame-to-frame motion and,
+                with the exposure time, gives the blur length a Wiener filter
+                removes.
+              </p>
+              <figure class="entry__figure">
+                <img class="entry__img" src="/assets/img/research/panorama-from-video.webp"
+                     width="2400" height="690" loading="eager"
+                     alt="A wide daytime panorama over the city around the CUHK-Shenzhen campus, with visible vertical seams between the stitched frames.">
+                <figcaption>
+                  The city around the CUHK-Shenzhen campus: one hand-held 1080p
+                  video, stitched. The seams and exposure steps between frames
+                  are left as the algorithm left them.
+                </figcaption>
+              </figure>
+            </div>
           </div>
         </section>
 
