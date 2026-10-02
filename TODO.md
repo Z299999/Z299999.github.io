@@ -13,6 +13,14 @@ done without reconstructing the conversation it came from.
 
 ## Waiting on something being published
 
+- **Code link for the panorama entry.** The Research entry *Obtaining
+  High-quality Panorama from Videos* has no "Code →" link because the
+  repository, `Z299999/eie4512-panorama-from-video`, is private (shared with
+  the co-author, Songlin Zhao). If it goes public, append to that entry's
+  `<h3>` the same `entry__paper` anchor the other entries use, pointing at
+  https://github.com/Z299999/eie4512-panorama-from-video, and re-run
+  `tools/build_pages.py`.
+
 - **arXiv link for the CDC paper.** When the preprint is posted, append the
   `Read paper →` link to the Research entry's `<h3>` — there is a TODO
   comment at the exact spot in `index.html` with the markup to use. Then
