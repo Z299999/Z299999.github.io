@@ -30,6 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     document.body.classList.toggle("theme-dark", target.id === "photography");
     document.body.classList.toggle("gallery-wide", !!target.querySelector(".photo-grid"));
+    // A lazy image inside a display:none panel is not fetched, and when the
+    // panel appears Safari does not always notice. The galleries get nudged by
+    // their relayout below; the handful of figures and posters do not, so ask
+    // for them outright.
+    target.querySelectorAll("img.entry__img[loading=lazy], img.film__poster[loading=lazy]")
+      .forEach((img) => { img.loading = "eager"; });
     if (window.relayoutGalleries) requestAnimationFrame(window.relayoutGalleries);
     window.scrollTo(0, 0);
   };

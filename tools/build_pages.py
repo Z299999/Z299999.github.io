@@ -39,7 +39,7 @@ PAGES = {
         "description": "Shuheng Zhang's research: PDE control, machines that learn "
                        "to learn, survival-driven robots, and one architecture for "
                        "intelligent control. Two projects run live.",
-        "image": "assets/img/research/hexapod-terrain.png",
+        "image": "assets/img/research/hexapod-terrain-og.jpg",  # JPEG copy: preview bots are not all WebP-aware
     },
     "films": {
         "title": "Film — Shuheng Zhang",
@@ -119,6 +119,15 @@ def build(quiet=False):
         html, n = re.subn(rf'(<a href="{path}" data-panel="{pid}")>',
                           r'\1 class="is-active">', html, count=1)
         assert n == 1, f"sidebar link for {pid} not found"
+
+        # the active panel's figures and posters load at once rather than lazily:
+        # they are in the viewport from the first paint, and lazy loading only
+        # delays them (and in Safari sometimes forgets them). Galleries stay lazy.
+        def eager(m):
+            return re.sub(r'loading="lazy"', 'loading="eager"', m.group(0))
+        html = re.sub(rf'<section class="panel is-active" id="{pid}".*?</section>',
+                      lambda m: re.sub(r'<img class="(?:entry__img|film__poster)"[^>]*>', eager, m.group(0)),
+                      html, count=1, flags=re.DOTALL)
 
         # body classes site.js would otherwise add on first paint
         classes = []

@@ -12,7 +12,7 @@
     <meta property="og:title" content="Research — Shuheng Zhang">
     <meta property="og:description" content="Shuheng Zhang's research: PDE control, machines that learn to learn, survival-driven robots, and one architecture for intelligent control. Two projects run live.">
     <meta property="og:url" content="https://shzhang.com/research/">
-    <meta property="og:image" content="https://shzhang.com/assets/img/research/hexapod-terrain.png">
+    <meta property="og:image" content="https://shzhang.com/assets/img/research/hexapod-terrain-og.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <!-- PAGE META END -->
     <!-- Every panel below is also served at its own path (/research/, /writing/, ...)
@@ -20,7 +20,7 @@
          editing this file; build_gallery.py runs it for you. -->
     <link rel="stylesheet" href="/assets/css/site.css?v=24">
     <script src="/assets/js/gallery.js?v=15" defer></script>
-    <script src="/assets/js/site.js?v=15" defer></script>
+    <script src="/assets/js/site.js?v=16" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -159,7 +159,10 @@
 
           <!-- House rules for the entries below (keep them when adding one):
                * One banner figure per project, 1600 px wide, no responsive
-                 variants -- the same image serves phone and desktop.
+                 variants -- the same image serves phone and desktop. Saved as
+                 WebP at quality 90: a fifth the bytes of PNG, and at 2x zoom
+                 thin lines and tick labels are indistinguishable. Pillow:
+                 im.save(f, "WEBP", quality=90, method=6).
                * Every entry paragraph stays UNDER 90 WORDS -- the length of
                  the three older entries below. Say what the project is and
                  what question it asks; the rest belongs in the linked paper,
@@ -192,8 +195,8 @@
                 experience compiles into files.
               </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="/assets/img/research/hexapod-terrain.png"
-                     width="1600" height="460" loading="lazy"
+                <img class="entry__img" src="/assets/img/research/hexapod-terrain.webp"
+                     width="1600" height="460" loading="eager"
                      alt="The simulated hexapod mid-stride on rough undulating ground, its two stalked eyes turned toward the camera, coloured fruit spheres scattered across the floor.">
                 <figcaption>
                   Run 3, life 22, mid-stride on the roughest ground any life
@@ -225,8 +228,8 @@
                 the system never trades.
               </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="/assets/img/research/longview-graph.png"
-                     width="1600" height="460" loading="lazy"
+                <img class="entry__img" src="/assets/img/research/longview-graph.webp"
+                     width="1600" height="460" loading="eager"
                      alt="A close view of the world graph with three unrelated nodes lit across the frame — Qualcomm, US drug pricing policy and OpenAI — each with its labelled edges to neighbours such as Apple, Merck and AMD, over a pale field of the rest of the graph.">
                 <figcaption>
                   Three unrelated corners lit together &mdash; Qualcomm,
@@ -257,8 +260,8 @@
                 with a decay rate explicit in the actuator delay.
               </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="/assets/img/research/age-structured-delay.png"
-                     width="1600" height="395" loading="lazy"
+                <img class="entry__img" src="/assets/img/research/age-structured-delay.webp"
+                     width="1600" height="395" loading="eager"
                      alt="Population density over time and age under three control strategies: nominal, naive feedback, and predictor feedback.">
                 <figcaption>
                   The population density
@@ -293,8 +296,8 @@
                   target="_blank" rel="noreferrer">Read paper &rarr;</a>
               </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="/assets/img/research/random-vortex.png"
-                     width="1600" height="355" loading="lazy"
+                <img class="entry__img" src="/assets/img/research/random-vortex.webp"
+                     width="1600" height="355" loading="eager"
                      alt="Simulated streamlines at t = 12 in three wall-bounded domains: the upper half-plane, a corner, and a belt.">
                 <figcaption>
                   Streamlines and vorticity at <span class="nowrap">t = 12</span>
@@ -322,8 +325,8 @@
                 real connectomes can be tested.
               </p>
               <figure class="entry__figure">
-                <img class="entry__img" src="/assets/img/research/brain-module.png"
-                     width="1600" height="743" loading="lazy"
+                <img class="entry__img" src="/assets/img/research/brain-module.webp"
+                     width="1600" height="743" loading="eager"
                      alt="Three-view projections of two Infomap modules within the Drosophila connectome.">
                 <figcaption>
                   Three-view projections of two second-level Infomap modules
