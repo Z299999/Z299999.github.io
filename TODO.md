@@ -13,12 +13,15 @@ done without reconstructing the conversation it came from.
 
 ## Waiting on something being published
 
-- **Code link for the panorama entry.** The Research entry *Obtaining
-  High-quality Panorama from Videos* has no "Code →" link because the
-  repository, `Z299999/eie4512-panorama-from-video`, is private (shared with
-  the co-author, Songlin Zhao). If it goes public, append to that entry's
-  `<h3>` the same `entry__paper` anchor the other entries use, pointing at
-  https://github.com/Z299999/eie4512-panorama-from-video, and re-run
+- **The panorama entry is hidden.** The Research entry *Obtaining
+  High-quality Panorama from Videos* (EIE4512, 2022, with Songlin Zhao) is
+  written and in `index.html`, inside an HTML comment marked `HIDDEN`, with
+  its banner in place. It is hidden because its repository,
+  `Z299999/eie4512-panorama-from-video`, is private and the entry would have
+  nothing to link to. To show it: remove the comment's opening and closing
+  lines; if the repository has gone public, also append to the `<h3>` the
+  same `entry__paper` anchor the other entries use, pointing at
+  https://github.com/Z299999/eie4512-panorama-from-video; then re-run
   `tools/build_pages.py`.
 
 - **arXiv link for the CDC paper.** When the preprint is posted, append the
