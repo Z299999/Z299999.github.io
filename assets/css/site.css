@@ -486,7 +486,11 @@ body.gallery-wide .content {
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 800px) {
+/* 1000px rather than a phone-sized breakpoint: an iPad held upright is 768
+   to 834px wide, and a 15rem sidebar plus the content padding left the photo
+   grid 498px, one column. Stacked, it gets the full width and two columns.
+   An iPad on its side (1024px and up) keeps the sidebar and still fits two. */
+@media (max-width: 1000px) {
   .site-shell {
     grid-template-columns: 1fr;
   }
