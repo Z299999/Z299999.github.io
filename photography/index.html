@@ -17,7 +17,13 @@
     <!-- PAGE META END -->
     <!-- Every panel below is also served at its own path (/research/, /writing/, ...)
          by tools/build_pages.py, which copies this file per panel. Re-run it after
-         editing this file; build_gallery.py runs it for you. -->
+         editing this file; build_gallery.py runs it for you.
+         Every href and src in this file is ROOT-ABSOLUTE (/assets/..., /van/),
+         never relative: site.js pushes /research/, /photography/, ... into the
+         address bar as the reader switches panels, and a URL resolved after
+         that -- a lazy image in Safari, the lightbox's img.src -- would resolve
+         against that folder and 404. That was why photos never loaded on an
+         iPad reached from Home. -->
     <link rel="stylesheet" href="/assets/css/site.css?v=24">
     <script src="/assets/js/gallery.js?v=15" defer></script>
     <script src="/assets/js/site.js?v=16" defer></script>
@@ -712,7 +718,7 @@
     <div class="lightbox" id="lightbox" hidden>
       <button class="lightbox__close" type="button" aria-label="Close">&times;</button>
       <button class="lightbox__nav lightbox__prev" type="button" aria-label="Previous">&lsaquo;</button>
-      <img class="lightbox__img" src="/" alt="">
+      <img class="lightbox__img" src="" alt="">
       <div class="lightbox__caption" id="lightbox-caption"></div>
       <button class="lightbox__nav lightbox__next" type="button" aria-label="Next">&rsaquo;</button>
     </div>

@@ -45,12 +45,15 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX = os.path.join(REPO, "index.html")
 
 GALLERIES = {
-    "photography": {"dir": "assets/img/photography", "src": "assets/img/photography",
+    "photography": {"dir": "assets/img/photography", "src": "/assets/img/photography",
                     "manifest": "tools/gallery.json", "prefix": "p",
                     "page": "index.html", "order": "desc"},
-    "life": {"dir": "assets/img/life", "src": "assets/img/life",
+    "life": {"dir": "assets/img/life", "src": "/assets/img/life",
              "manifest": "tools/life.json", "prefix": "l",
              "page": "index.html", "order": "desc"},
+    # "src" is what goes into the <img>: root-absolute for index.html (see the
+    # note in its <head> -- site.js changes the path as panels switch, so a
+    # relative src would 404 in Safari), relative for the standalone van page.
     # Van build — its grid lives on the standalone /van/ page (not the homepage)
     "vanlife": {"dir": "assets/img/vanlife", "src": "../assets/img/vanlife",
                 "manifest": "tools/vanlife.json", "prefix": "v",

@@ -88,9 +88,10 @@ def meta_block(path, title, description, image):
 
 def absolutize(html):
     """Relative hrefs/srcs resolve against /research/ in a sub-page, so make
-    them root-absolute. External, absolute, fragment and mailto links are
-    left alone."""
-    return re.sub(r'\b(href|src)="(?!(?:https?:|/|#|mailto:))', r'\1="/', html)
+    them root-absolute. External, absolute, fragment, mailto and empty values
+    are left alone. index.html is written root-absolute already (see the note
+    in its <head>), so this is a safety net for anything that slips in."""
+    return re.sub(r'\b(href|src)="(?!(?:https?:|/|#|mailto:|"))', r'\1="/', html)
 
 
 def build(quiet=False):
