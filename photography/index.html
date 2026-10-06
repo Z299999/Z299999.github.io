@@ -3,6 +3,12 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Every panel is reachable in place: a click pushes /research/, /writing/,
+         ... without a reload. From then on the browser resolves relative URLs
+         against that path, and a lazy image whose src is assets/... would be
+         fetched as /photography/assets/... and fail. Anchor everything to the
+         site root instead. -->
+    <base href="/">
     <!-- PAGE META START -->
     <title>Photography — Shuheng Zhang</title>
     <meta name="description" content="Photographs by Shuheng Zhang.">
