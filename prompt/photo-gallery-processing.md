@@ -1,5 +1,13 @@
 # Prompt: Process photos for the Photography gallery
 
+> **Superseded (2026-10-06).** `tools/build_gallery.py` now does all of this —
+> stable ids (`p0170.jpg`, never renamed), a manifest, de-duplication, and the
+> markup — for the Photography, Life and Van galleries:
+> `python3 tools/build_gallery.py add --gallery photography <originals…>`.
+> The steps below describe the hand process it replaced; the parameters
+> (1800 px, JPEG q82, EXIF stripped, newest first) are unchanged. See
+> `AGENTS.md` and the README.
+
 Use this when I give you a folder of full-resolution photos to add to the
 Photography section of the website (`index.html`, panel `#photography`).
 
