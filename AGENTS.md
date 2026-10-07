@@ -11,8 +11,9 @@ The owner's house rules for everything under `~/Documents` are in
    `7fec413`; local and `origin/main` were equal and the tree clean.
 2. `TODO.md` — everything that is waiting on a date, a publication or a fact.
 3. **Pushing to `main` publishes the site** (GitHub Pages, custom domain
-   `shzhang.com`, ~1 min). The owner wants to say "push" before anything visible
-   changes. Commit locally freely; push on their word. Something on this
+   `shzhang.com`, ~1 min). As agreed with the owner on 2026-10-06, push after
+   every commit by default; no separate confirmation is needed unless the
+   owner explicitly asks to keep that commit local. Something on this
    machine (probably the IDE's git sync) pushed once without anyone asking —
    check `origin/main` before assuming the live site matches your head.
 4. After a push, verify live with `curl` and a cache-buster (`?cb=$RANDOM`);
