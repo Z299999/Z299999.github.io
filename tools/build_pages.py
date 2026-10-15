@@ -35,7 +35,7 @@ START, END = "<!-- PAGE META START -->", "<!-- PAGE META END -->"
 # `image` is the Open Graph picture; swap any of them for something better.
 PAGES = {
     "research": {
-        "title": "Research — Shuheng Zhang",
+        "title": "Projects — Shuheng Zhang",
         "description": "Shuheng Zhang's research: PDE control, machines that learn "
                        "to learn, survival-driven robots, and one architecture for "
                        "intelligent control. Two projects run live.",
