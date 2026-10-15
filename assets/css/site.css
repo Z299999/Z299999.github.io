@@ -524,6 +524,3 @@ body.gallery-wide .content {
     flex: none;
   }
 }
-
-/* Research & Projects: the two groups on one panel (2026-10-14) */
-.panel__group{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:#777;margin:1.6rem 0 .6rem;font-weight:600}
