@@ -7,3 +7,7 @@ __pycache__/
 # The files are still on disk and edited as usual; git just ignores them.
 cv/*
 !cv/resume.pdf
+
+# Local only: the Claude Code session file and the inbox between repositories on the Mac mini (this repo is public)
+CLAUDE.md
+inbox/
