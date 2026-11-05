@@ -298,7 +298,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dropped": "2026-11-04: owner chose #10 (old numbering)"
   },
   {
    "id": "s2",
@@ -343,7 +344,8 @@
    "qa": true,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dropped": "2026-11-04: owner chose #3 (old numbering)"
   },
   {
    "id": "s5",
@@ -388,7 +390,8 @@
    "qa": true,
    "reception": "14:00 起",
    "note": "Official schedule labels program as 120 min, while program page identifies 94 min of shorts; 14:00 reception. Use schedule duration for conflicts.",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dropped": "2026-11-04: owner chose #8 (old numbering)"
   },
   {
    "id": "s8",
@@ -418,7 +421,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dropped": "2026-11-04: conflicts with chosen #10; The Specials at #6 (old numbering)"
   },
   {
    "id": "s10",
@@ -508,7 +512,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dropped": "2026-11-04: conflicts with #14; Gohan at #19 (old numbering)"
   },
   {
    "id": "s16",
@@ -538,7 +543,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dropped": "2026-11-04: owner chose #16 (old numbering)"
   },
   {
    "id": "s18",

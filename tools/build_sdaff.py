@@ -50,6 +50,11 @@ def link(url, text):
 
 def main():
     d = json.load(open(os.path.join(DIR, "data.json"), encoding="utf-8"))
+    # Screenings the owner dropped stay in data.json, marked "dropped", and are
+    # left off the page; so is a film with no screening left.
+    d["screenings"] = [s for s in d["screenings"] if not s.get("dropped")]
+    kept = {s["title"] for s in d["screenings"]}
+    d["titles"] = [t for t in d["titles"] if t["id"] in kept]
     titles = {t["id"]: t for t in d["titles"]}
 
     rows, numbers = [], {}
@@ -164,9 +169,8 @@ a {{ color: #00e; }}
 <h2>说明</h2>
 <ul>
 <li>同一部片出现两次，是两个不同场次。结束时间按片长估算。</li>
-<li>上面 21 个场次都在 UltraStar Cinemas Mission Valley（{day(verified) if verified else ""}对照官网每部片的页面核对过）；电影节其他场馆的放映不在这份候选里。</li>
+<li>上面 {len(rows)} 个场次都在 UltraStar Cinemas Mission Valley（{day(verified) if verified else ""}对照官网每部片的页面核对过）；电影节其他场馆的放映不在这份候选里。</li>
 <li>Q&amp;A 和 Reception 的结束时间官方大多没有公布。</li>
-<li>REEL VOICES 的短片合计 94 分钟，官方排片给了 120 分钟的时段。</li>
 <li>Filmmaker Brunch 只限业内嘉宾；Youth Days 是合作学校的学生项目，普通观众不能参加。</li>
 <li>来源：<a href="{e(d["officialSchedule"])}">SDAFF 2026 Schedule</a>、<a href="{e(d["officialSpecialEvents"])}">Special Events</a>{f"，{day(verified)}核对过" if verified else ""}。</li>
 </ul>
