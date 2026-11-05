@@ -62,7 +62,7 @@ def main():
             length += f'（排片时段 {s["slotMinutes"]}）'
         rows.append(
             f'<tr><td>{day(s["date"])}</td><td>{e(s["start"])}–{end_of(s)}</td>'
-            f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{TYPES[t["type"]]}</td>'
+            f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{e(t["director"])}</td><td>{TYPES[t["type"]]}</td>'
             f'<td>{length}</td><td>{e(s["price"])}</td>'
             f'<td>{e(t["tagline"])}</td><td>{"；".join(notes)}</td></tr>')
 
@@ -98,7 +98,7 @@ body {{ max-width: 980px; margin: 2em auto; padding: 0 16px; font-family: Georgi
 table {{ border-collapse: collapse; width: 100%; font-size: 15px; }}
 th, td {{ border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }}
 th {{ background: #eee; }}
-td:first-child, td:nth-child(2), .films td:nth-child(7) {{ white-space: nowrap; }}
+td:first-child, td:nth-child(2), .films td:nth-child(8) {{ white-space: nowrap; }}
 .scroll {{ overflow-x: auto; }}
 a {{ color: #00e; }}
 </style>
@@ -111,7 +111,7 @@ a {{ color: #00e; }}
 
 <h2>电影与短片合集（按场次）</h2>
 <div class="scroll"><table class="films">
-<tr><th>日期</th><th>时间</th><th>影院</th><th>片名</th><th>类型</th><th>片长</th><th>票价</th><th>简介</th><th>备注</th></tr>
+<tr><th>日期</th><th>时间</th><th>影院</th><th>片名</th><th>导演</th><th>类型</th><th>片长</th><th>票价</th><th>简介</th><th>备注</th></tr>
 {chr(10).join(rows)}
 </table></div>
 

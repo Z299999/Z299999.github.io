@@ -24,7 +24,8 @@
    "url": "https://sdaff.org/2026/movies/friends-house-is-here/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/09/18163247/The-Friends-House-is-Here_MAIN-STILL_Still-scaled.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Hossein Keshavarz、Maryam Ataei"
   },
   {
    "id": "t02",
@@ -37,11 +38,12 @@
    "url": "https://sdaff.org/2026/movies/bedford-park/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/09/15082902/Bedford-Park-Still-.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Stephanie Ahn"
   },
   {
    "id": "t03",
-   "name": "All of a Sudden · 滨口龙介",
+   "name": "All of a Sudden",
    "type": "feature",
    "minutes": 196,
    "price": "$15",
@@ -50,7 +52,8 @@
    "url": "https://sdaff.org/2026/movies/all-of-a-sudden/",
    "image": null,
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Ryusuke Hamaguchi（滨口龙介）"
   },
   {
    "id": "t04",
@@ -68,7 +71,8 @@
     "In the Morning Sun",
     "Slack Tide",
     "Born to Kill"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t05",
@@ -85,7 +89,8 @@
     "Just Not Naked Enough",
     "Church Girl",
     "Callback"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t06",
@@ -98,7 +103,8 @@
    "url": "https://sdaff.org/2026/movies/specials/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/09/10054517/The-Specials.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Eiji Uchida"
   },
   {
    "id": "t07",
@@ -111,7 +117,8 @@
    "url": "https://sdaff.org/2026/programs/reel-voices-3/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/09/10205941/Raes_Video_Diary_Rae_still3.jpg",
    "imageFrom": "Rae’s Video Diary",
-   "highlightedShorts": []
+   "highlightedShorts": [],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t08",
@@ -131,7 +138,8 @@
     "Florence From Ohio",
     "Thick & Sweet",
     "Still Standing"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t09",
@@ -144,7 +152,8 @@
    "url": "https://sdaff.org/2026/movies/were-nothing-at-all/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/09/01190828/WNAA_STILL_2.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Herman Yau（邱礼涛）"
   },
   {
    "id": "t10",
@@ -159,7 +168,8 @@
    "imageFrom": null,
    "highlightedShorts": [
     "Motel Grand-Pré"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t11",
@@ -175,7 +185,8 @@
    "highlightedShorts": [
     "WE WERE HERE",
     "GOLDEN ISLAND"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t12",
@@ -188,7 +199,8 @@
    "url": "https://sdaff.org/2026/movies/gohan/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/08/25221317/Sub-Still-2-scaled.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Chayanop Boonprakob、Baz Poonpiriya、Atta Hemwadee"
   },
   {
    "id": "t13",
@@ -201,7 +213,8 @@
    "url": "https://sdaff.org/2026/movies/girl-unknown/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/09/18164043/A-Girl-Unknown-scaled.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Zou Jing"
   },
   {
    "id": "t14",
@@ -214,7 +227,8 @@
    "url": "https://sdaff.org/2026/movies/tiktok-never-dies/",
    "image": "https://s3.amazonaws.com/nightjarprod/content/uploads/sites/462/2026/08/07090427/TikTok-Never-Dies_Martin-DiCicco_1-scaled.jpg",
    "imageFrom": null,
-   "highlightedShorts": null
+   "highlightedShorts": null,
+   "director": "Hao Wu"
   },
   {
    "id": "t15",
@@ -234,7 +248,8 @@
     "Caught in the Stream",
     "Sugarcoated Sugar-Free",
     "My Brother’s Memory Palace"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t16",
@@ -249,7 +264,8 @@
    "imageFrom": "We Buy Gold",
    "highlightedShorts": [
     "COPY, SAVE"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   },
   {
    "id": "t17",
@@ -264,7 +280,8 @@
    "imageFrom": "Sheesh, a Taylor Love Story",
    "highlightedShorts": [
     "THE DYING SKY"
-   ]
+   ],
+   "director": "多位导演（见合集页）"
   }
  ],
  "screenings": [
