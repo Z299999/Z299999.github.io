@@ -501,7 +501,8 @@
    "qa": true,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dim": true
   },
   {
    "id": "s15",
