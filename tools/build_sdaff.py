@@ -11,6 +11,7 @@ import datetime as dt
 import html
 import json
 import os
+import re
 import urllib.parse
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,6 +48,25 @@ def end_of(s):
 
 def link(url, text):
     return f'<a href="{e(url)}">{e(text)}</a>'
+
+
+def label_cells(page):
+    """Give every <td> its column header as data-label, for the phone layout.
+
+    In the screenings table the number, date and time make one bold heading
+    line on a phone (class "head") instead of three labelled lines.
+    """
+    def one_table(m):
+        tab = m.group(0)
+        heads = [re.sub(r"<[^>]+>", "", h) for h in re.findall(r"<th>(.*?)</th>", tab)]
+        lead = 3 if heads[:1] == ["编号"] else 0
+
+        def one_row(r):
+            cells = iter(range(len(heads)))
+            return re.sub(r"<td>", lambda _: (lambda i: f'<td class="head" data-label="{heads[i]}">'
+                          if i < lead else f'<td data-label="{heads[i]}">')(next(cells)), r.group(0))
+        return re.sub(r"<tr[^>]*>.*?</tr>", one_row, tab, flags=re.S)
+    return re.sub(r"<table[^>]*>.*?</table>", one_table, page, flags=re.S)
 
 
 def main():
@@ -126,6 +146,22 @@ th:first-child, td:first-child, td:nth-child(2), .films td:nth-child(3), .films 
 .scroll {{ overflow-x: auto; }}
 .dim, .dim td, .dim a {{ color: #aaa; }}
 a {{ color: #00e; }}
+/* Phones: each row becomes a short block, one field per line, labelled from
+   the column header (data-label, added by label_cells). No script. */
+@media (max-width: 700px) {{
+  body {{ margin: 1em auto; font-size: 16px; }}
+  table, tbody, tr, td {{ display: block; width: auto; }}
+  table {{ border: 0; }}
+  tr:first-child {{ display: none; }}
+  tr {{ border-top: 1px solid #999; padding: 8px 0; }}
+  td {{ border: 0; padding: 1px 0; white-space: normal !important; }}
+  td:empty {{ display: none; }}
+  td::before {{ content: attr(data-label) "："; color: #666; }}
+  td.head {{ display: inline; font-weight: bold; }}
+  td.head::before {{ content: none; }}
+  td.head + td.head::before {{ content: " "; }}
+  td.head:first-child::after {{ content: " 号"; }}
+}}
 </style>
 </head>
 <body>
@@ -183,7 +219,7 @@ a {{ color: #00e; }}
 </html>
 """
     with open(os.path.join(DIR, "index.html"), "w", encoding="utf-8") as f:
-        f.write(page)
+        f.write(label_cells(page))
     print("wrote sdaff-2026/index.html:", len(rows), "screenings,", len(events), "events,", len(shorts), "programs")
 
 
