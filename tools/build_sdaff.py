@@ -65,7 +65,7 @@ def main():
             length += f'（排片时段 {s["slotMinutes"]}）'
         rows.append(
             f'<tr><td>{n}</td><td>{day(s["date"])}</td><td>{e(s["start"])}–{end_of(s)}</td>'
-            f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{e(t["director"])}</td><td>{TYPES[t["type"]]}</td>'
+            f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{"<br>".join(e(x) for x in t["director"].split("、"))}</td><td>{TYPES[t["type"]]}</td>'
             f'<td>{length}</td><td>{e(s["price"])}</td>'
             f'<td>{e(t["tagline"])}</td><td>{"；".join(notes)}</td></tr>')
 
