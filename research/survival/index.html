@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival First, Tasks Later — Shuheng Zhang</title>
+    <meta
+      name="description"
+      content="A language agent handed an unknown body and one instruction, stay alive. Two simulation experiments, about 650 lives; next, a real wheeled robot that keeps itself charged."
+    >
+    <link rel="canonical" href="https://shzhang.com/research/survival/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Shuheng Zhang">
+    <meta property="og:title" content="Survival First, Tasks Later — Shuheng Zhang">
+    <meta property="og:description" content="A language agent handed an unknown body and one instruction, stay alive.">
+    <meta property="og:url" content="https://shzhang.com/research/survival/">
+    <meta property="og:image" content="https://shzhang.com/assets/img/research/hexapod-terrain-og.jpg">
+    <link rel="stylesheet" href="../../assets/css/site.css?v=24">
+    <style>
+      /* Slots waiting for material from other experiments. Delete a slot
+         when its content arrives; never publish one empty. */
+      .slot {
+        max-width: 46rem;
+        margin: 0 0 1rem;
+        padding: 1.2rem;
+        border: 1px dashed var(--line);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Facts on this page, and where each was checked (2026-10-27):
+         * 197 lives, five lineages; best life 308 min / 1952 fruit:
+           memory_lm exp0815_embodiedRobot/FINAL.md.
+         * 55 / 184 / 99 / 116 lives of m2 / M3 / M4 / M5, the last on
+           2026-10-06: exp0922_spiritsAndWorlds/spirits/mine_N/lives/NNN.json
+           at memory_lm d8c4fb5 (mine_1 is puppet lives, not counted).
+           M4 and M5 number their lives from 1 after dividing.
+         * M3 life 180, 353 fruit, 137.3 min: spirits/mine_3/lives/180.json.
+         * Life 60 of run_002: last tool call 55.9 min, 153 fruit then, 256 at
+           death 121.3 min: exp0815 RUN_002.md row ep60, and the ground-truth
+           extract in MAE_phd_research w00009 data/cutoff_run002_life60.csv.
+         * Leg lift 0.6 -> 0.15 cut drain 304 -> 166 W: mine_3
+           workspace.before-wall/README.md line 95.
+         * The wheeled robot: memory_lm exp1007_wheeledRobot/README.md
+           (concept design; no runs, no hardware results) and the plan sheet,
+           exp1007_wheeledRobot/docs/plan_sheet/ at memory_lm 32fbaf37 (v3, one camera; renders from 3d_models f209909).
+         Keep off this page: the HRI 2027 report, anything about advisors. -->
+    <div class="vanpage">
+      <p class="vanpage__top">
+        <a class="vanpage__back" href="../">&larr; Projects</a>
+      </p>
+
+      <h1>Survival First, Tasks Later</h1>
+      <p class="vanpage__status">
+        2026 &ndash; present &middot; two experiments in simulation; a real robot being built
+      </p>
+      <p>
+        A language agent is handed a body it knows nothing about and one
+        instruction: stay alive. There is no reward, no reinforcement learning
+        and no fine-tuning. Whatever it learns, it must write down in a folder of
+        its own; the folder outlives each life, and the next life starts from
+        what the last one wrote. The question is whether experience compiles
+        into files &mdash; and whether, given a body and nothing else to do, an
+        agent organises itself around keeping that body going before anyone
+        gives it a task.
+      </p>
+
+      <figure class="entry__figure">
+        <img src="../../assets/img/research/hexapod-terrain.webp"
+             width="2400" height="690"
+             alt="The simulated hexapod mid-stride on rough undulating ground, its two stalked eyes turned toward the camera, coloured fruit spheres scattered across the floor.">
+        <figcaption>
+          The simulated hexapod, mid-stride on the roughest ground any life was
+          given. A MuJoCo render replayed from the episode's logged pose; the
+          two stalks are its eyes, the spheres are fruit.
+        </figcaption>
+      </figure>
+
+      <section class="journal">
+        <h2>The setup</h2>
+        <p>
+          A coding agent runs in a sealed container and reaches a simulated
+          hexapod only over HTTP: twenty unlabeled channels (eighteen leg joints
+          and two eyes) and a one-page datasheet. The battery drains all the
+          time, faster when the legs work, and fruit scattered over the ground
+          refills it. That the body has six legs, how to stand, how to walk and
+          what fruit does are all things the agent has to find out by
+          experiment. Its workspace has a storage limit, so what it keeps, it
+          has to choose.
+        </p>
+      </section>
+
+      <section class="journal">
+        <h2>What happened in simulation</h2>
+        <p class="journal-date">August &ndash; October 2026</p>
+        <p>
+          The first experiment (August&ndash;September) ran five lineages for
+          197 lives, with the mind and the body frozen so that the workspace
+          was the only thing that changed. Its best life lasted 308 minutes and
+          ate 1,952 fruit. The second (from 22 September) made agents movable
+          between worlds; one of them was later copied twice, the way a cell
+          divides, so that three relatives could be compared and, later, put in
+          one maze together. By 6 October its four agents had lived 454 lives
+          &mdash; about 650 across both experiments. Lives in a lineage inherit
+          one another's files, so these are not independent trials.
+        </p>
+        <p>
+          What the agents wrote for themselves, life by life: a tripod gait;
+          odometry from the gyroscope; an explorer that walks toward the
+          least-visited direction; a table of gait power, from which one agent
+          cut its walking drain from about 304 to 166 W by lifting its legs
+          less; a map and a program to retrace its own track, which the next
+          life found still matched the world to two centimetres. The best life
+          of the second experiment ate 353 fruit in 137 minutes.
+        </p>
+        <p>
+          In one life the language model ran out of tokens 55.9 minutes in, and
+          every restart failed. The body went on foraging on the programs the
+          agent had written: it had eaten 153 fruit with the model and ate 103
+          more without it, then starved at 121.3 minutes. With nothing above
+          them, the programs left their own failures unhandled &mdash; which is
+          the next question as much as the result.
+        </p>
+        <!-- Video slot: simulation videos go here when exp0922 sends them. -->
+      </section>
+
+      <section class="journal">
+        <h2>Next: a real robot that keeps itself charged</h2>
+        <p class="journal-date">Being built &middot; no hardware results yet</p>
+        <p>
+          The same question moves onto real hardware: a wheeled robot about
+          25&nbsp;cm long, with one pan-tilt camera, a small arm and a basket, and the
+          coding agent running on board. It lives in a 1.8&nbsp;m wooden arena
+          with two charging docks. First it has to learn to find a dock, back
+          in and charge; only then comes a task &mdash; a dock gives power only
+          after the robot has delivered a ball, so working becomes how it keeps
+          charging. Two identical robots sharing the docks come later. Most
+          parts are in hand; the robot, the docks and the arena are being
+          built, and nothing has run yet.
+        </p>
+        <figure class="entry__figure">
+          <a href="../../assets/papers/survival-first-plan-sheet.pdf" target="_blank" rel="noreferrer">
+            <img src="../../assets/img/research/survival-plan-sheet.webp"
+                 width="2200" height="1700" loading="lazy"
+                 alt="One-page experiment plan: the question, the arena and the wheeled robot rendered from their CAD models, the curves to be measured, and four stages from build to two robots."></a>
+          <figcaption>
+            The experiment plan, October 2026. The curves on the right are the
+            expected shape, not data. Click for the PDF.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="journal">
+        <h2>See it</h2>
+        <p>
+          Lives of the simulation can be replayed in the console at
+          <a href="https://hexapod.shzhang.com/" target="_blank" rel="noreferrer">hexapod.shzhang.com</a>
+          (login required).
+        </p>
+      </section>
+    </div>
+  </body>
+</html>
