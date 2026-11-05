@@ -25,6 +25,7 @@ ADDRESSES = [
     ("University of San Diego, Warren Auditorium", "5998 Alcalá Park, San Diego, CA"),
 ]
 # Google Maps opens the app on phones that have it, the website elsewhere.
+DIM = ' class="dim"'
 MAPS = "https://www.google.com/maps/search/?api=1&query="
 EVENT_TYPES = {
     "reception": "酒会", "social": "Happy Hour", "awards": "颁奖",
@@ -57,10 +58,13 @@ def main():
     d["titles"] = [t for t in d["titles"] if t["id"] in kept]
     titles = {t["id"]: t for t in d["titles"]}
 
-    rows, numbers = [], {}
+    # "dim": screenings the owner is lukewarm on, shown in pale grey.
+    rows, numbers, dim_titles = [], {}, {}
     for n, s in enumerate(sorted(d["screenings"], key=lambda s: (s["date"], s["start"])), 1):
         t = titles[s["title"]]
-        numbers.setdefault(t["id"], []).append(f'{n}（{day(s["date"])[:5]}）')
+        num = f'{n}（{day(s["date"])[:5]}）'
+        numbers.setdefault(t["id"], []).append(f'<span class="dim">{num}</span>' if s.get("dim") else num)
+        dim_titles[t["id"]] = dim_titles.get(t["id"], True) and bool(s.get("dim"))
         notes = []
         if s["qa"]:
             notes.append("映后 Q&amp;A")
@@ -70,7 +74,7 @@ def main():
         if s["slotMinutes"] != t["minutes"]:
             length += f'（排片时段 {s["slotMinutes"]}）'
         rows.append(
-            f'<tr><td>{n}</td><td>{day(s["date"])}</td><td>{e(s["start"])}–{end_of(s)}</td>'
+            f'<tr{DIM if s.get("dim") else ""}><td>{n}</td><td>{day(s["date"])}</td><td>{e(s["start"])}–{end_of(s)}</td>'
             f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{"<br>".join(e(x) for x in t["director"].split("、"))}</td><td>{TYPES[t["type"]]}</td>'
             f'<td>{length}</td><td>{e(s["price"])}</td>'
             f'<td>{e(t["tagline"])}</td><td>{"；".join(notes)}</td></tr>')
@@ -79,7 +83,7 @@ def main():
     by_film = {}
     for kind in TYPES:
         by_film[kind] = "\n".join(
-            f'<tr><td>{link(t["url"], t["name"])}</td>'
+            f'<tr{DIM if dim_titles[t["id"]] else ""}><td>{link(t["url"], t["name"])}</td>'
             + (f'<td>{"<br>".join(e(x) for x in t["director"].split("、"))}</td>' if kind == "feature" else "")
             + f'<td>{t["minutes"]} 分钟</td><td>{e(t["price"])}</td><td>{e(t["tagline"])}</td>'
             f'<td>{"<br>".join(numbers[t["id"]])}</td></tr>'
@@ -118,8 +122,9 @@ body {{ max-width: 1240px; margin: 2em auto; padding: 0 16px; font-family: Georg
 table {{ border-collapse: collapse; width: 100%; font-size: 15px; }}
 th, td {{ border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }}
 th {{ background: #eee; }}
-td:first-child, td:nth-child(2), .films td:nth-child(3), .films td:nth-child(9) {{ white-space: nowrap; }}
+th:first-child, td:first-child, td:nth-child(2), .films td:nth-child(3), .films td:nth-child(9) {{ white-space: nowrap; }}
 .scroll {{ overflow-x: auto; }}
+.dim, .dim td, .dim a {{ color: #aaa; }}
 a {{ color: #00e; }}
 </style>
 </head>

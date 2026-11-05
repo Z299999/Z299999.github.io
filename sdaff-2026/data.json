@@ -360,7 +360,8 @@
    "qa": true,
    "reception": "18:00–19:30",
    "note": "Q&A per the official Q&A guide https://sdaff.org/2026/guides/qas/ (checked 2026-11-04).",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dim": true
   },
   {
    "id": "s6",
@@ -375,7 +376,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dim": true
   },
   {
    "id": "s7",
@@ -452,7 +454,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dim": true
   },
   {
    "id": "s12",
@@ -482,7 +485,8 @@
    "qa": false,
    "reception": "",
    "note": "",
-   "source": "existing_user_planner"
+   "source": "existing_user_planner",
+   "dim": true
   },
   {
    "id": "s14",
