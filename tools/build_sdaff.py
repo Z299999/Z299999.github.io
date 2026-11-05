@@ -16,6 +16,13 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR = os.path.join(REPO, "sdaff-2026")
 WEEK = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
 TYPES = {"feature": "长片", "shorts": "短片合集"}
+# Addresses from https://sdaff.org/2026/venues/ (checked 2026-11-04).
+ADDRESSES = [
+    ("UltraStar Cinemas Mission Valley", "7510 Hazard Center Drive, San Diego, CA 92108"),
+    ("San Diego Natural History Museum", "1788 El Prado, San Diego, CA 92101"),
+    ("UC San Diego Park & Market", "1100 Market St, San Diego, CA"),
+    ("University of San Diego, Warren Auditorium", "5998 Alcalá Park, San Diego, CA"),
+]
 EVENT_TYPES = {
     "reception": "酒会", "social": "Happy Hour", "awards": "颁奖",
     "artist_talk": "讲座", "special_screening": "特别场",
@@ -55,7 +62,7 @@ def main():
             length += f'（排片时段 {s["slotMinutes"]}）'
         rows.append(
             f'<tr><td>{day(s["date"])}</td><td>{e(s["start"])}–{end_of(s)}</td>'
-            f'<td>{link(t["url"], t["name"])}</td><td>{TYPES[t["type"]]}</td>'
+            f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{TYPES[t["type"]]}</td>'
             f'<td>{length}</td><td>{e(s["price"])}</td>'
             f'<td>{e(t["tagline"])}</td><td>{"；".join(notes)}</td></tr>')
 
@@ -91,7 +98,7 @@ body {{ max-width: 980px; margin: 2em auto; padding: 0 16px; font-family: Georgi
 table {{ border-collapse: collapse; width: 100%; font-size: 15px; }}
 th, td {{ border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }}
 th {{ background: #eee; }}
-td:first-child, td:nth-child(2), .films td:nth-child(6) {{ white-space: nowrap; }}
+td:first-child, td:nth-child(2), .films td:nth-child(7) {{ white-space: nowrap; }}
 .scroll {{ overflow-x: auto; }}
 a {{ color: #00e; }}
 </style>
@@ -104,7 +111,7 @@ a {{ color: #00e; }}
 
 <h2>电影与短片合集（按场次）</h2>
 <div class="scroll"><table class="films">
-<tr><th>日期</th><th>时间</th><th>片名</th><th>类型</th><th>片长</th><th>票价</th><th>简介</th><th>备注</th></tr>
+<tr><th>日期</th><th>时间</th><th>影院</th><th>片名</th><th>类型</th><th>片长</th><th>票价</th><th>简介</th><th>备注</th></tr>
 {chr(10).join(rows)}
 </table></div>
 
@@ -119,9 +126,15 @@ a {{ color: #00e; }}
 {chr(10).join(events)}
 </table></div>
 
+<h2>影院地址</h2>
+<ul>
+{chr(10).join(f'<li>{e(n)}：{e(a)}</li>' for n, a in ADDRESSES)}
+</ul>
+
 <h2>说明</h2>
 <ul>
 <li>同一部片出现两次，是两个不同场次。结束时间按片长估算。</li>
+<li>上面 21 个场次都在 UltraStar Cinemas Mission Valley（{day(verified) if verified else ""}对照官网每部片的页面核对过）；电影节其他场馆的放映不在这份候选里。</li>
 <li>Q&amp;A 和 Reception 的结束时间官方大多没有公布。</li>
 <li>REEL VOICES 的短片合计 94 分钟，官方排片给了 120 分钟的时段。</li>
 <li>Filmmaker Brunch 只限业内嘉宾；Youth Days 是合作学校的学生项目，普通观众不能参加。</li>
