@@ -11,6 +11,7 @@ import datetime as dt
 import html
 import json
 import os
+import urllib.parse
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR = os.path.join(REPO, "sdaff-2026")
@@ -23,6 +24,8 @@ ADDRESSES = [
     ("UC San Diego Park & Market", "1100 Market St, San Diego, CA"),
     ("University of San Diego, Warren Auditorium", "5998 Alcalá Park, San Diego, CA"),
 ]
+# Google Maps opens the app on phones that have it, the website elsewhere.
+MAPS = "https://www.google.com/maps/search/?api=1&query="
 EVENT_TYPES = {
     "reception": "酒会", "social": "Happy Hour", "awards": "颁奖",
     "artist_talk": "讲座", "special_screening": "特别场",
@@ -128,7 +131,7 @@ a {{ color: #00e; }}
 
 <h2>影院地址</h2>
 <ul>
-{chr(10).join(f'<li>{e(n)}：{e(a)}</li>' for n, a in ADDRESSES)}
+{chr(10).join(f'<li>{e(n)}：{link(MAPS + urllib.parse.quote(n + ", " + a), a)}</li>' for n, a in ADDRESSES)}
 </ul>
 
 <h2>说明</h2>
