@@ -11,7 +11,6 @@ import datetime as dt
 import html
 import json
 import os
-import urllib.parse
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR = os.path.join(REPO, "sdaff-2026")
@@ -42,15 +41,6 @@ def end_of(s):
     return f"{m // 60:02d}:{m % 60:02d}"
 
 
-def place(venue):
-    """The venue, its address and a map link, for one table cell."""
-    addr = dict(ADDRESSES).get(venue)
-    if not addr:
-        return e(venue)
-    maps = "https://www.google.com/maps/search/?api=1&query=" + urllib.parse.quote(addr)
-    return f'{e(venue)}<br>{link(maps, addr.split(", San Diego")[0])}'
-
-
 def link(url, text):
     return f'<a href="{e(url)}">{e(text)}</a>'
 
@@ -72,7 +62,7 @@ def main():
             length += f'（排片时段 {s["slotMinutes"]}）'
         rows.append(
             f'<tr><td>{day(s["date"])}</td><td>{e(s["start"])}–{end_of(s)}</td>'
-            f'<td>{place(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{e(t["director"])}</td><td>{TYPES[t["type"]]}</td>'
+            f'<td>{e(s["venue"])}</td><td>{link(t["url"], t["name"])}</td><td>{e(t["director"])}</td><td>{TYPES[t["type"]]}</td>'
             f'<td>{length}</td><td>{e(s["price"])}</td>'
             f'<td>{e(t["tagline"])}</td><td>{"；".join(notes)}</td></tr>')
 
@@ -85,7 +75,7 @@ def main():
             f'<tr><td>{day(v["date"])}</td><td>{e(time)}</td>'
             f'<td>{link(v["officialUrl"], v["title"])}</td>'
             f'<td>{EVENT_TYPES.get(v["type"], "")}</td>'
-            f'<td>{e(v["eligibility"])}</td><td>{place(v["venue"])}</td></tr>')
+            f'<td>{e(v["eligibility"])}</td><td>{e(v["venue"])}</td></tr>')
 
     shorts = []
     for t in d["titles"]:
@@ -121,7 +111,7 @@ a {{ color: #00e; }}
 
 <h2>电影与短片合集（按场次）</h2>
 <div class="scroll"><table class="films">
-<tr><th>日期</th><th>时间</th><th>影院和地址（点地址看地图）</th><th>片名</th><th>导演</th><th>类型</th><th>片长</th><th>票价</th><th>简介</th><th>备注</th></tr>
+<tr><th>日期</th><th>时间</th><th>影院</th><th>片名</th><th>导演</th><th>类型</th><th>片长</th><th>票价</th><th>简介</th><th>备注</th></tr>
 {chr(10).join(rows)}
 </table></div>
 
