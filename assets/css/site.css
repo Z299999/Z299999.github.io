@@ -259,6 +259,20 @@ img.film__poster {
   cursor: zoom-in;
 }
 
+/* Festival laurels under a film's text: a short row of small images. */
+.film__laurels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.2rem 0 0.9rem;
+}
+
+.film__laurel {
+  width: 9rem;
+  height: auto;
+}
+
 .film__poster--empty {
   display: flex;
   align-items: flex-end;

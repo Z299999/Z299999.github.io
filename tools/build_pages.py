@@ -44,7 +44,7 @@ PAGES = {
     "films": {
         "title": "Film — Shuheng Zhang",
         "description": "Documentary and creative films by Shuheng Zhang: Echos, "
-                       "Current, and Plant Pears for Your Heirs.",
+                       "Current, Guitar, and Plant Pears for Your Heirs.",
         "image": "assets/img/profile/profile.jpg",
     },
     "photography": {
